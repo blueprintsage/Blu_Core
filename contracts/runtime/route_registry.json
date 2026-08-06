@@ -1,0 +1,145 @@
+{
+  "contract_version": "0.1.0",
+  "golden_runtime": "v0.22.0",
+  "mandatory_restraint_order": {
+    "source_map_id": "exec.restraint_chain",
+    "steps": [
+      {"order": 1, "owner": "EXECLIB.ANTIDRIFT.001", "entrypoint": "pre_ingress_antidrift", "required_result_to_continue": "PERMIT"},
+      {"order": 2, "owner": "SERVICE.OPSRESTRAINT.001", "entrypoint": "ops_law_restraint", "required_result_to_continue": "PERMIT"},
+      {"order": 3, "owner": "RuntimeGate.Ingress", "entrypoint": "route_lock", "required_result_to_continue": "LOCKED"},
+      {"order": 4, "owner": "Exec.Scheduler", "entrypoint": "selected_owner_dispatch", "required_result_to_continue": "terminal packet proposal"},
+      {"order": 5, "owner": "RuntimeGate.Egress", "entrypoint": "terminal and ScopeLock validation", "required_result_to_continue": "scope-valid terminal packet"},
+      {"order": 6, "owner": "Exec", "entrypoint": "print or fail closed", "required_result_to_continue": "stop"}
+    ],
+    "fail_closed_on_missing_invalid_nonterminal_or_owner_mismatch": true
+  },
+  "runtimegate_ingress_order": {
+    "source_map_id": "exec.ingress",
+    "steps": [
+      "safety_precheck",
+      "unauthenticated_clone_first_read",
+      "unauthenticated_opsec_first_read",
+      "auth_first_read",
+      "slash_command_first_read",
+      "repo_bootstrap_first_read",
+      "workflow_resume_first_read",
+      "kernel_work_first_read",
+      "ordinary_conversation"
+    ],
+    "step_results": ["NO_MATCH", "LOCKED"],
+    "stop_after_locked": true
+  },
+  "declared_lane_classes": {
+    "source_map_id": "exec.ingress",
+    "values": ["auth", "diagnostic", "static_render", "repo_lookup", "workflow_resume", "internal_library", "ordinary_conversation", "sandbox"],
+    "route_table_only_value": "workflow",
+    "conflict_register_id": "UR-011"
+  },
+  "live_slash_routes": [
+    {"stem": "/ID", "lane_class": "auth", "owner": "SERVICE.AUTH.001", "source_or_contract": "SERVICE.AUTH.001::auth_gate", "terminal_packet_required": true, "source_map_id": "commands.routes"},
+    {"stem": "/echotrace", "lane_class": "diagnostic", "owner": "EXEC.SPINE_TRACE", "source_or_contract": "EXEC.SPINE_TRACE::safe_trace_render", "terminal_packet_required": true, "source_map_id": "commands.routes"},
+    {"stem": "/simcode", "lane_class": "sandbox", "owner": "PROGRAM.SIMCODE.001", "source_or_contract": "PROGRAM.SIMCODE.001::simcode_program", "terminal_packet_required": true, "source_map_id": "commands.routes"},
+    {"stem": "/memory", "lane_class": "workflow", "owner": "PROGRAM.MEMORY.001", "source_or_contract": "PROGRAM.MEMORY.001::memory_program", "terminal_packet_required": true, "source_map_id": "commands.routes"},
+    {"stem": "/commands", "lane_class": "static_render", "owner": "COMMANDS", "source_or_contract": "COMMANDS::boot_command_render", "terminal_packet_required": true, "source_map_id": "commands.routes"},
+    {"stem": "/help", "lane_class": "static_render", "owner": "COMMANDS", "source_or_contract": "COMMANDS::boot_help_render", "terminal_packet_required": true, "source_map_id": "commands.routes"}
+  ],
+  "active_command_forms": {
+    "source_map_id": "commands.live",
+    "values": [
+      "/ID <target> <answer>",
+      "/ID logout",
+      "/ID reset",
+      "/echotrace ingress",
+      "/echotrace scheduler",
+      "/echotrace egress",
+      "/echotrace all",
+      "/echotrace last",
+      "/echotrace <target>",
+      "/simcode <command>",
+      "/memory",
+      "/memory list",
+      "/memory list staged",
+      "/memory list <tag>",
+      "/memory tag auto",
+      "/memory import",
+      "/memory export",
+      "/commands",
+      "/help"
+    ]
+  },
+  "deferred_command_forms": {
+    "source_map_ids": ["commands.not_live", "programs.memory"],
+    "values": [
+      "/memory tag <id> <tag>",
+      "/memory keep",
+      "/memory archive",
+      "/memory trash",
+      "/memory purge"
+    ],
+    "routing_behavior": "not live; must not be listed by /commands"
+  },
+  "unavailable_command_surfaces": {
+    "source_map_id": "commands.not_live",
+    "values": ["/mood", "/verbosity", "/remind", "/cpm", "/DevMode", "/PASS"],
+    "notes": {
+      "/PASS": "Explicitly removed and not implemented as a Program, command, service, or ExecLib component.",
+      "/mood": "Not live even though MoodLib contains a force_show path; see UR-010."
+    }
+  },
+  "non_slash_routes": [
+    {
+      "id": "route.repo_bootstrap",
+      "match": "configured repo bootstrap target plus supported lookup verb after earlier ingress steps return NO_MATCH",
+      "lane_class": "repo_lookup",
+      "owner": "SERVICE.REPOBOOT.001",
+      "status": "active_route_with_undefined_owner_component",
+      "source_map_id": "exec.ingress"
+    },
+    {
+      "id": "route.workflow_resume",
+      "match": "active_phase_state",
+      "lane_class": "workflow_resume",
+      "owner": "active workflow owner",
+      "status": "active_but_owner_selection_fields_underspecified",
+      "source_map_id": "exec.scheduler"
+    },
+    {
+      "id": "route.kernel_work",
+      "match": "kernel-work input after earlier ingress steps return NO_MATCH",
+      "lane_class": "internal_library",
+      "owner": "EXECLIB.BLUCODE.001",
+      "status": "active_route_with_undefined_owner_component",
+      "source_map_id": "exec.scheduler"
+    },
+    {
+      "id": "route.ordinary_conversation",
+      "match": "all prior ingress steps return NO_MATCH after both restraints PERMIT",
+      "lane_class": "ordinary_conversation",
+      "owner": "Exec",
+      "status": "active_fallback_lane",
+      "persona_boundary": "Persona may shape wording only after route admission and before egress containment.",
+      "source_map_id": "exec.ingress"
+    }
+  ],
+  "artifact_context_hook": {
+    "owner": "SERVICE.CONTEXTINTAKE.001",
+    "status": "intent_gated_support_not_public_route",
+    "condition": "artifact-bearing turn requires context intake support",
+    "source_map_id": "exec.ingress"
+  },
+  "unknown_slash_behavior": {
+    "result": "no route and fail closed through the slash gate",
+    "ordinary_conversation_fallback_allowed": false,
+    "source_map_ids": ["commands.routes", "exec.ingress"]
+  },
+  "one_owner_constraints": {
+    "source_map_ids": ["exec.canon", "exec.ingress", "commands.validation", "operations.ownership"],
+    "rules": [
+      "RuntimeGate.Ingress locks exactly one lane and one owner.",
+      "A dispatch row resolves to exactly one owner.",
+      "Exec.Scheduler dispatches only the selected owner and declared dependencies.",
+      "RuntimeGate.Egress accepts exactly one packet for the locked owner.",
+      "Libraries assist, Services support, Programs own workflows, and Exec orchestrates and validates."
+    ]
+  }
+}

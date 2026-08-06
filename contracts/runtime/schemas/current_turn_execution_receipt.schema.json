@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/contracts/runtime/schemas/current_turn_execution_receipt.schema.json",
+  "title": "Blu v0.22.0 current-turn execution receipt",
+  "description": "The golden runtime does not name a separate receipt packet. For this extraction, the current-turn receipt is the declared terminal packet and inherits its exact shape without adding fields.",
+  "allOf": [
+    {"$ref": "terminal_packet.schema.json"}
+  ],
+  "x-blu-contract-status": "extraction_alias",
+  "x-source-map-id": "schema.current_turn_execution_receipt"
+}

@@ -21,7 +21,7 @@ canonical_base: 7aed76e
 
 | ID | Assignment | Owner | Status | Packet | Base | Collision domain / notes |
 |---|---|---|---|---|---|---|
-| BC-010 | Extract machine-readable runtime contracts from CTS | Codex | ready | Inline below | `7aed76e` | `contracts/runtime/`, contract-validation fixtures/tooling, runtime-domain logs; no behavior rewrite |
+| BC-010 | Extract machine-readable runtime contracts from CTS | Codex | review | Inline below | `7aed76e` | Work commit `40138b6e16f28c01904aae97158878468ee47ad0`; Claude semantic review targets the work commit, not the metadata record commit |
 | BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
 | BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
 
@@ -54,6 +54,23 @@ canonical_base: 7aed76e
 - **Starting branch:** clean `main` at `7aed76e`
 - **Recommended work branch:** `bc-010-runtime-contracts`
 - **Status at handoff:** `ready`
+
+### Amendment — commit identity bookkeeping
+
+- **Approved by:** Dad, by explicit instruction on 2026-08-05.
+- **Defective original requirement:** BC-010 required one implementation commit
+  while also requiring that commit's exact SHA to be recorded inside a tracked
+  file in the same commit.
+- **Why defective:** A Git commit cannot contain its own final hash. Changing
+  the recorded hash changes the tree and therefore produces a different commit
+  hash.
+- **Authorized method:** Create one reviewable implementation commit, capture
+  its exact SHA, then create one metadata-only commit that records the work SHA
+  in the assignment handoff and this index.
+- **Review target:** Claude's semantic review targets the implementation commit,
+  not the metadata-only record commit.
+- **Metadata boundary:** The record commit must not modify
+  `contracts/runtime/**`, `tools/**`, `tests/**`, or `kernel/golden/**`.
 
 ### Objective
 
@@ -260,6 +277,16 @@ Move BC-010 from `active` to `review` only when:
 - the work is committed as one reviewable, revertible commit;
 - the exact commit ID is recorded in this file;
 - no behavior implementation was added.
+
+### Implementation receipt
+
+- **Work commit:** `40138b6e16f28c01904aae97158878468ee47ad0`
+- **Review status:** `review`
+- **Semantic review target:** `40138b6e16f28c01904aae97158878468ee47ad0`
+- **Handoff:** `docs/domains/runtime/assignments/BC-010/handoff.md`
+- **Record method:** authorized metadata-only follow-up commit under the
+  amendment above
+- **Push status:** not pushed
 
 ### Handoff format
 

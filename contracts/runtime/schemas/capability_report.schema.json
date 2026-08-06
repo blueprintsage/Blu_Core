@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/contracts/runtime/schemas/capability_report.schema.json",
+  "title": "Blu v0.22.0 capability report",
+  "description": "The golden runtime requires capability honesty and blocked-state reporting but does not declare a deterministic capability-report field contract. This schema therefore asserts object shape only and must not be read as a completed design.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-blu-contract-status": "underspecified",
+  "x-source-map-id": "schema.capability_report"
+}

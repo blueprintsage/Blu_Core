@@ -123,9 +123,10 @@ For every non-trivial task:
 3. Read `docs/dev/docs_index.md`.
 4. Read `docs/dev/assistant_coding_behavior.md`.
 5. Read `docs/worklogs/assignments.md` and claim or confirm the assignment.
-6. Read the active domain index and continuity quartet.
-7. Read any named handoff, skill, pattern, or drill packet.
-8. Verify the assignment's base branch/commit before changing files.
+6. Read the exact domain assignment packet referenced by the assignment row.
+7. Read the active domain index and continuity quartet.
+8. Read any named handoff, skill, pattern, or drill packet.
+9. Verify the assignment's base branch/commit before changing files.
 
 If a required source is missing, record the block before changing files.
 
@@ -146,6 +147,9 @@ If a required source is missing, record the block before changing files.
 ## Branch and assignment rules
 
 - Check `docs/worklogs/assignments.md` before touching files.
+- The global assignment log is an index, not the canonical packet body.
+- Every assignment row must point to:
+  `docs/domains/<domain>/assignments/<assignment-id>/assignment.md`.
 - One checkout handles one assignment at a time.
 - Parallel work requires separate branches and worktrees.
 - Every packet states the base branch or exact base commit.
@@ -153,6 +157,41 @@ If a required source is missing, record the block before changing files.
 - Commit between assignments.
 - On completion, move the assignment to `review`, record the exact checks, and
   wait for integration approval.
+
+## Assignment records
+
+The canonical record for each assignment lives under its owning domain:
+
+```text
+docs/domains/<domain>/assignments/<assignment-id>/
+├── assignment.md
+├── handoff.md
+├── validation.md
+└── review.md
+```
+
+Rules:
+
+- `assignment.md` is the approved task packet and must exist before status moves
+  to `active`.
+- Approved scope changes are appended to `assignment.md` as dated amendments;
+  the original packet is not silently rewritten.
+- `handoff.md` records the implementer's result or blocked outcome.
+- `validation.md` records exact commands, outputs, checks, and limitations.
+- `review.md` records semantic review, integration disposition, and the approved
+  commit identity.
+- The global `docs/worklogs/assignments.md` stores status, owner, base, packet
+  path, and commit references only.
+- The owning domain quartet remains cumulative continuity. Assignment folders
+  preserve task-specific evidence.
+- Reusable failure knowledge belongs in the owning domain's `failures.md`.
+  Assignment-specific detail may remain in `handoff.md` or `validation.md`, with
+  a link from `failures.md` when the lesson should survive the assignment.
+- A folder does not authorize work by itself. The assignment must also be
+  approved in the global assignment log by Dad or Blu.
+
+Use `docs/dev/domain_assignment_record_standard.md` and the templates under
+`docs/dev/templates/domain_assignment/`.
 
 ## Verification
 
@@ -181,12 +220,21 @@ After writing to a danger zone, read it back and run the relevant machine check.
 
 ## Required logging
 
-After meaningful work, update the owning domain's:
+After meaningful work, update the owning domain's assignment record and
+continuity files:
 
 ```text
+assignments/<assignment-id>/handoff.md
+assignments/<assignment-id>/validation.md
 worklog.md
 failures.md       when an attempt fails or a path proves unsafe
 next_steps.md     when a safe continuation is known
+```
+
+The assigned reviewer updates:
+
+```text
+assignments/<assignment-id>/review.md
 ```
 
 Record:

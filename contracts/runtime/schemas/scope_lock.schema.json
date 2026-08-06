@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/contracts/runtime/schemas/scope_lock.schema.json",
+  "title": "Blu v0.22.0 ScopeLock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "active_task",
+    "requested_deliverable",
+    "allowed_subjects",
+    "allowed_actions",
+    "explicit_constraints",
+    "source_authority_required",
+    "workflow_boundary",
+    "prohibited_moves"
+  ],
+  "properties": {
+    "active_task": {"type": "string", "minLength": 1},
+    "requested_deliverable": {
+      "enum": ["answer", "file", "archive", "patch", "command_render", "analysis", "question", "refusal"]
+    },
+    "allowed_subjects": {"type": "array", "items": {"type": "string"}},
+    "allowed_actions": {"type": "array", "items": {"type": "string"}},
+    "explicit_constraints": {"type": "array", "items": {"type": "string"}},
+    "source_authority_required": {"type": "boolean"},
+    "workflow_boundary": {"type": "string", "minLength": 1},
+    "prohibited_moves": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "unrequested_scope_expansion",
+          "workflow_redirect",
+          "adjacent_optimization",
+          "unsupported_confidence",
+          "deliverable_shape_substitution",
+          "source_bypass",
+          "platform_abstraction_override",
+          "apology_without_behavior_change"
+        ]
+      }
+    }
+  },
+  "x-blu-contract-status": "explicit",
+  "x-source-map-id": "schema.scope_lock"
+}

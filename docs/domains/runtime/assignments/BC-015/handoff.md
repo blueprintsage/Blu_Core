@@ -9,8 +9,8 @@ last_reviewed: 2026-08-06
 - Assignment: BC-015 — Runtime Viability Audit
 - Exact base: `4b51427b361283715a24110409e031e191b52452`
 - Branch: `bc-015-runtime-viability-audit`
-- Audit work commit: pending
-- Metadata record commit: pending
+- Audit work commit: `9936cc4be2f7f397deebccdf7400e8b7b774df08`
+- Metadata record commit: this metadata receipt commit; exact SHA is reported externally
 - Semantic reviewer: Claude
 - Push status: pending
 
@@ -83,5 +83,5 @@ All required structural, existing-contract, unit, checksum, manifest, and protec
 ## Working tree and push
 
 - Pre-commit working tree: contains only BC-015 collision-domain changes.
-- Final clean state: pending commits.
-- Push status: pending.
+- Audit work commit state: clean immediately after commit.
+- Metadata and push status: pending at the time this receipt was written.

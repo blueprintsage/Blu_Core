@@ -276,5 +276,6 @@ last_reviewed: 2026-08-06
 
 - Exact base: `4b51427b361283715a24110409e031e191b52452`
 - Branch: `bc-015-runtime-viability-audit`
-- Audit work commit: pending
-- Metadata record commit: pending
+- Audit work commit: `9936cc4be2f7f397deebccdf7400e8b7b774df08`
+- Metadata record commit: reported externally because a commit cannot contain
+  its own final SHA

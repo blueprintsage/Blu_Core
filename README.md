@@ -6,8 +6,11 @@ architecture without making her less Blu.
 
 ## Current truth
 
-- Blu's complete current runtime is the CTS Markdown kernel.
-- The golden kernel is preserved byte-for-byte under
+- Blu's current CTS deployment is a Markdown source set with two source roles:
+  - `00_Instructions.md` is the GPT host/deployment instruction document.
+  - `01_Persona.md` through `06_Programs.md` are the six Blu kernel/runtime
+    capsules loaded as Markdown sources.
+- The complete golden CTS source set is preserved byte-for-byte under
   `kernel/golden/v0.22.0/`.
 - No Python Blu runtime exists in this bootstrap release.
 - `Blu_KB_Preview` is the current continuity/reference repository.
@@ -27,6 +30,7 @@ architecture without making her less Blu.
 AGENTS.md
 docs/dev/docs_index.md
 docs/architecture/current_runtime.md
+docs/sources/cts_source_roles.md
 docs/architecture/migration_centerline.md
 docs/worklogs/assignments.md
 ```

@@ -17,6 +17,7 @@ docs/worklogs/assignments.md
 
 ```text
 docs/architecture/current_runtime.md
+docs/sources/cts_source_roles.md
 docs/architecture/migration_centerline.md
 docs/sources/authority_map.md
 config/source_authority.json
@@ -26,7 +27,7 @@ config/source_authority.json
 
 | Domain | Path | Owns |
 |---|---|---|
-| Kernel | `docs/domains/kernel/` | golden source protection; Persona/Operations boundaries |
+| Kernel | `docs/domains/kernel/` | golden source protection; CTS source roles; Persona/Operations boundaries |
 | Runtime | `docs/domains/runtime/` | Exec, ExecLib, Programs, routing, validation, receipts |
 | Repository | `docs/domains/repository/` | live repo identity, indexed retrieval, source receipts |
 | Continuity | `docs/domains/continuity/` | MMU, StateTree, memcaps, reminders, Local Mirror |

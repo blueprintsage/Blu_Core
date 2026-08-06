@@ -1,21 +1,39 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "project": "Blu Core",
   "effective_date": "2026-08-05",
   "authority_order": [
     "dad_current_instruction",
     "approved_blu_core_decisions",
-    "cts_golden_kernel",
+    "cts_golden_source_set",
     "active_blu_core_docs",
     "live_continuity_repo",
     "approved_references",
     "legacy_or_experimental"
   ],
-  "golden_kernel": {
+  "golden_cts_source_set": {
     "name": "Blu v0.22.0 CTS",
     "archive": "Blu_v0_22_0_5_22_26_2104_CTS.zip",
     "repo_path": "kernel/golden/v0.22.0",
-    "immutable": true
+    "immutable": true,
+    "source_roles": {
+      "deployment_instruction": [
+        "00_Instructions.md"
+      ],
+      "kernel_runtime_capsules": [
+        "01_Persona.md",
+        "02_Operations_Law.md",
+        "03_Exec.md",
+        "04_Exec_Library.md",
+        "05_Commands.md",
+        "06_Programs.md"
+      ]
+    },
+    "terminology": {
+      "cts_source_set": "00_Instructions.md plus the six kernel/runtime capsules",
+      "kernel": "01_Persona.md through 06_Programs.md",
+      "deployment_instruction": "00_Instructions.md; loaded in the GPT instruction box"
+    }
   },
   "continuity_repository": {
     "name": "Blu_KB_Preview",

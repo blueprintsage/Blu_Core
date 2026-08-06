@@ -72,6 +72,19 @@ authority or Python implementation. The earlier 2026-08-05 AGENTS/docs-index
 governance update was authorized by Dad and Blu. BC-010-C1 restores discovery
 here without modifying `AGENTS.md`.
 
+## Runtime viability audit
+
+```text
+docs/domains/runtime/viability/README.md
+docs/domains/runtime/viability/evidence_register.json
+docs/domains/runtime/viability/viability_matrix.json
+docs/domains/runtime/viability/probe_catalog.md
+docs/domains/runtime/viability/audit_report.md
+```
+
+BC-015 classifies current evidence separately from successor disposition. It is
+an audit and inventory layer, not runtime implementation or behavioral proof.
+
 ## Project-wide guides
 
 ```text

@@ -210,3 +210,71 @@ last_reviewed: 2026-08-06
 - Integrated reviewed state before closure:
   `8a37ae3c62829f16f949f5896d2bef0542721565`.
 - No runtime contracts, validator code, tests, or golden sources changed.
++
+## 2026-08-06 — BC-015 runtime viability audit
+
+### What changed
+
+- Created an evidence register, 30-record viability matrix, 24-probe safe host
+  catalog, audit guide, and audit report under
+  `docs/domains/runtime/viability/`.
+- Covered all 47 component entries, 76 normalized route-surface entries, 12
+  parity requirements, and 28 unresolved items.
+- Classified no capability as `live_and_stable`; preserved Dad and Blu's
+  Auth, OPSEC, and Persona warmth observations as
+  `live_but_nondeterministic_or_host_dependent`.
+- Kept current OPSEC behavior separate from the approved successor pre-ingress
+  restraint.
+- Recorded the v0.15.2 historical archive as unavailable without reconstructing
+  its contents.
+- Added standard-library-only validation and nine required negative tests.
+- Added the BC-015 assignment quartet and documentation discovery.
+- Did not implement runtime behavior or modify golden sources, runtime
+  contracts, architecture, configuration, or runtime decisions.
+
+### What was tested or reviewed
+
+- Verified the exact base and clean startup state.
+- Read the required governance, architecture, source, runtime continuity,
+  extracted contract, prior review, and golden CTS inputs.
+- Verified all eight golden checksum entries before audit work.
+- `python tools/validate_viability_audit.py` passed.
+- `python -m unittest discover -s tests/viability -p "test_*.py"` passed nine
+  tests during implementation.
+- Final Git, manifest, protected-path, contract, checksum, and unit-test
+  receipts are recorded in `assignments/BC-015/validation.md`.
+
+### What worked
+
+- Mechanical coverage is complete and exact.
+- Evidence and successor provenance remain separate.
+- The validator rejects unknown classifications, missing evidence, incomplete
+  coverage, duplicate IDs, invalid dispositions, declaration-only stable
+  claims, incomplete historical evidence, and successor-as-golden projection.
+
+### What failed or remains unavailable
+
+- The historical v0.15.2 archive was unavailable.
+- No current Blu GPT-host probe was executed; all 24 probes remain for Dad or
+  Blu.
+
+### Known risks
+
+- Grouped records must not be interpreted as approval of current component
+  topology.
+- Proposed dispositions remain non-final.
+- Auth and OPSEC details remain protected and require security-authorized
+  specification work.
+
+### Next safe step
+
+- Claude reviews the BC-015 audit work commit read-only; Dad and Blu decide
+  probe execution, historical-source reopening, and any successor
+  specification assignment.
+
+### Commit or patch identity
+
+- Exact base: `4b51427b361283715a24110409e031e191b52452`
+- Branch: `bc-015-runtime-viability-audit`
+- Audit work commit: pending
+- Metadata record commit: pending

@@ -14,17 +14,15 @@ Python runtime.
 
 ## Next safe step
 
-Prepare a bounded assignment packet for a Runtime Viability Audit before
-starting Python runtime implementation.
+Claude performs a read-only semantic review of the BC-015 audit work commit.
+Dad and Blu may then:
 
-The audit must distinguish:
+1. run selected safe probes from
+   `docs/domains/runtime/viability/probe_catalog.md`;
+2. supply the exact v0.15.2 baseline archive so historical evidence can be
+   reopened with checksum and member-path receipts;
+3. decide whether the evidence is sufficient to issue a specification
+   assignment for the smallest successor control plane described in the audit.
 
-1. live and stable behavior;
-2. live but nondeterministic or host-dependent behavior;
-3. declared but not observably functioning behavior;
-4. conflicting or underspecified behavior;
-5. explicitly deferred or removed behavior;
-6. new successor-runtime capability.
-
-Do not begin BC-020, BC-030, or Python implementation until the applicable
-assignment packet is approved and its exact base is named.
+Do not implement that control plane, begin BC-020 or BC-030, restore PASS, or
+resolve the 28 current-source gaps without an approved packet and named base.

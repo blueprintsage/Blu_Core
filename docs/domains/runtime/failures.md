@@ -60,3 +60,17 @@ last_reviewed: 2026-08-06
 - Successor architecture decisions must not be projected backward into
   golden-source extraction. Record the approved future boundary in project
   decisions while preserving the CTS gap in generated contracts.
+
+## 2026-08-06 — BC-015 evidence limits
+
+- An `ACTIVE` Markdown status, component entry, route row, parity case, or
+  passing static validator is not current behavioral evidence. BC-015 therefore
+  classifies no capability as `live_and_stable` without repeatable GPT-host
+  observations.
+- The required `2026-05-02_1333_Blu_v0.15.2_Baseline.zip` archive was not
+  present in the attachment bundle or repository. Historical member paths,
+  checksum, and direct behavior evidence must remain unavailable; do not
+  reconstruct them from conversation memory.
+- A successor decision cannot repair current provenance. Current OPSEC remains
+  nondeterministic and lane-underspecified even though the successor
+  pre-ingress restraint is approved.

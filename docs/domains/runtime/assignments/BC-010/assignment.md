@@ -1,49 +1,15 @@
-# Blu Core Assignment Log
+# BC-010 — Golden Runtime Contract Extraction
 
-status: active
-owner: docs/worklogs
-last_reviewed: 2026-08-05
-canonical_base: 7aed76e
+status: review
+owner: Codex
+semantic_reviewer: Claude
+record_status: backfilled
+backfilled_on: 2026-08-05
+source_record: docs/worklogs/assignments.md inline approved packet
 
-## Rules
-
-1. Read `AGENTS.md` before claiming work.
-2. One owner per assignment and collision domain.
-3. Every implementation packet names its base branch or commit.
-4. One assignment per checkout; parallel work uses branches and worktrees.
-5. The implementing agent runs checks and commits verified work.
-6. Completion moves to `review`; Dad or Blu authorizes integration.
-7. Golden kernel files are never an implementation collision domain.
-8. Assignment status follows: `spec-needed` → `ready` → `active` → `review` → `done`.
-9. Use `blocked` when an assignment cannot safely continue; record the reason before changing scope.
-
-## Implementation assignments
-
-| ID | Assignment | Owner | Status | Packet | Base | Collision domain / notes |
-|---|---|---|---|---|---|---|
-| BC-010 | Extract machine-readable runtime contracts from CTS | Codex | review | `docs/domains/runtime/assignments/BC-010/assignment.md` | `7aed76e` | Work commit `40138b6e16f28c01904aae97158878468ee47ad0`; Claude semantic review targets the work commit, not the metadata record commit |
-| BC-010-C1 | Runtime contract extraction corrections | Codex | review | `docs/domains/runtime/assignments/BC-010-C1/assignment.md` | `38611bf4b8051c858dcbbc30a07904d0117211b3` | Repair work commit `63c8b692403fe5ec1a9433a8313a7980fbd55437`; metadata-only record follows; Claude reviews the repair work commit; push explicitly authorized 2026-08-06 |
-| BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
-| BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
-
-## Design assignments
-
-| ID | Assignment | Owner | Status | Notes |
-|---|---|---|---|---|
-| BC-001 | Establish bootstrap authority and golden source | Blu | done | Verified on clean `main` at `7aed76e`; live history has two commits rather than the four-commit bootstrap plan, but all protected artifacts and checksums passed |
-
-## Completed
-
-- BC-001 — Blu Core bootstrap authority and CTS golden source verified at `7aed76e`.
-- Governance, source authority, migration boundaries, golden CTS runtime, validation evidence, and completion records are present.
-- All eight golden checksums passed.
-- All repository manifest checksums passed.
-- All seven extracted runtime files are byte-identical to their ZIP members.
-- `git diff --check` passed.
-- Working tree was clean and synchronized with `origin/main`.
-- The documented four-commit bootstrap plan versus two-commit live history is a non-blocking provenance discrepancy. History was not rewritten.
-
-## BC-010 — Golden Runtime Contract Extraction
+> This task-specific record was backfilled from the approved inline packet.
+> Original base, owner, scope, amendment, completion rules, and receipt text are
+> preserved below without rewriting the original assignment history.
 
 ### Assignment identity
 
@@ -312,14 +278,3 @@ Push status:
 Claude then performs a read-only semantic review against the golden CTS source.
 Claude does not modify the BC-010 implementation branch unless Blu or Dad issues
 a separate correction assignment.
-
-## Standing guardrails
-
-- Bootstrap checks: `git diff --check` and
-  `sha256sum -c kernel/golden/v0.22.0/SHA256SUMS`.
-- Do not touch `kernel/golden/`.
-- Blu's current runtime is the Markdown CTS kernel.
-- No Python Blu runtime exists yet.
-- Contract-validation tooling is not runtime implementation.
-- Do not restore legacy `library/` SkillForge routing.
-- Do not begin BC-020 or BC-030 before its packet is approved and its base is named.

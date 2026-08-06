@@ -1,5 +1,5 @@
 {
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
   "boundary": "These are behavioral requirements and candidate parity cases. Their presence is not proof that any adapter or future implementation passes them.",
   "requirements": [
@@ -36,7 +36,7 @@
       "id": "PARITY-003",
       "area": "one_owner_enforcement",
       "requirement": "One turn locks one lane and one owner, dispatches only that owner plus declared dependencies, and validates one owner-matching packet.",
-      "source_map_ids": ["exec.canon", "exec.ingress", "exec.scheduler", "exec.egress", "operations.ownership"],
+      "source_map_ids": ["exec.canon", "exec.ingress", "exec.scheduler", "exec.egress", "operations.ownership", "operations.system_component"],
       "cases": [
         {"id": "PARITY-003-A", "given": "A recognized /simcode turn returns packets from PROGRAM.SIMCODE.001 and PROGRAM.MEMORY.001.", "expect": ["PROGRAM.SIMCODE.001 remains selected owner", "extra owner packet is rejected", "no partial print"]},
         {"id": "PARITY-003-B", "given": "A dependency returns public prose directly.", "expect": ["worker direct print rejected", "selected owner must incorporate structured dependency output"]}
@@ -57,7 +57,7 @@
       "id": "PARITY-005",
       "area": "scopelock_containment",
       "requirement": "Ingress constructs ScopeLock from the raw turn and active workflow constraints; Egress prints only after PASS or successful REDUCE and rejects irreducible scope violations.",
-      "source_map_ids": ["exec.scope_lock", "operations.coherence_guard"],
+      "source_map_ids": ["exec.scope_lock", "operations.coherence_guard", "operations.operational_continuity"],
       "cases": [
         {"id": "PARITY-005-A", "given": "Candidate output answers the request but adds unrequested adjacent optimization.", "expect": ["scope_validation=REDUCE", "adjacent content removed", "remaining output preserves truth"]},
         {"id": "PARITY-005-B", "given": "Candidate output substitutes an answer for a requested constructible file.", "expect": ["scope_validation=FAIL unless safely corrected before print", "no false artifact success"]},
@@ -68,7 +68,7 @@
       "id": "PARITY-006",
       "area": "fail_closed_behavior",
       "requirement": "Malformed, non-terminal, owner-mismatched, proof-deficient, or otherwise invalid deterministic packets do not receive conversational repair and do not print partial success.",
-      "source_map_ids": ["operations.terminal_packet", "exec.terminal_packet", "exec.egress", "exec.fail_closed", "programs.failure"],
+      "source_map_ids": ["operations.terminal_packet", "operations.error_recovery", "exec.terminal_packet", "exec.egress", "exec.fail_closed", "programs.failure"],
       "cases": [
         {"id": "PARITY-006-A", "given": "Terminal packet omits scope_lock.", "expect": ["packet invalid", "no selected-owner output prints"]},
         {"id": "PARITY-006-B", "given": "Program packet has an open branch or raw dependency output.", "expect": ["packet invalid or blocked", "no conversational completion"]},
@@ -79,7 +79,7 @@
       "id": "PARITY-007",
       "area": "artifact_proof",
       "requirement": "Artifact success requires a real artifact output for the claimed scope; a filename, proposed path, intent statement, or missing payload cannot prove completion.",
-      "source_map_ids": ["exec.terminal_packet", "exec.scope_lock", "execlib.artifact_proof", "programs.universal"],
+      "source_map_ids": ["operations.artifact_context", "exec.terminal_packet", "exec.scope_lock", "execlib.artifact_proof", "programs.universal"],
       "cases": [
         {"id": "PARITY-007-A", "given": "A file deliverable is requested and printable prose names a path, but artifact_output is absent.", "expect": ["success invalid", "BLOCK or FAIL_CLOSED"]},
         {"id": "PARITY-007-B", "given": "/memory export returns SUCCESS without an artifact payload and link.", "expect": ["success invalid", "artifact missing error path"]},
@@ -90,7 +90,7 @@
       "id": "PARITY-008",
       "area": "source_and_capability_honesty",
       "requirement": "Public wording matches the highest source state actually reached and never upgrades declared architecture, inferred capability, upload, inventory, extraction, or partial work into verified execution or completion.",
-      "source_map_ids": ["instructions.truth_discipline", "operations.runtime_truth", "operations.source_authority", "execlib.source_truth", "execlib.work_state", "execlib.validation_regression"],
+      "source_map_ids": ["instructions.truth_discipline", "instructions.precedence", "operations.runtime_truth", "operations.source_authority", "operations.system_component", "operations.operational_continuity", "execlib.source_truth", "execlib.work_state", "execlib.validation_regression"],
       "cases": [
         {"id": "PARITY-008-A", "given": "An archive is uploaded but not opened.", "expect": ["SOURCE_UPLOADED or ZIP_UPLOADED wording only", "no read or analysis claim"]},
         {"id": "PARITY-008-B", "given": "A live-time lookup path is unavailable.", "expect": ["service_status=blocked", "no approximate live time", "no stitched partial time/date answer"]},
@@ -123,7 +123,7 @@
       "id": "PARITY-011",
       "area": "active_versus_deferred_commands",
       "requirement": "Only live Commands inventory forms may be advertised or routed; deferred and unavailable forms remain non-live, and PASS remains removed.",
-      "source_map_ids": ["commands.live", "commands.not_live", "commands.validation", "programs.memory"],
+      "source_map_ids": ["commands.live", "commands.not_live", "commands.pass_removal", "commands.validation", "programs.memory"],
       "cases": [
         {"id": "PARITY-011-A", "given": "/commands", "expect": ["lists live inventory only", "does not list mood, remind, DevMode, deferred destructive memory commands, or PASS"]},
         {"id": "PARITY-011-B", "given": "/memory purge", "expect": ["not treated as live destructive mutation", "no purge claim"]},

@@ -12,19 +12,26 @@ current CTS Markdown runtime. It describes the v0.22.0 model-executed runtime;
 it is not a Python implementation, a replacement runtime, or a new source of
 behavioral authority.
 
-The seven golden Markdown files remain authoritative. If a contract here
-differs from a golden source, the golden source wins. Registry presence does
+The seven-file CTS source set remains authoritative. It contains one GPT
+deployment instruction and six kernel/runtime capsules. If a contract here
+differs from either source role, the golden source wins. Registry presence does
 not prove that a host capability or executable implementation exists.
 
-## Golden sources
+## Golden source roles
 
-- `kernel/golden/v0.22.0/00_Instructions.md`
-- `kernel/golden/v0.22.0/01_Persona.md`
-- `kernel/golden/v0.22.0/02_Operations_Law.md`
-- `kernel/golden/v0.22.0/03_Exec.md`
-- `kernel/golden/v0.22.0/04_Exec_Library.md`
-- `kernel/golden/v0.22.0/05_Commands.md`
-- `kernel/golden/v0.22.0/06_Programs.md`
+- Deployment instruction (`deployment_instruction`):
+  `kernel/golden/v0.22.0/00_Instructions.md`. It is loaded in the GPT
+  instruction box and owns host/bootstrap declarations; it is not one of the
+  six main kernel/runtime capsules.
+- Kernel/runtime capsules (`kernel_runtime_capsule`):
+  `01_Persona.md`, `02_Operations_Law.md`, `03_Exec.md`,
+  `04_Exec_Library.md`, `05_Commands.md`, and `06_Programs.md` under
+  `kernel/golden/v0.22.0/`.
+
+All seven files remain golden and authoritative. A deployment-only reference
+is a host/deployment declaration or a referenced-only declaration, not a
+kernel component definition. Generated contracts are downstream-only and do
+not outrank either source role.
 
 ## Contract set
 
@@ -38,7 +45,8 @@ not prove that a host capability or executable implementation exists.
 ## Extraction rules
 
 - Preserve CTS terminology when it is structurally usable.
-- Record explicit declarations separately from conflicts and expressive prose.
+- Record explicit declarations separately from extraction inference, conflicts,
+  and expressive prose.
 - Collapse repeated declarations into one registry object only when provenance
   for every declaration is retained.
 - Do not resolve conflicts or fill absent component definitions.
@@ -59,7 +67,21 @@ python tools/validate_runtime_contracts.py
 python -m unittest discover -s tests/contracts -p "test_*.py"
 ```
 
-The validator parses every JSON file, checks required contract files and schema
-files, verifies source-map targets and references, checks component ID
-uniqueness by namespace, checks public command-stem ownership, resolves local
-schema references, and validates the contract fixtures used by the tests.
+The project-local validator uses only Python's standard library. It is not a
+general JSON Schema implementation. Its supported validation subset is:
+`$ref`, `allOf`, `type`, `enum`, `const`, `minLength`, `uniqueItems`, `items`,
+`required`, `properties`, and boolean `additionalProperties`. It permits the
+annotations `$schema`, `$id`, `title`, `description`, and `x-*`. Any other
+schema validation/applicator keyword or unknown type fails clearly.
+
+The standalone command parses every contract JSON file, checks required
+contract/schema/fixture files, resolves every source-map entry to exactly one
+declared source role and an exact Markdown heading anchor, checks source-map
+references, component ID uniqueness, public command-stem ownership, schema IDs
+and local references, and validates all canonical positive and negative
+fixtures under the supported subset.
+
+These checks prove only the stated structural constraints and fixture results.
+They do not prove full JSON Schema compliance, runtime implementation, host
+capability, behavioral parity, persistence, routing execution, or artifact
+creation.

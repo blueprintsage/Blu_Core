@@ -32,3 +32,19 @@ last_reviewed: 2026-08-05
   handoff record. Dad authorized BC-010 to use one implementation commit
   followed by one metadata-only receipt commit; semantic review targets the
   implementation SHA.
+
+## 2026-08-05 — BC-010-C1 reusable extraction failures
+
+- Deployment instructions and kernel/runtime capsules must not be flattened
+  into one source role. A host-only declaration can constrain loading,
+  precedence, or exclusive dispatch without defining a kernel component.
+- Unsupported JSON Schema validation or applicator keywords must never be
+  ignored. A small local validator must publish its allowlist and fail clearly
+  when a schema exceeds it.
+- Extraction inference must be labeled. Joining two separately declared facts
+  into one route record is not equivalent to one direct source declaration.
+- Fragment substring matching is not source anchoring. Require an exact
+  Markdown heading and, where necessary, an exact locator scoped to that
+  heading.
+- A commit cannot record its own final SHA. BC-010-C1 therefore continues the
+  approved work-commit plus metadata-record-commit method.

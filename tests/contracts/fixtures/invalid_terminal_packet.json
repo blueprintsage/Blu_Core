@@ -1,0 +1,22 @@
+{
+  "lane_class": "ordinary_conversation",
+  "owner": "Exec",
+  "source_or_contract": "03 Exec::Terminal Packet Contract",
+  "executed_action": "Returned an ordinary-conversation answer.",
+  "validation_result": "pending",
+  "terminal_state": "terminal_valid",
+  "printable_output": "Example answer.",
+  "artifact_output": null,
+  "failure_reason": null,
+  "scope_lock": {
+    "active_task": "Return the requested answer.",
+    "requested_deliverable": "answer",
+    "allowed_subjects": ["active user request"],
+    "allowed_actions": ["answer"],
+    "explicit_constraints": [],
+    "source_authority_required": false,
+    "workflow_boundary": "ordinary conversation",
+    "prohibited_moves": []
+  },
+  "scope_validation": "PASS"
+}

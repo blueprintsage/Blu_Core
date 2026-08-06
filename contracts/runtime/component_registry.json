@@ -1,18 +1,18 @@
 {
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
   "boundary": "Descriptive extraction only. A registry entry does not prove executable implementation or host capability.",
   "components": [
     {
       "namespace": "runtime_owner",
       "id": "00 Instructions",
-      "kind": "runtime_entry",
+      "kind": "deployment_instruction_entry",
       "status": "active",
       "ownership": ["boot-critical constraints", "runtime entry boundary"],
       "dependencies": ["AntiDrift", "Ops_Law", "Exec"],
       "inputs": null,
       "outputs": null,
-      "definition_status": "defined_in_golden",
+      "definition_status": "defined_in_golden_deployment_instruction",
       "source_map_id": "instructions.entry_boundary"
     },
     {
@@ -45,7 +45,8 @@
       "kind": "hosted_single_turn_scheduler",
       "status": "active",
       "ownership": ["hosted per-turn scheduler", "required restraint scheduling", "RuntimeGate.Ingress", "one-owner route lock", "dependency scheduling", "RuntimeGate.Egress", "terminal packet validation", "final print or fail-closed authorization", "same-turn EchoTrace spine trace", "ScopeLock declaration and containment"],
-      "dependencies": ["EXECLIB.ANTIDRIFT.001", "SERVICE.OPSRESTRAINT.001", "COMMANDS"],
+      "dependencies": ["EXECLIB.ANTIDRIFT.001", "SERVICE.OPSRESTRAINT.001", "SERVICE.AUTH.001", "SERVICE.ECHOTRACE.001", "SERVICE.REPOBOOT.001", "COMMANDS", "PROGRAM.SIMCODE.001", "PROGRAM.MEMORY.001", "EXECLIB.BLUCODE.001", "SERVICE.CONTEXTINTAKE.001"],
+      "dependency_prose": ["ContextIntake is an intent-gated support path permitted by RuntimeGate.Ingress."],
       "inputs": ["raw user turn"],
       "outputs": ["one scope-valid terminal packet print or fail-closed result"],
       "definition_status": "defined_in_golden",
@@ -93,7 +94,8 @@
       "kind": "locked_owner_dispatcher",
       "status": "active",
       "ownership": ["selected owner dispatch", "declared dependency scheduling"],
-      "dependencies": ["RuntimeGate.Ingress lock"],
+      "dependencies": ["RuntimeGate.Ingress", "EXECLIB.ANTIDRIFT.001", "SERVICE.OPSRESTRAINT.001", "SERVICE.AUTH.001", "SERVICE.ECHOTRACE.001", "SERVICE.REPOBOOT.001", "COMMANDS", "PROGRAM.SIMCODE.001", "PROGRAM.MEMORY.001", "EXECLIB.BLUCODE.001", "SERVICE.CONTEXTINTAKE.001"],
+      "dependency_prose": ["Scheduler must call the active workflow owner when Ingress locks workflow_resume from active_phase_state.", "ContextIntake is an intent-gated support path permitted by RuntimeGate.Ingress."],
       "inputs": ["locked lane", "locked owner", "declared dependencies"],
       "outputs": ["one selected-owner terminal packet proposal"],
       "definition_status": "declared_as_exec_subcomponent",
@@ -222,7 +224,8 @@
       "kind": "hosted_turn_runtime_bridge",
       "status": "ACTIVE",
       "ownership": ["deterministic baseline Persona payload", "current-turn Persona payload shaping", "same-turn state staging"],
-      "dependencies": ["Persona source"],
+      "dependencies": [],
+      "dependency_prose": ["PersonaLib is the hosted-runtime bridge for Persona Engine.", "Persona shapes reply state first; Mood reflects that finished state publicly."],
       "inputs": ["touchstones[]?", "identity_traits[]?", "relational_posture?", "live_signal?", "mmu.continuity_packet?", "mmu.compact_preload?"],
       "outputs": ["mood_word", "release_word", "ribbons[]", "main_weather", "counterweight?", "thin_spine?", "identity_traits[]", "relational_posture", "touchstones[]?", "live_signal", "state_delta", "valid"],
       "definition_status": "defined_in_golden",
@@ -235,7 +238,8 @@
       "kind": "deterministic_public_reflection_library",
       "status": "ACTIVE",
       "ownership": ["public swatch collapse", "mood reflection payload", "mood render mode semantics"],
-      "dependencies": ["Persona-shaped state"],
+      "dependencies": [],
+      "dependency_prose": ["MoodLib is downstream of Identity, Persona Engine, and Anchors."],
       "inputs": ["mood_mode", "mood_word?", "release_word?", "swatch_hint?", "ribbons[]?", "main_weather?", "counterweight?", "thin_spine?", "identity_traits[]?", "relational_posture?", "touchstones[]?", "anchor_core?", "anchor_release?", "live_signal?", "last_public_mood_word?", "last_public_swatch?", "last_visible_signature?", "force_show?"],
       "outputs": ["mood_word", "public_swatch", "render_line?", "visible_signature", "should_render", "state_delta"],
       "definition_status": "defined_but_public_route_not_live",
@@ -344,7 +348,7 @@
       "inputs": ["requested_state_delta", "current_memory_state?", "caller_owner", "user_intent?", "source_classification?", "risk_flags?"],
       "outputs": ["result", "validated_state_delta?", "blocked_fields[]", "required_clarification?", "error_code?", "terminal"],
       "definition_status": "defined_multiple_times_with_status_conflict",
-      "source_map_ids": ["execlib.statetree_base", "execlib.statetree_validation", "execlib.statetree_tag", "execlib.statetree_memorypacket"]
+      "source_map_ids": ["execlib.statetree_base", "execlib.statetree_validation", "execlib.statetree_tag", "execlib.statetree_memorypacket", "execlib.active_registry_stabilization", "execlib.active_registry", "commands.help"]
     },
     {
       "namespace": "library",
@@ -515,6 +519,94 @@
       "outputs": null,
       "definition_status": "declared_but_not_defined",
       "source_map_id": "execlib.personalib"
+    },
+    {
+      "namespace": "referenced_component",
+      "id": "HumorLib",
+      "kind": "humor_library_reference",
+      "status": "referenced",
+      "ownership": ["humor trigger evaluation, eligibility, frequency, placement, and rendering"],
+      "dependencies": [],
+      "inputs": null,
+      "outputs": null,
+      "definition_status": "declared_but_not_defined",
+      "source_map_id": "persona.humor_relation"
+    },
+    {
+      "namespace": "referenced_component",
+      "id": "Humor service",
+      "kind": "humor_service_reference",
+      "status": "referenced",
+      "ownership": ["humor trigger evaluation, eligibility, frequency, placement, and rendering"],
+      "dependencies": [],
+      "inputs": null,
+      "outputs": null,
+      "definition_status": "declared_but_not_defined",
+      "source_map_id": "persona.humor_relation"
+    },
+    {
+      "namespace": "referenced_component",
+      "id": "ErrorMacros catalog",
+      "kind": "error_macro_catalog_reference",
+      "status": "referenced",
+      "ownership": ["error macro catalog"],
+      "dependencies": [],
+      "inputs": null,
+      "outputs": null,
+      "definition_status": "declared_but_not_defined",
+      "source_map_id": "exec.terminal_packet"
+    },
+    {
+      "namespace": "referenced_component",
+      "id": "Error Macros catalog",
+      "kind": "error_macro_catalog_reference",
+      "status": "referenced",
+      "ownership": ["canonical fail-closed user-visible condition coverage"],
+      "dependencies": [],
+      "inputs": null,
+      "outputs": null,
+      "definition_status": "declared_but_not_defined",
+      "source_map_id": "execlib.error_coverage"
+    },
+    {
+      "namespace": "referenced_component",
+      "id": "error renderer",
+      "kind": "error_renderer_reference",
+      "status": "referenced",
+      "ownership": ["rendering fail-closed macro identifiers instead of leaking raw tokens"],
+      "dependencies": [],
+      "inputs": null,
+      "outputs": null,
+      "definition_status": "declared_but_not_defined",
+      "source_map_id": "execlib.validation_regression"
+    },
+    {
+      "namespace": "referenced_component",
+      "id": "Persona Engine",
+      "kind": "persona_engine_reference",
+      "status": "referenced",
+      "ownership": ["Persona continuity stabilization and sensing"],
+      "dependencies": [],
+      "inputs": null,
+      "outputs": null,
+      "definition_status": "declared_but_not_defined",
+      "source_map_ids": ["persona.continuity", "persona.anchor_precedence", "execlib.personalib", "execlib.moodlib"]
+    }
+  ],
+  "declared_macro_identifiers": [
+    {
+      "id": "TIME_LOOKUP_BLOCKED",
+      "status": "declared_identifier_only",
+      "render_text": null,
+      "implementation_behavior": null,
+      "source_map_id": "execlib.time_service"
+    },
+    {
+      "id": "GENERIC_BLOCKED",
+      "status": "declared_identifier_only",
+      "render_text": null,
+      "implementation_behavior": null,
+      "source_map_ids": ["execlib.personalib", "execlib.moodlib", "execlib.mmu"]
     }
   ]
 }

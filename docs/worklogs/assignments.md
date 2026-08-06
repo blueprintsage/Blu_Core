@@ -21,9 +21,9 @@ canonical_base: 7aed76e
 
 | ID | Assignment | Owner | Status | Packet | Base | Collision domain / notes |
 |---|---|---|---|---|---|---|
-| BC-010 | Extract machine-readable runtime contracts from CTS | Codex | review | `docs/domains/runtime/assignments/BC-010/assignment.md` | `7aed76e` | Work commit `40138b6e16f28c01904aae97158878468ee47ad0`; Claude semantic review targets the work commit, not the metadata record commit |
-| BC-010-C1 | Runtime contract extraction corrections | Codex | review | `docs/domains/runtime/assignments/BC-010-C1/assignment.md` | `38611bf4b8051c858dcbbc30a07904d0117211b3` | Repair work commit `63c8b692403fe5ec1a9433a8313a7980fbd55437`; metadata-only record follows; Claude reviews the repair work commit; push explicitly authorized 2026-08-06 |
-| BC-010-C2 | OPSEC route classification repair | Codex | review | `docs/domains/runtime/assignments/BC-010-C2/assignment.md` | `424f80b254a02f057da6c82db5230377076fc415` | Repair work commit `06292ce0e2f326ef84988e030c7fe14402192859`; metadata-only record follows; Claude reviews the repair work commit; do not merge |
+| BC-010 | Extract machine-readable runtime contracts from CTS | Codex | done | `docs/domains/runtime/assignments/BC-010/assignment.md` | `7aed76e` | Work commit `40138b6e16f28c01904aae97158878468ee47ad0`; closed after corrective assignments BC-010-C1 and BC-010-C2; integrated reviewed state before closure `8a37ae3c62829f16f949f5896d2bef0542721565` |
+| BC-010-C1 | Runtime contract extraction corrections | Codex | done | `docs/domains/runtime/assignments/BC-010-C1/assignment.md` | `38611bf4b8051c858dcbbc30a07904d0117211b3` | Repair work commit `63c8b692403fe5ec1a9433a8313a7980fbd55437`; closed after its remaining OPSEC classification issue was corrected by BC-010-C2; integrated reviewed state before closure `8a37ae3c62829f16f949f5896d2bef0542721565` |
+| BC-010-C2 | OPSEC route classification repair | Codex | done | `docs/domains/runtime/assignments/BC-010-C2/assignment.md` | `424f80b254a02f057da6c82db5230377076fc415` | Repair work commit `06292ce0e2f326ef84988e030c7fe14402192859`; closed after Claude's `approve-with-notes` review with no blockers; integrated reviewed state before closure `8a37ae3c62829f16f949f5896d2bef0542721565` |
 | BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
 | BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
 
@@ -35,6 +35,15 @@ canonical_base: 7aed76e
 
 ## Completed
 
+- BC-010 — Runtime contract extraction closed after corrective assignments
+  BC-010-C1 and BC-010-C2; integrated reviewed state before closure:
+  `8a37ae3c62829f16f949f5896d2bef0542721565`.
+- BC-010-C1 — Corrections closed after BC-010-C2 repaired the remaining OPSEC
+  classification issue; integrated reviewed state before closure:
+  `8a37ae3c62829f16f949f5896d2bef0542721565`.
+- BC-010-C2 — OPSEC route classification repair closed after Claude's
+  `approve-with-notes` review with no blockers; integrated reviewed state before
+  closure: `8a37ae3c62829f16f949f5896d2bef0542721565`.
 - BC-001 — Blu Core bootstrap authority and CTS golden source verified at `7aed76e`.
 - Governance, source authority, migration boundaries, golden CTS runtime, validation evidence, and completion records are present.
 - All eight golden checksums passed.

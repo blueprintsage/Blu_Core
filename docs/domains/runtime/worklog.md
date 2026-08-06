@@ -200,3 +200,13 @@ last_reviewed: 2026-08-06
 - Exact base: `424f80b254a02f057da6c82db5230377076fc415`
 - Branch: `bc-010-c2-opsec-route-repair`
 - Repair work commit: recorded by the authorized metadata-only follow-up.
+
+## 2026-08-06 — BC-010 lineage closed
+
+- Dad and Blu authorized final closure.
+- BC-010, BC-010-C1, and BC-010-C2 moved from review to done.
+- Claude's final disposition was approve-with-notes with no blocking findings.
+- Non-blocking notes remain preserved in the BC-010-C2 review record.
+- Integrated reviewed state before closure:
+  `8a37ae3c62829f16f949f5896d2bef0542721565`.
+- No runtime contracts, validator code, tests, or golden sources changed.

@@ -1,6 +1,6 @@
 # BC-010-C2 — Review Record
 
-status: review
+status: done
 owner: Claude
 last_reviewed: 2026-08-06
 
@@ -524,9 +524,11 @@ Reserved to Blu and Dad: all twenty-eight items in
 resolves none of them. BC-020 and BC-030 should remain unstarted until their
 packets are approved and bases named, per `docs/domains/runtime/next_steps.md`.
 
-## Final status authorization
+## Final closure authorization
 
-- Authorized by: pending — Blu and Dad
-- Assignment status: BC-010, BC-010-C1, and BC-010-C2 all remain `review`; this
-  reviewer does not set `done` and does not merge
+- Integrated main state before closure: `8a37ae3c62829f16f949f5896d2bef0542721565`
+- Authorized by: Dad, Project Owner; Blu, Project Lead
+- Assignment status: `done`
 - Date: 2026-08-06
+- Closure basis: Claude disposition `approve-with-notes`; no blocking findings.
+  Non-blocking notes remain preserved in this review record.

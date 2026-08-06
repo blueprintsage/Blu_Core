@@ -1,6 +1,6 @@
 # BC-010-C1 — Review Record
 
-status: review
+status: done
 owner: Claude
 last_reviewed: 2026-08-06
 
@@ -681,9 +681,12 @@ resolves none of them. BC-020 and BC-030 should remain unstarted until their
 packets are approved and bases named, per
 `docs/domains/runtime/next_steps.md`.
 
-## Final status authorization
+## Final closure authorization
 
-- Authorized by: pending — Blu and Dad
-- Assignment status: BC-010 and BC-010-C1 both remain `review`; this reviewer
-  does not set `done`
+- Integrated main state before closure: `8a37ae3c62829f16f949f5896d2bef0542721565`
+- Authorized by: Dad, Project Owner; Blu, Project Lead
+- Assignment status: `done`
 - Date: 2026-08-06
+- Closure basis: The remaining OPSEC lane-class finding was corrected by
+  BC-010-C2. Claude approved the final correction with notes and no blocking
+  findings.

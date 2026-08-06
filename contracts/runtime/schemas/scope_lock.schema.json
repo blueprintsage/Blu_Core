@@ -3,7 +3,6 @@
   "$id": "https://blu-core.local/contracts/runtime/schemas/scope_lock.schema.json",
   "title": "Blu v0.22.0 ScopeLock",
   "type": "object",
-  "additionalProperties": false,
   "required": [
     "active_task",
     "requested_deliverable",

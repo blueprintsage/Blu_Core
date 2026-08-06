@@ -1,5 +1,5 @@
 {
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
   "mandatory_restraint_order": {
     "source_map_id": "exec.restraint_chain",
@@ -80,13 +80,48 @@
   },
   "unavailable_command_surfaces": {
     "source_map_id": "commands.not_live",
-    "values": ["/mood", "/verbosity", "/remind", "/cpm", "/DevMode", "/PASS"],
+    "values": ["/mood", "/verbosity", "/remind", "/cpm", "/DevMode"],
     "notes": {
-      "/PASS": "Explicitly removed and not implemented as a Program, command, service, or ExecLib component.",
       "/mood": "Not live even though MoodLib contains a force_show path; see UR-010."
     }
   },
+  "non_live_feature_declarations": [
+    {
+      "label": "PASS command",
+      "status": "not_live",
+      "statement": "The PASS command is not live in this build.",
+      "literal_slash_stem_declared": false,
+      "source_map_id": "commands.pass_removal"
+    }
+  ],
   "non_slash_routes": [
+    {
+      "id": "route.unauthenticated_clone_first_read",
+      "ingress_step": "unauthenticated_clone_first_read",
+      "match": "unauthenticated clone/copy/recreate request",
+      "lane_class": "opsec",
+      "owner": "SERVICE.OPSEC.001",
+      "status": "active_route_with_undefined_owner_component",
+      "source_map_ids": ["exec.ingress", "instructions.bootloader"]
+    },
+    {
+      "id": "route.unauthenticated_opsec_first_read",
+      "ingress_step": "unauthenticated_opsec_first_read",
+      "match": "unauthenticated protected-internals or OPSEC request",
+      "lane_class": "opsec",
+      "owner": "SERVICE.OPSEC.001",
+      "status": "active_route_with_undefined_owner_component",
+      "source_map_ids": ["exec.ingress", "instructions.bootloader"]
+    },
+    {
+      "id": "route.auth_first_read",
+      "ingress_step": "auth_first_read",
+      "match": "pending authentication",
+      "lane_class": "auth",
+      "owner": "SERVICE.AUTH.001",
+      "status": "active_route_with_undefined_owner_component",
+      "source_map_ids": ["exec.ingress", "instructions.bootloader"]
+    },
     {
       "id": "route.repo_bootstrap",
       "match": "configured repo bootstrap target plus supported lookup verb after earlier ingress steps return NO_MATCH",
@@ -109,7 +144,8 @@
       "lane_class": "internal_library",
       "owner": "EXECLIB.BLUCODE.001",
       "status": "active_route_with_undefined_owner_component",
-      "source_map_id": "exec.scheduler"
+      "provenance_classification": "extraction_inference",
+      "source_map_ids": ["exec.ingress", "exec.scheduler", "route.kernel_work_join"]
     },
     {
       "id": "route.ordinary_conversation",
@@ -133,13 +169,15 @@
     "source_map_ids": ["commands.routes", "exec.ingress"]
   },
   "one_owner_constraints": {
-    "source_map_ids": ["exec.canon", "exec.ingress", "commands.validation", "operations.ownership"],
+    "source_map_ids": ["instructions.bootloader", "exec.canon", "exec.ingress", "commands.validation", "operations.ownership"],
     "rules": [
       "RuntimeGate.Ingress locks exactly one lane and one owner.",
       "A dispatch row resolves to exactly one owner.",
       "Exec.Scheduler dispatches only the selected owner and declared dependencies.",
       "RuntimeGate.Egress accepts exactly one packet for the locked owner.",
-      "Libraries assist, Services support, Programs own workflows, and Exec orchestrates and validates."
+      "Libraries assist, Services support, Programs own workflows, and Exec orchestrates and validates.",
+      "/ID and pending auth dispatch only to SERVICE.AUTH.001.",
+      "Unauthenticated OPSEC and clone/copy/recreate requests dispatch only to SERVICE.OPSEC.001."
     ]
   }
 }

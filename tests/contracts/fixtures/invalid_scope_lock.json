@@ -1,0 +1,9 @@
+{
+  "requested_deliverable": "answer",
+  "allowed_subjects": [],
+  "allowed_actions": [],
+  "explicit_constraints": [],
+  "source_authority_required": false,
+  "workflow_boundary": "ordinary conversation",
+  "prohibited_moves": []
+}

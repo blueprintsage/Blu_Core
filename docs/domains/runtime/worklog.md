@@ -94,3 +94,60 @@ last_reviewed: 2026-08-05
 - Work commit: `40138b6e16f28c01904aae97158878468ee47ad0`
 - Record commit: this authorized metadata-only follow-up; its exact SHA is
   reported externally because a commit cannot contain its own final hash
+
+## 2026-08-05 — BC-010-C1 runtime contract extraction corrections
+
+### What changed
+
+- Separated the deployment instruction from the six kernel/runtime capsules in
+  source mapping and documentation.
+- Added the three missing non-slash routes and both deployment-level exclusive
+  dispatch constraints.
+- Added omitted referenced components and declared macro identifiers without
+  inventing implementations, stable IDs, or render text.
+- Replaced fragment-only source citations with exact Markdown heading anchors
+  plus scoped exact locators where a file lacks doctrine subheadings.
+- Corrected PASS, dependency, StateTree, schema-closure, parity-provenance, and
+  extraction-inference representations.
+- Replaced the permissive schema checker with a strict documented subset
+  validator and canonical positive/negative fixture validation.
+- Backfilled BC-010 assignment and validation records and created the approved
+  BC-010-C1 assignment quartet.
+- Restored runtime-contract discovery in the documentation index.
+
+### What was tested or reviewed
+
+- `python tools/validate_runtime_contracts.py` passed during implementation.
+- `python -m unittest discover -s tests/contracts -p "test_*.py"` passed 15
+  tests during implementation.
+- Final Git, checksum, manifest, Python-version, and dependency receipts are in
+  `assignments/BC-010-C1/validation.md`.
+
+### What worked
+
+- Every source-map entry resolves to one declared role and one exact heading.
+- Unsupported schema keywords and unknown types fail clearly.
+- All five positive fixtures pass and all five negative fixtures fail.
+- StateTree remains `unresolved_conflict` with `ALPHA` and `ACTIVE` preserved.
+
+### What failed
+
+- No implementation path failed. The pre-existing untracked
+  `.claude/settings.local.json` remains outside assignment scope and is not
+  committed.
+
+### Known risks
+
+- Structural validation is not behavioral parity or runtime proof.
+- Referenced components and macro identifiers remain undefined.
+- Claude's second semantic review remains required.
+
+### Next safe step
+
+- Review the repair work commit read-only against the CTS source set, then let
+  Blu or Dad decide integration. Do not begin BC-020 or BC-030.
+
+### Commit or patch identity
+
+- Repair work commit: recorded by the authorized metadata-only follow-up.
+- Metadata record commit: reported externally after creation.

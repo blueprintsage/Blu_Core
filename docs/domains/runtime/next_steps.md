@@ -14,3 +14,13 @@ last_reviewed: 2026-08-05
    BC-010 must not resolve those items itself.
 3. Do not begin BC-020 or BC-030 until their packets are approved and bases are
    named.
+
+## BC-010-C1
+
+1. Claude performs a read-only second semantic review against the repair work
+   commit recorded in the BC-010-C1 handoff.
+2. Review source-role separation, repaired routes/exclusivity, referenced
+   component non-invention, validator guarantees, exact anchoring, PASS
+   provenance, dependency wording, and StateTree conflict preservation.
+3. Blu or Dad decides integration. Keep both BC-010 and BC-010-C1 in `review`
+   until that disposition; do not begin BC-020 or BC-030.

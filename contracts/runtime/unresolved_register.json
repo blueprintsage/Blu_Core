@@ -1,5 +1,5 @@
 {
-  "contract_version": "0.1.0",
+  "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
   "resolution_policy": "Open items preserve golden-source gaps or conflicts. This register does not resolve them and does not authorize implementation.",
   "items": [
@@ -106,8 +106,8 @@
       "id": "UR-012",
       "category": "duplicate_declaration_conflict",
       "subject": "EXECLIB.STATETREE.001",
-      "summary": "StateTree is declared in four component blocks. The base block says status ALPHA while later extension blocks say ACTIVE; versions and field sets also differ.",
-      "source_map_ids": ["execlib.statetree_base", "execlib.statetree_validation", "execlib.statetree_tag", "execlib.statetree_memorypacket"],
+      "summary": "StateTree is declared in four component blocks. The base block says status ALPHA while later extension blocks say ACTIVE; versions and field sets also differ. Two active registry sections and the live /help target inventory additionally name StateTree as ACTIVE without resolving the conflicting base declaration.",
+      "source_map_ids": ["execlib.statetree_base", "execlib.statetree_validation", "execlib.statetree_tag", "execlib.statetree_memorypacket", "execlib.active_registry_stabilization", "execlib.active_registry", "commands.help"],
       "preserved_state": "collapsed_registry_identity_with_unresolved_status",
       "required_later_decision": "Approve a single consolidated StateTree contract and status; this extraction does not choose one."
     },
@@ -200,6 +200,51 @@
       "source_map_ids": ["exec.echotrace", "execlib.canon", "execlib.active_registry"],
       "preserved_state": "names_not_promoted_to_aliases",
       "required_later_decision": "Approve missing stable aliases or narrow the alias requirement; BC-010 does not synthesize aliases from names."
+    },
+    {
+      "id": "UR-023",
+      "category": "referenced_but_not_defined",
+      "subject": "HumorLib and Humor service",
+      "summary": "Persona assigns humor trigger evaluation, eligibility, frequency, placement, and rendering to the exact labels HumorLib and Humor service. Exec also names humor as non-routing and normally suppressed decoration, but no defining library or service contract exists.",
+      "source_map_ids": ["persona.humor_relation", "exec.ingress", "exec.egress"],
+      "preserved_state": "distinct_source_labels_declared_but_not_defined",
+      "required_later_decision": "Define both owners and their relationship without merging the source labels or inferring public behavior."
+    },
+    {
+      "id": "UR-024",
+      "category": "referenced_but_not_defined",
+      "subject": "ErrorMacros catalog and Error Macros catalog",
+      "summary": "Exec names the ErrorMacros catalog while ExecLib names the Error Macros catalog. Neither source defines the catalog, and the spelling variants are not enough evidence to collapse them into one future identity.",
+      "source_map_ids": ["exec.terminal_packet", "execlib.error_coverage"],
+      "preserved_state": "distinct_source_labels_declared_but_not_defined",
+      "required_later_decision": "Approve the catalog identity and contract before implementing or merging either label."
+    },
+    {
+      "id": "UR-025",
+      "category": "referenced_but_not_defined",
+      "subject": "error renderer",
+      "summary": "ExecLib requires raw macro tokens to pass through the error renderer or a built-in fallback, but no renderer identity, inputs, outputs, or render catalog is defined.",
+      "source_map_id": "execlib.validation_regression",
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Define the renderer and authorized render behavior without inventing macro prose."
+    },
+    {
+      "id": "UR-026",
+      "category": "referenced_but_not_defined",
+      "subject": "Persona Engine",
+      "summary": "Persona and ExecLib reference Persona Engine for continuity, fallback sensing, PersonaLib bridging, and MoodLib's downstream relation, but no defining component contract or stable machine ID is declared.",
+      "source_map_ids": ["persona.continuity", "persona.anchor_precedence", "execlib.personalib", "execlib.moodlib"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Define the component without reducing Persona or inventing a versioned ID."
+    },
+    {
+      "id": "UR-027",
+      "category": "identifier_contract_underspecified",
+      "subject": "TIME_LOOKUP_BLOCKED and GENERIC_BLOCKED",
+      "summary": "The macro identifiers are declared by Time Service, PersonaLib, MoodLib, and MMULib, but the golden source does not define their render text or implementation behavior.",
+      "source_map_ids": ["execlib.time_service", "execlib.personalib", "execlib.moodlib", "execlib.mmu", "execlib.validation_regression"],
+      "preserved_state": "identifiers_only_no_render_or_behavior_inferred",
+      "required_later_decision": "Define macro rendering through an approved error-catalog and renderer contract."
     }
   ]
 }

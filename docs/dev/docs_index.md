@@ -55,6 +55,23 @@ docs/worklogs/assignments.md
 `docs/worklogs/assignments.md` is the project-wide index. The approved packet,
 handoff, validation evidence, and review live under the owning domain.
 
+## Extracted runtime contracts
+
+```text
+contracts/runtime/README.md
+contracts/runtime/source_map.json
+contracts/runtime/component_registry.json
+contracts/runtime/route_registry.json
+contracts/runtime/parity_matrix.json
+contracts/runtime/unresolved_register.json
+contracts/runtime/schemas/
+```
+
+These files are downstream extractions of the CTS source set, not runtime
+authority or Python implementation. The earlier 2026-08-05 AGENTS/docs-index
+governance update was authorized by Dad and Blu. BC-010-C1 restores discovery
+here without modifying `AGENTS.md`.
+
 ## Project-wide guides
 
 ```text

@@ -3,7 +3,6 @@
   "$id": "https://blu-core.local/contracts/runtime/schemas/terminal_packet.schema.json",
   "title": "Blu v0.22.0 terminal packet",
   "type": "object",
-  "additionalProperties": false,
   "required": [
     "lane_class",
     "owner",

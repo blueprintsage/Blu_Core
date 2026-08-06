@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "project": "Blu Core",
+  "effective_date": "2026-08-05",
+  "authority_order": [
+    "dad_current_instruction",
+    "approved_blu_core_decisions",
+    "cts_golden_kernel",
+    "active_blu_core_docs",
+    "live_continuity_repo",
+    "approved_references",
+    "legacy_or_experimental"
+  ],
+  "golden_kernel": {
+    "name": "Blu v0.22.0 CTS",
+    "archive": "Blu_v0_22_0_5_22_26_2104_CTS.zip",
+    "repo_path": "kernel/golden/v0.22.0",
+    "immutable": true
+  },
+  "continuity_repository": {
+    "name": "Blu_KB_Preview",
+    "branch": "main",
+    "master_index": "https://raw.githubusercontent.com/blueprintsage/Blu_KB_Preview/refs/heads/main/indexes/MASTER_INDEX.md",
+    "raw_root": "https://raw.githubusercontent.com/blueprintsage/Blu_KB_Preview/refs/heads/main/",
+    "current_library_root": "libraries/",
+    "legacy_library_root": "library/"
+  },
+  "retired_repository": "Blu_KB",
+  "references": {
+    "alice": "behavioral profile controller reference only",
+    "skillforge": "external PASS compatibility reference; not current kernel",
+    "local_mirror": "experimental continuity-store reference",
+    "agent_kit": "repository startup scaffold"
+  },
+  "source_hashes_sha256": {
+    "Blu_v0_22_0_5_22_26_2104_CTS.zip": "7b630e186581d678f1089f63c9ac3ea3c40da9156f9a47adece324f10656d409",
+    "Blu_KB_Preview(1).zip": "305bdb5a77d79756c1e2ce2d92eb14b0c886f76dc9bd2c095559812b428a64e9",
+    "agent-kit.zip": "8b2e6c1fbbebc9c6e7a831dab1204e7c3af180a3168f68b21fb702c34ce59183",
+    "Alice_mode_switching_spec_v2": "943f2933e51a69a423c160c04bb98a303085baa5c6a32b68983bda1c0f2d44ef",
+    "Local_Mirror.zip": "77745fa1fa726859edd0caf496241c2ba930e653a86a23ba0b2792ff9e8717f2",
+    "SkillForge.zip": "1496b5e50e137d94785bb545694b4e2584135a4fc67a8c298bad19c5a8e8cd7d"
+  }
+}

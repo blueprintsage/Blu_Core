@@ -22,7 +22,7 @@ canonical_base: 7aed76e
 | ID | Assignment | Owner | Status | Packet | Base | Collision domain / notes |
 |---|---|---|---|---|---|---|
 | BC-010 | Extract machine-readable runtime contracts from CTS | Codex | review | `docs/domains/runtime/assignments/BC-010/assignment.md` | `7aed76e` | Work commit `40138b6e16f28c01904aae97158878468ee47ad0`; Claude semantic review targets the work commit, not the metadata record commit |
-| BC-010-C1 | Runtime contract extraction corrections | Codex | active | `docs/domains/runtime/assignments/BC-010-C1/assignment.md` | `38611bf4b8051c858dcbbc30a07904d0117211b3` | Parent BC-010 remains in review; repair work commit pending; Claude owns second semantic review |
+| BC-010-C1 | Runtime contract extraction corrections | Codex | review | `docs/domains/runtime/assignments/BC-010-C1/assignment.md` | `38611bf4b8051c858dcbbc30a07904d0117211b3` | Repair work commit `63c8b692403fe5ec1a9433a8313a7980fbd55437`; metadata-only record follows; Claude reviews the repair work commit; push explicitly authorized 2026-08-06 |
 | BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
 | BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
 

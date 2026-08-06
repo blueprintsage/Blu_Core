@@ -1,20 +1,21 @@
 # BC-010-C1 — Implementation Handoff
 
-status: active
+status: review
 owner: Codex
 semantic_reviewer: Claude
 project_lead: Blu
 project_owner: Dad
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 
 ## Identity
 
 - Assignment: BC-010-C1 — Runtime Contract Extraction Corrections
 - Exact base: `38611bf4b8051c858dcbbc30a07904d0117211b3`
 - Branch: `bc-010-c1-contract-repair`
-- Repair work commit: pending until the non-self-referential work commit exists
-- Metadata record commit: reported externally after commit
-- Push status: pending
+- Repair work commit: `63c8b692403fe5ec1a9433a8313a7980fbd55437`
+- Semantic review target: `63c8b692403fe5ec1a9433a8313a7980fbd55437`
+- Metadata record commit: this metadata-only follow-up; exact SHA is reported externally
+- Push status: explicitly authorized on 2026-08-06; observed final result is reported externally
 
 ## Result summary
 
@@ -57,5 +58,7 @@ No file under `kernel/golden/**` changed.
 
 ## Working-tree receipt
 
-Final status is recorded in `validation.md` and the external handoff after both
-commits and push complete.
+The repair implementation and validation are complete. This record commit adds
+the real repair SHA without modifying contracts, tools, tests, or golden
+sources. Final clean-tree and push observations are reported externally because
+a commit cannot contain evidence of its own later push.

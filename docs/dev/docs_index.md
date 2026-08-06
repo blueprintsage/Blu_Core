@@ -9,6 +9,7 @@ last_reviewed: 2026-08-05
 ```text
 AGENTS.md
 docs/dev/assistant_coding_behavior.md
+docs/dev/domain_assignment_record_standard.md
 docs/worklogs/assignments.md
 ```
 
@@ -32,26 +33,34 @@ config/source_authority.json
 | Adapters | `docs/domains/adapters/` | Chat/Codex capability adapters |
 | Build and release | `docs/domains/build-release/` | deterministic builds, parity, manifests, releases |
 
+Each domain stores cumulative continuity in its quartet and task-specific
+evidence under:
+
+```text
+docs/domains/<domain>/assignments/<assignment-id>/
+```
+
+## Assignment records
+
+```text
+docs/dev/domain_assignment_record_standard.md
+docs/dev/templates/domain_assignment/assignment.md
+docs/dev/templates/domain_assignment/handoff.md
+docs/dev/templates/domain_assignment/validation.md
+docs/dev/templates/domain_assignment/review.md
+docs/worklogs/assignments.md
+```
+
+`docs/worklogs/assignments.md` is the project-wide index. The approved packet,
+handoff, validation evidence, and review live under the owning domain.
+
 ## Project-wide guides
 
 ```text
 docs/dev/assistant_coding_behavior.md
 docs/dev/doc_status_header_standard.md
+docs/dev/domain_assignment_record_standard.md
 docs/dev/bootstrap_commit_plan.md
-```
-
-## Extracted runtime contracts
-
-```text
-contracts/runtime/README.md
-contracts/runtime/source_map.json
-contracts/runtime/component_registry.json
-contracts/runtime/route_registry.json
-contracts/runtime/schemas/
-contracts/runtime/parity_matrix.json
-contracts/runtime/unresolved_register.json
-tools/validate_runtime_contracts.py
-tests/contracts/
 ```
 
 ## Assistant packets

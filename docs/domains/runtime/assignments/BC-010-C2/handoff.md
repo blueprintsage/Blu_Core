@@ -12,10 +12,10 @@ last_reviewed: 2026-08-06
 - Assignment: BC-010-C2 — OPSEC Route Classification Repair
 - Exact base: `424f80b254a02f057da6c82db5230377076fc415`
 - Branch: `bc-010-c2-opsec-route-repair`
-- Repair work commit: pending first commit
-- Semantic review target: pending first commit
+- Repair work commit: `06292ce0e2f326ef84988e030c7fe14402192859`
+- Semantic review target: `06292ce0e2f326ef84988e030c7fe14402192859`
 - Metadata record commit: this metadata-only follow-up; exact SHA is reported externally
-- Push status: pending final push observation
+- Push status: explicitly authorized by the approved packet; final observation is reported externally
 
 ## Result summary
 

@@ -40,6 +40,20 @@ docs/dev/doc_status_header_standard.md
 docs/dev/bootstrap_commit_plan.md
 ```
 
+## Extracted runtime contracts
+
+```text
+contracts/runtime/README.md
+contracts/runtime/source_map.json
+contracts/runtime/component_registry.json
+contracts/runtime/route_registry.json
+contracts/runtime/schemas/
+contracts/runtime/parity_matrix.json
+contracts/runtime/unresolved_register.json
+tools/validate_runtime_contracts.py
+tests/contracts/
+```
+
 ## Assistant packets
 
 ```text

@@ -1,0 +1,205 @@
+{
+  "contract_version": "0.1.0",
+  "golden_runtime": "v0.22.0",
+  "resolution_policy": "Open items preserve golden-source gaps or conflicts. This register does not resolve them and does not authorize implementation.",
+  "items": [
+    {
+      "id": "UR-001",
+      "category": "referenced_but_not_defined",
+      "subject": "EXECLIB.ANTIDRIFT.001",
+      "summary": "Exec requires pre_ingress_antidrift on every turn, but none of the seven golden files defines this library's component contract.",
+      "source_map_ids": ["exec.restraint_chain", "exec.scheduler"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Provide or approve a defining contract before deterministic implementation or parity claims."
+    },
+    {
+      "id": "UR-002",
+      "category": "referenced_but_not_defined",
+      "subject": "SERVICE.OPSRESTRAINT.001",
+      "summary": "Exec requires ops_law_restraint before ingress, but the service has no defining component block in the golden runtime.",
+      "source_map_ids": ["exec.restraint_chain", "exec.scheduler"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Provide or approve a defining service contract while preserving Operations Law authority."
+    },
+    {
+      "id": "UR-003",
+      "category": "referenced_but_not_defined",
+      "subject": "SERVICE.AUTH.001",
+      "summary": "Instructions, Commands, and Exec route authentication exclusively to SERVICE.AUTH.001 and require an exact render contract, but neither the service nor the allowed exact strings are defined in the golden files.",
+      "source_map_ids": ["instructions.bootloader", "commands.routes", "exec.scheduler", "exec.egress"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Supply an authorized auth service contract and exact render set without inferring protected authentication details."
+    },
+    {
+      "id": "UR-004",
+      "category": "referenced_but_not_defined",
+      "subject": "SERVICE.REPOBOOT.001",
+      "summary": "Exec declares an active repo_lookup route and scheduler dispatch to RepoBoot, but no RepoBoot service definition appears in the authoritative inputs.",
+      "source_map_ids": ["exec.ingress", "exec.scheduler", "exec.echotrace"],
+      "preserved_state": "active_route_with_undefined_owner_component",
+      "required_later_decision": "Define the service contract and capability checks before executable routing."
+    },
+    {
+      "id": "UR-005",
+      "category": "ownership_underspecified",
+      "subject": "SERVICE.ECHOTRACE.001 and EXEC.SPINE_TRACE",
+      "summary": "Exec defines EXEC.SPINE_TRACE as the diagnostic owner but also schedules an undefined SERVICE.ECHOTRACE.001 for diagnostic construction; their interface and division of responsibility are not fully declared.",
+      "source_map_ids": ["exec.scheduler", "exec.echotrace", "programs.simcode"],
+      "preserved_state": "owner_defined_support_service_undefined",
+      "required_later_decision": "Define the support service contract without transferring public ownership from EXEC.SPINE_TRACE."
+    },
+    {
+      "id": "UR-006",
+      "category": "referenced_but_not_defined",
+      "subject": "EXECLIB.BLUCODE.001",
+      "summary": "Exec and SimCode require BluCode phase authorization, but no BluCode library definition is present in the golden runtime.",
+      "source_map_ids": ["exec.component_termination", "exec.scheduler", "programs.simcode"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Provide an approved phase contract before kernel-work execution or SimCode patch authorization."
+    },
+    {
+      "id": "UR-007",
+      "category": "referenced_but_not_defined",
+      "subject": "SYSTEM.RUNTIME.001",
+      "summary": "Instructions, Exec, and SimCode assign configuration truth to SYSTEM.RUNTIME.001, but its fields and component contract are absent.",
+      "source_map_ids": ["instructions.bootloader", "exec.runtime_configuration", "programs.simcode"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Define configuration fields and availability behavior without hardcoding channel-specific roots into Exec."
+    },
+    {
+      "id": "UR-008",
+      "category": "referenced_but_not_defined",
+      "subject": "SERVICE.OPSEC.001",
+      "summary": "Instructions route unauthenticated protected-internals and clone requests exclusively to SERVICE.OPSEC.001, but no defining service block is present.",
+      "source_map_ids": ["instructions.opsec", "instructions.bootloader"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Define the service through a security-authorized assignment; do not infer protected messages here."
+    },
+    {
+      "id": "UR-009",
+      "category": "referenced_but_not_defined",
+      "subject": "SIMCODE_GATE and MEMORY_GATE",
+      "summary": "Programs requires these validation gates, but their packet fields, owner IDs, and validation behavior are not defined.",
+      "source_map_id": "programs.required_gates",
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Define gate owners and contracts before Program implementation parity can be demonstrated."
+    },
+    {
+      "id": "UR-010",
+      "category": "route_conflict",
+      "subject": "/mood",
+      "summary": "Commands declares /mood not live, while active MoodLib describes an explicit /mood show force path and public rendering modes. The extraction keeps MoodLib active as support but exposes no /mood route.",
+      "source_map_ids": ["commands.not_live", "execlib.moodlib"],
+      "preserved_state": "public_route_unavailable_support_library_active",
+      "required_later_decision": "Choose and approve a command surface before exposing mood commands."
+    },
+    {
+      "id": "UR-011",
+      "category": "registry_conflict",
+      "subject": "workflow lane_class",
+      "summary": "Exec's lane_classes list omits workflow, but Commands assigns lane_class=workflow to /memory and Exec schedules PROGRAM.MEMORY.001 for that lock.",
+      "source_map_ids": ["exec.ingress", "exec.scheduler", "commands.routes"],
+      "preserved_state": "route_table_value_not_in_declared_lane_enum",
+      "required_later_decision": "Reconcile the canonical lane-class set before an executable route validator is implemented."
+    },
+    {
+      "id": "UR-012",
+      "category": "duplicate_declaration_conflict",
+      "subject": "EXECLIB.STATETREE.001",
+      "summary": "StateTree is declared in four component blocks. The base block says status ALPHA while later extension blocks say ACTIVE; versions and field sets also differ.",
+      "source_map_ids": ["execlib.statetree_base", "execlib.statetree_validation", "execlib.statetree_tag", "execlib.statetree_memorypacket"],
+      "preserved_state": "collapsed_registry_identity_with_unresolved_status",
+      "required_later_decision": "Approve a single consolidated StateTree contract and status; this extraction does not choose one."
+    },
+    {
+      "id": "UR-013",
+      "category": "schema_underspecified",
+      "subject": "task packet",
+      "summary": "The golden runtime requires active-task identification and task continuity but declares no named task-packet field contract.",
+      "source_map_ids": ["schema.task_packet", "instructions.execution_law", "exec.scope_lock"],
+      "preserved_state": "permissive_object_schema",
+      "required_later_decision": "Define task-packet fields in an approved deterministic-runtime design assignment."
+    },
+    {
+      "id": "UR-014",
+      "category": "schema_underspecified",
+      "subject": "capability report",
+      "summary": "The golden runtime requires capability honesty and blocked-state truth but declares no named capability-report fields.",
+      "source_map_ids": ["schema.capability_report", "instructions.truth_discipline", "operations.runtime_truth", "execlib.validation_regression"],
+      "preserved_state": "permissive_object_schema",
+      "required_later_decision": "Define report fields without turning declared architecture into capability proof."
+    },
+    {
+      "id": "UR-015",
+      "category": "schema_alias",
+      "subject": "current-turn execution receipt",
+      "summary": "The golden runtime requires same-turn terminal packets but does not name a separate execution-receipt structure. The extraction aliases the receipt schema to the terminal-packet schema and adds no fields.",
+      "source_map_ids": ["schema.current_turn_execution_receipt", "exec.terminal_packet", "exec.hosted_boundary"],
+      "preserved_state": "terminal_packet_schema_alias",
+      "required_later_decision": "Define a distinct receipt only if an approved runtime design needs fields beyond the terminal packet."
+    },
+    {
+      "id": "UR-016",
+      "category": "underspecified_declaration",
+      "subject": "Program compatibility phase owners",
+      "summary": "The Programs registry includes the headings 'Compatibility phase owners' and 'Compatibility rule' with no values.",
+      "source_map_id": "programs.canon",
+      "preserved_state": "empty_declaration",
+      "required_later_decision": "Specify or remove these declarations through an approved source change; do not infer owners."
+    },
+    {
+      "id": "UR-017",
+      "category": "identifier_underspecified",
+      "subject": "ordinary conversation owner",
+      "summary": "Instructions and Exec make Exec the authoritative default owner, but no stable machine-style owner ID is declared for ordinary conversation.",
+      "source_map_ids": ["instructions.entry_boundary", "exec.ingress"],
+      "preserved_state": "owner_label_Exec",
+      "required_later_decision": "Approve a stable ID only if executable registries require one."
+    },
+    {
+      "id": "UR-018",
+      "category": "external_source_reference",
+      "subject": "Personal Experience Library (PEL) and Identity_Lore",
+      "summary": "Persona declares these as continuity source inputs, but they are outside BC-010's seven authoritative extraction files and are not imported into the contracts.",
+      "source_map_id": "persona.source_boundary",
+      "preserved_state": "external_reference_not_extracted",
+      "required_later_decision": "Handle through the repository or continuity domain under a separately approved assignment."
+    },
+    {
+      "id": "UR-019",
+      "category": "host_capability_unproven",
+      "subject": "live time, persistence, artifact, and background capabilities",
+      "summary": "Several contracts describe behavior conditional on supported host paths. The golden runtime explicitly denies unproven background execution and persistence and requires real proof for time and artifacts.",
+      "source_map_ids": ["exec.hosted_boundary", "execlib.time_service", "execlib.artifact_proof", "programs.memory"],
+      "preserved_state": "capability_conditional",
+      "required_later_decision": "Adapters must report actual host support; registry presence alone is insufficient."
+    },
+    {
+      "id": "UR-020",
+      "category": "referenced_but_not_defined",
+      "subject": "GateKernel",
+      "summary": "Programs assigns Program packet validation to GateKernel and makes it mandatory before print, but no GateKernel component ID, packet contract, or defining block is present.",
+      "source_map_ids": ["programs.canon", "programs.required_gates", "programs.universal"],
+      "preserved_state": "declared_but_not_defined",
+      "required_later_decision": "Define its identity and relationship to RuntimeGate.Egress before deterministic Program validation is implemented."
+    },
+    {
+      "id": "UR-021",
+      "category": "universal_contract_incomplete",
+      "subject": "PROGRAM.MEMORY.001",
+      "summary": "The Universal Program Contract requires declared inputs, outputs, terminal result states, artifact truth rules, failure states, and trace fields. Memory declares behavior, dependencies, render contracts, artifact rules, and trace fields, but it has no explicit Inputs, Outputs, or terminal-result declaration comparable to SimCode.",
+      "source_map_ids": ["programs.universal", "programs.memory"],
+      "preserved_state": "inputs_and_outputs_left_null_in_component_registry",
+      "required_later_decision": "Approve a complete Program packet contract without inferring fields from prose."
+    },
+    {
+      "id": "UR-022",
+      "category": "alias_contract_incomplete",
+      "subject": "active component alias registry",
+      "summary": "Exec says every ACTIVE Library, Service, and Program must declare exactly one stable alias, but many ACTIVE ExecLib blocks declare name only and the active trace registry lists only MMU, StateTree, MemoryPacket, Memory, and SimCode.",
+      "source_map_ids": ["exec.echotrace", "execlib.canon", "execlib.active_registry"],
+      "preserved_state": "names_not_promoted_to_aliases",
+      "required_later_decision": "Approve missing stable aliases or narrow the alias requirement; BC-010 does not synthesize aliases from names."
+    }
+  ]
+}

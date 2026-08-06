@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/contracts/runtime/schemas/task_packet.schema.json",
+  "title": "Blu v0.22.0 task packet",
+  "description": "The golden runtime requires task identification but does not declare a deterministic task-packet field contract. This schema therefore asserts object shape only and must not be read as a completed design.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-blu-contract-status": "underspecified",
+  "x-source-map-id": "schema.task_packet"
+}

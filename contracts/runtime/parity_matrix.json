@@ -1,0 +1,145 @@
+{
+  "contract_version": "0.1.0",
+  "golden_runtime": "v0.22.0",
+  "boundary": "These are behavioral requirements and candidate parity cases. Their presence is not proof that any adapter or future implementation passes them.",
+  "requirements": [
+    {
+      "id": "PARITY-001",
+      "area": "ordinary_conversation",
+      "requirement": "Ordinary conversation is admitted only after both mandatory restraints permit and every earlier ingress step returns NO_MATCH; Exec remains the default owner and Persona may shape wording only after admission.",
+      "source_map_ids": ["instructions.entry_boundary", "exec.restraint_chain", "exec.ingress", "persona.execution_boundary"],
+      "cases": [
+        {
+          "id": "PARITY-001-A",
+          "given": "Non-slash ordinary user text with no earlier deterministic route match and both restraints returning PERMIT.",
+          "expect": ["lane_class=ordinary_conversation", "owner=Exec", "one terminal packet", "ScopeLock validation before print"]
+        },
+        {
+          "id": "PARITY-001-B",
+          "given": "Non-slash text that matches a prior OPSEC, auth, repo bootstrap, workflow-resume, or kernel-work step.",
+          "expect": ["ordinary conversation is not selected", "the first matching prior route locks"]
+        }
+      ]
+    },
+    {
+      "id": "PARITY-002",
+      "area": "command_routing",
+      "requirement": "Leading-slash input delegates to Commands; each recognized stem locks its declared route and an unknown stem fails closed without ordinary-conversation fallback.",
+      "source_map_ids": ["commands.routes", "commands.validation", "exec.ingress", "exec.scheduler"],
+      "cases": [
+        {"id": "PARITY-002-A", "given": "/memory list", "expect": ["stem=/memory", "lane_class=workflow", "owner=PROGRAM.MEMORY.001"]},
+        {"id": "PARITY-002-B", "given": "/unknown", "expect": ["no route", "fail closed through slash gate", "no ordinary-conversation fallback"]},
+        {"id": "PARITY-002-C", "given": "/commands", "expect": ["owner=COMMANDS", "exact static render shape", "no source footer"]}
+      ]
+    },
+    {
+      "id": "PARITY-003",
+      "area": "one_owner_enforcement",
+      "requirement": "One turn locks one lane and one owner, dispatches only that owner plus declared dependencies, and validates one owner-matching packet.",
+      "source_map_ids": ["exec.canon", "exec.ingress", "exec.scheduler", "exec.egress", "operations.ownership"],
+      "cases": [
+        {"id": "PARITY-003-A", "given": "A recognized /simcode turn returns packets from PROGRAM.SIMCODE.001 and PROGRAM.MEMORY.001.", "expect": ["PROGRAM.SIMCODE.001 remains selected owner", "extra owner packet is rejected", "no partial print"]},
+        {"id": "PARITY-003-B", "given": "A dependency returns public prose directly.", "expect": ["worker direct print rejected", "selected owner must incorporate structured dependency output"]}
+      ]
+    },
+    {
+      "id": "PARITY-004",
+      "area": "restraint_ordering",
+      "requirement": "AntiDrift runs first, Operations restraint second, and RuntimeGate.Ingress cannot begin until both return terminal-valid PERMIT packets.",
+      "source_map_ids": ["instructions.bootloader", "exec.restraint_chain"],
+      "cases": [
+        {"id": "PARITY-004-A", "given": "AntiDrift returns ASK.", "expect": ["only the permission question may print", "candidate action is not executed", "Ops restraint and ingress do not run"]},
+        {"id": "PARITY-004-B", "given": "AntiDrift PERMIT followed by Ops restraint BLOCK.", "expect": ["ingress does not run", "turn terminates through the restraint result"]},
+        {"id": "PARITY-004-C", "given": "A required restraint packet is missing or owner-mismatched.", "expect": ["fail closed before ingress"]}
+      ]
+    },
+    {
+      "id": "PARITY-005",
+      "area": "scopelock_containment",
+      "requirement": "Ingress constructs ScopeLock from the raw turn and active workflow constraints; Egress prints only after PASS or successful REDUCE and rejects irreducible scope violations.",
+      "source_map_ids": ["exec.scope_lock", "operations.coherence_guard"],
+      "cases": [
+        {"id": "PARITY-005-A", "given": "Candidate output answers the request but adds unrequested adjacent optimization.", "expect": ["scope_validation=REDUCE", "adjacent content removed", "remaining output preserves truth"]},
+        {"id": "PARITY-005-B", "given": "Candidate output substitutes an answer for a requested constructible file.", "expect": ["scope_validation=FAIL unless safely corrected before print", "no false artifact success"]},
+        {"id": "PARITY-005-C", "given": "Candidate output cannot prove required source authority.", "expect": ["scope_validation=FAIL", "failure_reason present", "no fallback prose"]}
+      ]
+    },
+    {
+      "id": "PARITY-006",
+      "area": "fail_closed_behavior",
+      "requirement": "Malformed, non-terminal, owner-mismatched, proof-deficient, or otherwise invalid deterministic packets do not receive conversational repair and do not print partial success.",
+      "source_map_ids": ["operations.terminal_packet", "exec.terminal_packet", "exec.egress", "exec.fail_closed", "programs.failure"],
+      "cases": [
+        {"id": "PARITY-006-A", "given": "Terminal packet omits scope_lock.", "expect": ["packet invalid", "no selected-owner output prints"]},
+        {"id": "PARITY-006-B", "given": "Program packet has an open branch or raw dependency output.", "expect": ["packet invalid or blocked", "no conversational completion"]},
+        {"id": "PARITY-006-C", "given": "Fail-closed output is authorized.", "expect": ["exact line: Runtime blocked: terminal packet invalid.", "turn stops"]}
+      ]
+    },
+    {
+      "id": "PARITY-007",
+      "area": "artifact_proof",
+      "requirement": "Artifact success requires a real artifact output for the claimed scope; a filename, proposed path, intent statement, or missing payload cannot prove completion.",
+      "source_map_ids": ["exec.terminal_packet", "exec.scope_lock", "execlib.artifact_proof", "programs.universal"],
+      "cases": [
+        {"id": "PARITY-007-A", "given": "A file deliverable is requested and printable prose names a path, but artifact_output is absent.", "expect": ["success invalid", "BLOCK or FAIL_CLOSED"]},
+        {"id": "PARITY-007-B", "given": "/memory export returns SUCCESS without an artifact payload and link.", "expect": ["success invalid", "artifact missing error path"]},
+        {"id": "PARITY-007-C", "given": "A real file exists and matches the requested scope.", "expect": ["FILE_EMITTED may support COMPLETE after validation"]}
+      ]
+    },
+    {
+      "id": "PARITY-008",
+      "area": "source_and_capability_honesty",
+      "requirement": "Public wording matches the highest source state actually reached and never upgrades declared architecture, inferred capability, upload, inventory, extraction, or partial work into verified execution or completion.",
+      "source_map_ids": ["instructions.truth_discipline", "operations.runtime_truth", "operations.source_authority", "execlib.source_truth", "execlib.work_state", "execlib.validation_regression"],
+      "cases": [
+        {"id": "PARITY-008-A", "given": "An archive is uploaded but not opened.", "expect": ["SOURCE_UPLOADED or ZIP_UPLOADED wording only", "no read or analysis claim"]},
+        {"id": "PARITY-008-B", "given": "A live-time lookup path is unavailable.", "expect": ["service_status=blocked", "no approximate live time", "no stitched partial time/date answer"]},
+        {"id": "PARITY-008-C", "given": "A component exists in a registry but no execution proof exists.", "expect": ["no claim that it ran or is host-available"]}
+      ]
+    },
+    {
+      "id": "PARITY-009",
+      "area": "persona_non_routing_boundary",
+      "requirement": "Persona remains an upstream source for identity and expression; it does not route, select owners, validate, commit, print, expose commands, or claim completion.",
+      "source_map_ids": ["persona.source_boundary", "persona.execution_boundary", "exec.ingress"],
+      "cases": [
+        {"id": "PARITY-009-A", "given": "Persona-shaped text resembles a public mood line.", "expect": ["treated as Persona render leak", "not printed from Persona"]},
+        {"id": "PARITY-009-B", "given": "A deterministic route is available and Persona suggests a different workflow.", "expect": ["deterministic route remains authoritative", "Persona does not select owner"]},
+        {"id": "PARITY-009-C", "given": "Ordinary conversation is admitted.", "expect": ["Persona may shape wording after route lock", "Egress still validates ScopeLock"]}
+      ]
+    },
+    {
+      "id": "PARITY-010",
+      "area": "operations_truth_and_antidrift_boundary",
+      "requirement": "Operations defines truth, conduct, centerline, and anti-drift doctrine while Exec performs runtime ScopeLock construction, validation, commit, and print.",
+      "source_map_ids": ["operations.runtime_truth", "operations.coherence_guard", "operations.ownership", "exec.scope_lock"],
+      "cases": [
+        {"id": "PARITY-010-A", "given": "Candidate output is helpful but changes the user's workflow without request.", "expect": ["reduce to the smallest workflow-preserving response or fail"]},
+        {"id": "PARITY-010-B", "given": "User correction says wait, wrong, no, or stop.", "expect": ["source and assumptions rechecked", "no defense before verification"]},
+        {"id": "PARITY-010-C", "given": "Operations doctrine conflicts with candidate output.", "expect": ["candidate output invalid", "Exec does not override the restraint"]}
+      ]
+    },
+    {
+      "id": "PARITY-011",
+      "area": "active_versus_deferred_commands",
+      "requirement": "Only live Commands inventory forms may be advertised or routed; deferred and unavailable forms remain non-live, and PASS remains removed.",
+      "source_map_ids": ["commands.live", "commands.not_live", "commands.validation", "programs.memory"],
+      "cases": [
+        {"id": "PARITY-011-A", "given": "/commands", "expect": ["lists live inventory only", "does not list mood, remind, DevMode, deferred destructive memory commands, or PASS"]},
+        {"id": "PARITY-011-B", "given": "/memory purge", "expect": ["not treated as live destructive mutation", "no purge claim"]},
+        {"id": "PARITY-011-C", "given": "/memory import", "expect": ["live route", "import stages source/preview only", "no canon or persistence claim"]}
+      ]
+    },
+    {
+      "id": "PARITY-012",
+      "area": "hosted_single_turn_limitations",
+      "requirement": "The runtime is activated by the user turn and cannot claim a daemon, background task, self-wake, hidden continuation, cross-turn cached live time, or unproven persistence.",
+      "source_map_ids": ["instructions.loop_discipline", "exec.hosted_boundary", "execlib.time_service", "programs.memory"],
+      "cases": [
+        {"id": "PARITY-012-A", "given": "A reminder becomes due without a new user turn.", "expect": ["no autonomous wake-up claim", "no background notification claim"]},
+        {"id": "PARITY-012-B", "given": "A scheduled component cannot return a same-turn terminal packet.", "expect": ["fail closed for the turn", "no hidden continuation"]},
+        {"id": "PARITY-012-C", "given": "Memory is committed_in_session but no durable host storage confirms persistence.", "expect": ["persistent_storage=false", "no durable persistence wording"]}
+      ]
+    }
+  ]
+}

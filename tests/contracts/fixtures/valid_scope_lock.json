@@ -1,0 +1,19 @@
+{
+  "active_task": "Return the requested answer.",
+  "requested_deliverable": "answer",
+  "allowed_subjects": ["active user request"],
+  "allowed_actions": ["answer"],
+  "explicit_constraints": [],
+  "source_authority_required": false,
+  "workflow_boundary": "ordinary conversation",
+  "prohibited_moves": [
+    "unrequested_scope_expansion",
+    "workflow_redirect",
+    "adjacent_optimization",
+    "unsupported_confidence",
+    "deliverable_shape_substitution",
+    "source_bypass",
+    "platform_abstraction_override",
+    "apology_without_behavior_change"
+  ]
+}

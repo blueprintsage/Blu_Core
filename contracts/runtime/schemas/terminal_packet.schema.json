@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/contracts/runtime/schemas/terminal_packet.schema.json",
+  "title": "Blu v0.22.0 terminal packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "lane_class",
+    "owner",
+    "source_or_contract",
+    "executed_action",
+    "validation_result",
+    "terminal_state",
+    "printable_output",
+    "artifact_output",
+    "failure_reason",
+    "scope_lock",
+    "scope_validation"
+  ],
+  "properties": {
+    "lane_class": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Must match the Ingress lock. This extraction does not close the value to an enum because /memory uses workflow while Exec's declared lane_classes list omits it; see UR-011."
+    },
+    "owner": {"type": "string", "minLength": 1},
+    "source_or_contract": {"type": "string", "minLength": 1},
+    "executed_action": {"type": "string"},
+    "validation_result": {"enum": ["pass", "fail"]},
+    "terminal_state": {"enum": ["terminal_valid", "invalid"]},
+    "printable_output": {"type": ["string", "null"]},
+    "artifact_output": {},
+    "failure_reason": {"type": ["string", "null"]},
+    "scope_lock": {"$ref": "scope_lock.schema.json"},
+    "scope_validation": {"enum": ["PASS", "REDUCE", "FAIL"]},
+    "error_code": {"type": "string"}
+  },
+  "x-blu-contract-status": "explicit",
+  "x-source-map-id": "schema.terminal_packet"
+}

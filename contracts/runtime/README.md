@@ -3,7 +3,10 @@
 status: extracted
 owner: docs/domains/runtime
 source_runtime: kernel/golden/v0.22.0
-assignment: BC-010
+assignment_lineage:
+  - BC-010
+  - BC-010-C1
+  - BC-010-C2
 
 ## Purpose
 

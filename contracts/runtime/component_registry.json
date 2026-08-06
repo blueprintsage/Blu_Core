@@ -1,6 +1,7 @@
 {
   "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
+  "assignment_lineage": ["BC-010", "BC-010-C1", "BC-010-C2"],
   "boundary": "Descriptive extraction only. A registry entry does not prove executable implementation or host capability.",
   "components": [
     {
@@ -70,7 +71,8 @@
       "kind": "terminal_validator",
       "status": "active",
       "ownership": ["one terminal packet validation", "ScopeLock containment", "print authorization"],
-      "dependencies": ["selected owner contract", "mandatory restraint packets"],
+      "dependencies": [],
+      "dependency_prose": ["selected owner contract", "mandatory restraint packets"],
       "inputs": ["Ingress lock", "terminal packet", "scope_lock"],
       "outputs": ["authorized print", "reduced scope-valid print", "fail closed"],
       "definition_status": "defined_in_golden",
@@ -252,7 +254,8 @@
       "kind": "continuity_overlay_library",
       "status": "ACTIVE",
       "ownership": ["memory classification", "promotion validation", "typed continuity shaping", "compact preload", "staged memory proposals"],
-      "dependencies": ["EXECLIB.STATETREE.001 for staged transition validation"],
+      "dependencies": ["EXECLIB.STATETREE.001"],
+      "dependency_prose": ["StateTree validates staged transition state deltas."],
       "inputs": ["portrait?", "project?", "ctx?", "token_budget?", "memory candidates", "source inventory"],
       "outputs": ["continuity_packet?", "compact_preload?", "staged memory entry proposals", "valid"],
       "definition_status": "defined_in_golden_repeated_extension",
@@ -265,7 +268,8 @@
       "kind": "source_inventory_and_selection_library",
       "status": "ACTIVE",
       "ownership": ["source inventory", "readable-scope classification", "archive traversal planning", "source selection planning"],
-      "dependencies": ["EXECLIB.DATELIB.001 for anchored relative-date math"],
+      "dependencies": ["EXECLIB.DATELIB.001"],
+      "dependency_prose": ["DateLib performs deterministic relative-date math only after a date anchor exists."],
       "inputs": ["artifact_path", "artifact_name", "visible_metadata", "inventory_depth?", "traversal_policy?", "user_constraints?", "user_request?", "turn_date_anchor?", "source_selection_policy?"],
       "outputs": ["inventory[]", "readable_sources[]", "visual_only_sources[]", "OCR_fragile_sources[]", "index_candidates[]", "rules_candidates[]", "operational_state_candidates[]", "date_matched_candidates[]", "traversal_plan", "source_selection_plan", "inventory_summary", "unresolved_source_questions[]", "valid", "err?"],
       "definition_status": "defined_in_golden",

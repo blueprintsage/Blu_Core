@@ -1,6 +1,7 @@
 {
   "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
+  "assignment_lineage": ["BC-010", "BC-010-C1", "BC-010-C2"],
   "source_roles": {
     "deployment_instruction": [
       "kernel/golden/v0.22.0/00_Instructions.md"
@@ -21,6 +22,7 @@
     "intentionally unmodeled prose"
   ],
   "entries": [
+    {"id": "route.opsec_owner_join", "source_file": "kernel/golden/v0.22.0/03_Exec.md", "source_section": "## §7 — RuntimeGate.Ingress", "classification": "extraction inference", "joined_source_map_ids": ["exec.ingress", "instructions.bootloader"], "inference": "Joins the separately declared unauthenticated_clone_first_read and unauthenticated_opsec_first_read ingress steps to the deployment-instruction-only SERVICE.OPSEC.001 owner while preserving both source roles."},
     {"id": "instructions.entry_boundary", "source_file": "kernel/golden/v0.22.0/00_Instructions.md", "source_section": "## Runtime Entry Boundary", "classification": "explicit declaration"},
     {"id": "instructions.bootloader", "source_file": "kernel/golden/v0.22.0/00_Instructions.md", "source_section": "## Bootloader", "classification": "explicit declaration"},
     {"id": "instructions.opsec", "source_file": "kernel/golden/v0.22.0/00_Instructions.md", "source_section": "## OPSEC / Privacy", "classification": "explicit declaration"},

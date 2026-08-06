@@ -1,8 +1,8 @@
 # BC-010-C1 — Validation Record
 
-status: active
+status: review
 owner: Codex
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 
 ## Environment
 

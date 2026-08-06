@@ -1,6 +1,6 @@
 # BC-010-C1 — Runtime Contract Extraction Corrections
 
-status: active
+status: review
 owner: Codex
 semantic_reviewer: Claude
 approved_by: Dad and Blu

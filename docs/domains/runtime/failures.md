@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 
 ## 2026-08-05 — BC-010 safe extraction limits
 
@@ -48,3 +48,15 @@ last_reviewed: 2026-08-05
   heading.
 - A commit cannot record its own final SHA. BC-010-C1 therefore continues the
   approved work-commit plus metadata-record-commit method.
+
+## 2026-08-06 — BC-010-C2 reusable route-extraction failures
+
+- A route name does not prove a lane-class enum value. An ingress step containing
+  `opsec` cannot be promoted to `lane_class=opsec` when Exec's declared lane
+  list omits it.
+- Cross-role owner joins must be labeled as extraction inference. Preserving two
+  source citations is necessary but does not turn separate declarations into
+  one direct declaration.
+- Successor architecture decisions must not be projected backward into
+  golden-source extraction. Record the approved future boundary in project
+  decisions while preserving the CTS gap in generated contracts.

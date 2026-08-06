@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 
 ## BC-010
 
@@ -24,3 +24,13 @@ last_reviewed: 2026-08-05
    provenance, dependency wording, and StateTree conflict preservation.
 3. Blu or Dad decides integration. Keep both BC-010 and BC-010-C1 in `review`
    until that disposition; do not begin BC-020 or BC-030.
+
+## BC-010-C2
+
+1. Claude performs a read-only semantic review against the C2 repair work
+   commit recorded in its handoff.
+2. Review the null OPSEC lane-class representation, UR-028, cross-role inference
+   provenance, lane closure, dependency cleanup, and reason-specific negative
+   tests.
+3. Blu or Dad decides integration. Keep BC-010, BC-010-C1, and BC-010-C2 in
+   `review`; do not merge this branch or begin BC-020 or BC-030.

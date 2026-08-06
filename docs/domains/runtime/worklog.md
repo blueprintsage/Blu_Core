@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 
 ## 2026-08-05 — Bootstrap
 
@@ -151,3 +151,52 @@ last_reviewed: 2026-08-05
 
 - Repair work commit: recorded by the authorized metadata-only follow-up.
 - Metadata record commit: reported externally after creation.
+
+## 2026-08-06 — BC-010-C2 OPSEC route classification repair
+
+### What changed
+
+- Replaced the two unsupported `opsec` route lane values with null lane classes,
+  explicit undeclared status, and UR-028.
+- Marked the cross-role OPSEC owner join as extraction inference and added a
+  dedicated source-map join entry preserving both source roles.
+- Added route lane-class closure validation for Exec-declared lanes,
+  unresolved route-table-only values, and source-proven null lanes.
+- Separated component IDs from dependency prose in the three records identified
+  by Claude's C1 review.
+- Strengthened negative fixture reasons and added synthetic object-closure
+  coverage.
+- Recorded assignment lineage, the approved successor-runtime Auth/OPSEC
+  decision, C2 assignment evidence, and C1 status cleanup.
+- Did not modify the golden CTS source or implement runtime behavior.
+
+### What was tested or reviewed
+
+- Final exact command and checksum receipts are recorded in
+  `assignments/BC-010-C2/validation.md`.
+
+### What worked
+
+- The validator rejects `opsec` and arbitrary invented lane classes.
+- Declared `auth`, unresolved route-table-only `workflow`, and the two
+  source-proven null OPSEC lane classes validate.
+- All five canonical negative fixtures are asserted against their intended
+  failure reasons.
+
+### Known risks
+
+- Contract validation remains structural and does not prove runtime behavior.
+- The successor OPSEC decision is deliberately not represented as golden CTS
+  provenance.
+
+### Next safe step
+
+- Claude performs a read-only semantic review of the C2 repair work commit;
+  Blu or Dad decides integration. Do not merge or mark BC-010, BC-010-C1, or
+  BC-010-C2 done.
+
+### Commit or patch identity
+
+- Exact base: `424f80b254a02f057da6c82db5230377076fc415`
+- Branch: `bc-010-c2-opsec-route-repair`
+- Repair work commit: recorded by the authorized metadata-only follow-up.

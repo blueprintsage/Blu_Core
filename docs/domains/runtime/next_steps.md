@@ -6,13 +6,11 @@ last_reviewed: 2026-08-05
 
 ## BC-010
 
-1. Commit the validated BC-010 implementation as one reviewable work commit.
-2. Record the work SHA in one metadata-only receipt commit under the authorized
-   amendment; do not change contracts, tools, tests, or golden files in it.
-3. Have Claude perform the assigned read-only semantic review against all seven
-   golden files, focusing on unresolved declarations, route/lane fidelity,
-   schema non-invention, and Persona/Operations non-reduction.
-4. Let Blu or Dad decide every item in `contracts/runtime/unresolved_register.json`;
+1. Have Claude perform the assigned read-only semantic review of work commit
+   `40138b6e16f28c01904aae97158878468ee47ad0` against all seven golden files,
+   focusing on unresolved declarations, route/lane fidelity, schema
+   non-invention, and Persona/Operations non-reduction.
+2. Let Blu or Dad decide every item in `contracts/runtime/unresolved_register.json`;
    BC-010 must not resolve those items itself.
-5. Do not begin BC-020 or BC-030 until their packets are approved and bases are
+3. Do not begin BC-020 or BC-030 until their packets are approved and bases are
    named.

@@ -21,7 +21,7 @@ canonical_base: 7aed76e
 
 | ID | Assignment | Owner | Status | Packet | Base | Collision domain / notes |
 |---|---|---|---|---|---|---|
-| BC-010 | Extract machine-readable runtime contracts from CTS | Codex | active | Inline below | `7aed76e` | Validated implementation ready for the authorized work-commit plus metadata-receipt sequence |
+| BC-010 | Extract machine-readable runtime contracts from CTS | Codex | review | Inline below | `7aed76e` | Work commit `40138b6e16f28c01904aae97158878468ee47ad0`; Claude semantic review targets the work commit, not the metadata record commit |
 | BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
 | BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
 
@@ -277,6 +277,16 @@ Move BC-010 from `active` to `review` only when:
 - the work is committed as one reviewable, revertible commit;
 - the exact commit ID is recorded in this file;
 - no behavior implementation was added.
+
+### Implementation receipt
+
+- **Work commit:** `40138b6e16f28c01904aae97158878468ee47ad0`
+- **Review status:** `review`
+- **Semantic review target:** `40138b6e16f28c01904aae97158878468ee47ad0`
+- **Handoff:** `docs/domains/runtime/assignments/BC-010/handoff.md`
+- **Record method:** authorized metadata-only follow-up commit under the
+  amendment above
+- **Push status:** not pushed
 
 ### Handoff format
 

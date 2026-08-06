@@ -74,9 +74,8 @@ last_reviewed: 2026-08-05
 
 ### Next safe step
 
-- Commit the validated implementation, record its SHA in the authorized
-  metadata-only receipt commit, and request Claude's read-only semantic review
-  against the seven golden files at the implementation SHA.
+- Request Claude's read-only semantic review against the seven golden files at
+  work commit `40138b6e16f28c01904aae97158878468ee47ad0`.
 
 ### Files changed
 
@@ -92,4 +91,6 @@ last_reviewed: 2026-08-05
 ### Commit or patch identity
 
 - Work branch: `bc-010-runtime-contracts`
-- Commit: pending authorized implementation commit
+- Work commit: `40138b6e16f28c01904aae97158878468ee47ad0`
+- Record commit: this authorized metadata-only follow-up; its exact SHA is
+  reported externally because a commit cannot contain its own final hash

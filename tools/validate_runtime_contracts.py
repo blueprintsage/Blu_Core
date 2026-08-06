@@ -82,6 +82,7 @@ SUPPORTED_SCHEMA_KEYWORDS = {
 ANNOTATION_KEYWORDS = {"$schema", "$id", "title", "description"}
 SUPPORTED_TYPES = {"null", "object", "array", "string", "boolean", "integer", "number"}
 HEADING_RE = re.compile(r"^(#{1,6})[ \t]+\S")
+UNDECLARED_LANE_STATUSES = {"undeclared_in_golden_source"}
 
 
 def load_json(path: Path) -> Any:
@@ -300,6 +301,64 @@ def declared_source_roles(source_map: dict[str, Any]) -> tuple[dict[str, set[str
     return roles_by_file, errors
 
 
+def route_lane_class_errors(
+    route_registry: dict[str, Any],
+    unresolved_register: dict[str, Any],
+    source_ids: set[str],
+) -> list[str]:
+    """Enforce closure over source-declared and explicitly unresolved lane classes."""
+    errors: list[str] = []
+    lane_declarations = route_registry.get("declared_lane_classes", {})
+    declared_values = lane_declarations.get("values", [])
+    if not isinstance(declared_values, list) or any(not isinstance(item, str) for item in declared_values):
+        return ["declared_lane_classes.values must be a list of strings"]
+    declared_lanes = set(declared_values)
+
+    unresolved_ids = {
+        item.get("id")
+        for item in unresolved_register.get("items", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    route_table_only = lane_declarations.get("route_table_only_value")
+    route_table_conflict = lane_declarations.get("conflict_register_id")
+    if route_table_only is not None and (
+        not isinstance(route_table_only, str)
+        or not isinstance(route_table_conflict, str)
+        or route_table_conflict not in unresolved_ids
+    ):
+        errors.append("route-table-only lane_class must link to an existing unresolved entry")
+
+    for surface in ("live_slash_routes", "non_slash_routes"):
+        routes = route_registry.get(surface, [])
+        if not isinstance(routes, list):
+            errors.append(f"{surface} must be an array")
+            continue
+        for route in routes:
+            if not isinstance(route, dict):
+                errors.append(f"{surface} entry must be an object")
+                continue
+            route_id = route.get("id") or route.get("stem") or "<unnamed route>"
+            lane_class = route.get("lane_class")
+            if lane_class is None:
+                if route.get("lane_class_status") not in UNDECLARED_LANE_STATUSES:
+                    errors.append(f"null lane_class requires unresolved status: {route_id}")
+                refs = collect_source_refs(route)
+                if not refs or not refs.issubset(source_ids):
+                    errors.append(f"null lane_class requires valid source provenance: {route_id}")
+                unresolved_id = route.get("unresolved_register_id")
+                if not isinstance(unresolved_id, str) or unresolved_id not in unresolved_ids:
+                    errors.append(f"null lane_class requires an existing unresolved entry: {route_id}")
+            elif not isinstance(lane_class, str) or not lane_class:
+                errors.append(f"invalid route lane_class: {route_id}: {lane_class!r}")
+            elif lane_class in declared_lanes:
+                continue
+            elif lane_class == route_table_only and route_table_conflict in unresolved_ids:
+                continue
+            else:
+                errors.append(f"undeclared route lane_class {lane_class!r}: {route_id}")
+    return errors
+
+
 def validate_contracts(repo_root: Path) -> list[str]:
     errors: list[str] = []
     contract_root = repo_root / "contracts" / "runtime"
@@ -369,6 +428,17 @@ def validate_contracts(repo_root: Path) -> list[str]:
             )
         )
 
+    for entry in entries:
+        joined_refs = entry.get("joined_source_map_ids")
+        if joined_refs is None:
+            continue
+        if not isinstance(joined_refs, list) or any(not isinstance(item, str) for item in joined_refs):
+            errors.append(f"joined_source_map_ids must be a list of ids: {entry.get('id')}")
+            continue
+        for joined_ref in joined_refs:
+            if joined_ref not in source_ids:
+                errors.append(f"unknown joined source_map reference: {entry.get('id')}: {joined_ref}")
+
     for path, document in documents.items():
         if path == source_map_path or fixture_root in path.parents:
             continue
@@ -397,6 +467,7 @@ def validate_contracts(repo_root: Path) -> list[str]:
                 errors.append(f"deployment-only reference classified as kernel definition: {component.get('id')}")
 
     route_registry = documents[contract_root / "route_registry.json"]
+    unresolved_register = documents[contract_root / "unresolved_register.json"]
     owners_by_stem: dict[str, set[str]] = {}
     for route in route_registry.get("live_slash_routes", []):
         stem = route.get("stem")
@@ -410,6 +481,7 @@ def validate_contracts(repo_root: Path) -> list[str]:
             errors.append(f"duplicate public owners for command stem {stem}: {sorted(owners)}")
     if len(route_registry.get("live_slash_routes", [])) != len(owners_by_stem):
         errors.append("duplicate public command stem row")
+    errors.extend(route_lane_class_errors(route_registry, unresolved_register, source_ids))
 
     schema_ids: set[str] = set()
     for relative in REQUIRED_SCHEMAS:

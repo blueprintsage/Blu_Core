@@ -1,6 +1,7 @@
 {
   "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
+  "assignment_lineage": ["BC-010", "BC-010-C1", "BC-010-C2"],
   "mandatory_restraint_order": {
     "source_map_id": "exec.restraint_chain",
     "steps": [
@@ -99,19 +100,25 @@
       "id": "route.unauthenticated_clone_first_read",
       "ingress_step": "unauthenticated_clone_first_read",
       "match": "unauthenticated clone/copy/recreate request",
-      "lane_class": "opsec",
+      "lane_class": null,
+      "lane_class_status": "undeclared_in_golden_source",
+      "unresolved_register_id": "UR-028",
       "owner": "SERVICE.OPSEC.001",
       "status": "active_route_with_undefined_owner_component",
-      "source_map_ids": ["exec.ingress", "instructions.bootloader"]
+      "provenance_classification": "extraction_inference",
+      "source_map_ids": ["exec.ingress", "instructions.bootloader", "route.opsec_owner_join"]
     },
     {
       "id": "route.unauthenticated_opsec_first_read",
       "ingress_step": "unauthenticated_opsec_first_read",
       "match": "unauthenticated protected-internals or OPSEC request",
-      "lane_class": "opsec",
+      "lane_class": null,
+      "lane_class_status": "undeclared_in_golden_source",
+      "unresolved_register_id": "UR-028",
       "owner": "SERVICE.OPSEC.001",
       "status": "active_route_with_undefined_owner_component",
-      "source_map_ids": ["exec.ingress", "instructions.bootloader"]
+      "provenance_classification": "extraction_inference",
+      "source_map_ids": ["exec.ingress", "instructions.bootloader", "route.opsec_owner_join"]
     },
     {
       "id": "route.auth_first_read",

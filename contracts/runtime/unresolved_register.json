@@ -1,6 +1,7 @@
 {
   "contract_version": "0.2.0",
   "golden_runtime": "v0.22.0",
+  "assignment_lineage": ["BC-010", "BC-010-C1", "BC-010-C2"],
   "resolution_policy": "Open items preserve golden-source gaps or conflicts. This register does not resolve them and does not authorize implementation.",
   "items": [
     {
@@ -245,6 +246,15 @@
       "source_map_ids": ["execlib.time_service", "execlib.personalib", "execlib.moodlib", "execlib.mmu", "execlib.validation_regression"],
       "preserved_state": "identifiers_only_no_render_or_behavior_inferred",
       "required_later_decision": "Define macro rendering through an approved error-catalog and renderer contract."
+    },
+    {
+      "id": "UR-028",
+      "category": "route_classification_underspecified",
+      "subject": "unauthenticated_clone_first_read and unauthenticated_opsec_first_read lane class",
+      "summary": "Exec declares both OPSEC ingress steps and their terminal route behavior, while the deployment instruction assigns their exclusive owner to SERVICE.OPSEC.001. The golden source does not declare either route's lane class or formally resolve whether OPSEC is a route lane or a pre-ingress restraint.",
+      "source_map_ids": ["exec.ingress", "instructions.bootloader", "route.opsec_owner_join"],
+      "preserved_state": "null_lane_class_with_cross_role_owner_join",
+      "required_later_decision": "Specify the successor-runtime OPSEC restraint and route relationship without projecting that later decision backward into the golden CTS extraction."
     }
   ]
 }

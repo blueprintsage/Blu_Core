@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/worklogs
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-06
 canonical_base: 7aed76e
 
 ## Rules
@@ -23,6 +23,7 @@ canonical_base: 7aed76e
 |---|---|---|---|---|---|---|
 | BC-010 | Extract machine-readable runtime contracts from CTS | Codex | review | `docs/domains/runtime/assignments/BC-010/assignment.md` | `7aed76e` | Work commit `40138b6e16f28c01904aae97158878468ee47ad0`; Claude semantic review targets the work commit, not the metadata record commit |
 | BC-010-C1 | Runtime contract extraction corrections | Codex | review | `docs/domains/runtime/assignments/BC-010-C1/assignment.md` | `38611bf4b8051c858dcbbc30a07904d0117211b3` | Repair work commit `63c8b692403fe5ec1a9433a8313a7980fbd55437`; metadata-only record follows; Claude reviews the repair work commit; push explicitly authorized 2026-08-06 |
+| BC-010-C2 | OPSEC route classification repair | Codex | review | `docs/domains/runtime/assignments/BC-010-C2/assignment.md` | `424f80b254a02f057da6c82db5230377076fc415` | Repair work commit pending first commit; metadata-only record follows; Claude reviews the repair work commit; do not merge |
 | BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
 | BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
 
@@ -318,7 +319,8 @@ a separate correction assignment.
 - Bootstrap checks: `git diff --check` and
   `sha256sum -c kernel/golden/v0.22.0/SHA256SUMS`.
 - Do not touch `kernel/golden/`.
-- Blu's current runtime is the Markdown CTS kernel.
+- Blu's current CTS deployment is one GPT deployment instruction plus six
+  kernel/runtime capsules.
 - No Python Blu runtime exists yet.
 - Contract-validation tooling is not runtime implementation.
 - Do not restore legacy `library/` SkillForge routing.

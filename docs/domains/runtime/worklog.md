@@ -291,3 +291,55 @@ last_reviewed: 2026-08-06
   integration assignment and does not retroactively change the BC-015 record.
 - Integrated main state before closure:
   `1f07333457b18895fbb04d5c776e3259d870f2f6`.
+
+## 2026-08-06 — BC-016 historical archive inventory integration
+
+### What changed
+
+- Integrated 249 path-sanitized historical source records: 244 archives, three
+  branch-root Markdown file sets, and two historical source folders.
+- Independently verified the stable outer `Kernel.zip` receipt and confirmed
+  all 279 snapshot payload files match the live historical root by relative
+  path and SHA-256.
+- Added two exact shared-SHA duplicate groups, 500 reconciliation entries, and
+  eight representative milestones covering all requested structural eras.
+- Added standard-library-only static validation and twelve tests.
+- Preserved the current CTS authority boundary and imported no archive bytes.
+
+### What was tested or reviewed
+
+- Verified external JSON/CSV agreement and consumed all four discovery outputs.
+- Recomputed live archive/file-set identities and compared them with the stable
+  snapshot.
+- Ran the historical inventory validator and twelve tests successfully during
+  implementation; final full-repository receipts are in
+  `assignments/BC-016/validation.md`.
+
+### What worked
+
+- All local paths were converted to approved source-root aliases plus relative
+  paths.
+- Snapshot, live root, and discovery identities remain distinct and explicit.
+- Exact duplicate grouping now requires one shared canonical SHA-256.
+- Two ambiguous external short-date parses were rejected rather than silently
+  accepted.
+
+### What failed or remains unavailable
+
+- Seven Deflate64 archives cannot be decompressed by installed readers. Their
+  central directories and archive hashes are available; integrity is
+  `not_tested`.
+- No historical behavior was executed or compared.
+
+### Known risks and next safe step
+
+- Marker prominence and implementation-style Markdown can be mistaken for
+  behavioral proof; BC-017 must not make that inference.
+- Claude performs a read-only semantic review of the BC-016 inventory work
+  commit. Do not begin archaeology, BC-020, BC-030, or Python implementation.
+
+### Commit or patch identity
+
+- Exact base: `fdb6c7e150d3717172e08a1bc349a428187df45a`
+- Branch: `bc-016-historical-archive-inventory`
+- Inventory work commit: recorded by the authorized metadata-only follow-up.

@@ -85,6 +85,22 @@ docs/domains/runtime/viability/audit_report.md
 BC-015 classifies current evidence separately from successor disposition. It is
 an audit and inventory layer, not runtime implementation or behavioral proof.
 
+## Historical archive source map
+
+```text
+docs/sources/historical_archives/README.md
+docs/sources/historical_archives/kernel_archive_inventory.json
+docs/sources/historical_archives/kernel_archive_inventory.csv
+docs/sources/historical_archives/snapshot_receipt.json
+docs/sources/historical_archives/reconciliation_report.md
+docs/sources/historical_archives/milestone_recommendations.md
+docs/sources/historical_archives/discovery_receipt.md
+```
+
+BC-016 integrates path-sanitized historical source identities and representative
+milestones. These records are non-authoritative for the current runtime and do
+not prove historical behavior.
+
 ## Project-wide guides
 
 ```text

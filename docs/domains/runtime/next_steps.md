@@ -14,13 +14,13 @@ Python runtime.
 
 ## Next safe step
 
-BC-016 integrates the completed external historical-archive inventory and the
-stable owner-supplied snapshot receipt as sanitized, non-authoritative source
-records. BC-016 does not perform behavioral archaeology or change BC-015's
-viability conclusions.
+BC-016 is ready for Claude's read-only semantic review. It integrates the
+external historical-archive inventory and independently verified stable
+snapshot receipt as sanitized, non-authoritative source records. It performs no
+behavioral archaeology and does not change BC-015's viability conclusions.
 
-BC-017 may later inspect an approved representative milestone set through a
-separate packet and named base.
+After approved BC-016 integration, BC-017 may inspect the representative
+milestone set only through a separate packet and named base.
 
 Do not begin BC-020 or BC-030, implement a Python runtime or successor control
 plane, restore historical capabilities, or resolve the 28 current-source gaps

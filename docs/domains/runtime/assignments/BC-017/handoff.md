@@ -55,6 +55,6 @@ integration. Do not begin successor design, BC-018, BC-020, or BC-030.
 
 - Exact base: `4abae4865067d8a6ae0651017d4a564c09dde47b`
 - Branch: `bc-017-historical-behavioral-archaeology`
-- Substantive work commit: `PENDING_METADATA_COMMIT`
+- Substantive work commit: `dcad56f7d50252ab70e993aef7a763ed2bd3617b`
 - Metadata commit: reported externally because a commit cannot contain its own
   final SHA.

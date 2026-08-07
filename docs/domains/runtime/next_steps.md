@@ -14,14 +14,14 @@ Python runtime.
 
 ## Next safe step
 
-BC-016 is closed. BC-017 is the next eligible assignment, but it has not started
-and is not authorized by this closure. It requires a separate approved
-assignment packet and named base.
+BC-017 is in review. Its implementation resolved BC-016 NB-1 and NB-4,
+completed bounded behavioral archaeology, and did not restore a runtime.
+Claude's next action is a separate read-only semantic review of the BC-017
+metadata commit, modifying only the assignment's `review.md`. Dad and Blu
+decide integration and closure.
 
-Claude's NB-1 through NB-10 remain available as review evidence. NB-1 and NB-4
-must be resolved or explicitly bounded before BC-017 relies on the affected
-records. NB-2, NB-3, and NB-6 remain validator and evidence-hardening follow-ups.
-The remaining notes stay preserved for the next assignment that legitimately
+NB-2, NB-3, and NB-6 remain validator and evidence-hardening follow-ups. The
+remaining BC-016 notes stay preserved for an assignment that legitimately
 touches their records.
 
 ### Legacy PASS exclusion
@@ -33,10 +33,10 @@ Legacy PASS must not be treated as a behavior-recovery candidate, recommended
 for restoration, treated as an architectural precedent, used as the successor
 PASS design, or allowed to displace or redefine the newer PASS specification.
 
-BC-017 must not spend analysis effort evaluating whether old PASS should return.
+Historical archaeology must not spend analysis effort evaluating whether old PASS should return.
 The newer PASS is the relevant successor reference and remains separate from
 historical archaeology.
 
-Do not begin BC-020 or BC-030, implement a Python runtime or successor control
-plane, restore historical capabilities, or resolve the 28 current-source gaps
-without an approved packet and named base.
+Do not begin successor design, BC-018, BC-020, or BC-030; implement a Python
+runtime or successor control plane; restore historical capabilities; or resolve
+the 28 current-source gaps without an approved packet and named base.

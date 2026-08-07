@@ -95,11 +95,19 @@ docs/sources/historical_archives/snapshot_receipt.json
 docs/sources/historical_archives/reconciliation_report.md
 docs/sources/historical_archives/milestone_recommendations.md
 docs/sources/historical_archives/discovery_receipt.md
+docs/sources/historical_archives/behavioral_archaeology/README.md
+docs/sources/historical_archives/behavioral_archaeology/boundary_specimens.json
+docs/sources/historical_archives/behavioral_archaeology/evidence_register.json
+docs/sources/historical_archives/behavioral_archaeology/behavior_recovery_matrix.md
+docs/sources/historical_archives/behavioral_archaeology/behavioral_evidence_report.md
+docs/sources/historical_archives/behavioral_archaeology/transition_map.md
 ```
 
 BC-016 integrates path-sanitized historical source identities and representative
 milestones. These records are non-authoritative for the current runtime and do
-not prove historical behavior.
+not prove historical behavior. BC-017 adds sanitized boundary-first behavioral
+archaeology and recovery dispositions without importing archive payloads or
+changing current authority.
 
 ## Project-wide guides
 

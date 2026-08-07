@@ -1,0 +1,413 @@
+{
+  "schema_version": "1.1.0",
+  "assignment": "BC-017",
+  "purpose": "Sanitized boundary specimens for historical behavioral archaeology; identifiers resolve through the canonical BC-016 inventory.",
+  "selection_rules": {
+    "chronology_precedence": [
+      "internal_archive_date",
+      "parsed_version",
+      "filesystem_fallback"
+    ],
+    "unsupported_archives": "Inventory records with integrity.status != readable are chronology-only and are never behavioral specimens.",
+    "source_folders": "Source-folder records may corroborate chronology but are not archive-boundary behavioral specimens."
+  },
+  "families": [
+    {
+      "family": "v0.3.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0007",
+      "last_specimen_archive_id": "BLU-HIST-0004",
+      "first_version_label": "v0.3.6.4",
+      "last_version_label": "v0.3.7.5",
+      "selection_basis": "internal_archive_date",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "early instruction/persona structure"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": null
+    },
+    {
+      "family": "v0.4.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0009",
+      "last_specimen_archive_id": null,
+      "first_version_label": "v0.4.3",
+      "last_version_label": "v0.4.4b ambiguity",
+      "selection_basis": "filesystem_fallback",
+      "chronology_confidence": "low",
+      "single_specimen_family": false,
+      "boundary_ambiguity": "Both candidates share a version label and only fallback chronology; neither is promoted as the unique last boundary.",
+      "primary_behavior_deltas": [
+        "command and memory structure changes"
+      ],
+      "drilldown_required": true,
+      "drilldown_specimens": [
+        "BLU-HIST-0011",
+        "BLU-HIST-0012"
+      ],
+      "notes": "Both candidates share a version label and only fallback chronology; neither is promoted as the unique last boundary. Unresolved last candidates: BLU-HIST-0011, BLU-HIST-0012."
+    },
+    {
+      "family": "v0.6.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0013",
+      "last_specimen_archive_id": "BLU-HIST-0013",
+      "first_version_label": "v0.6 archive",
+      "last_version_label": "v0.6 archive",
+      "selection_basis": "single_readable_archive",
+      "chronology_confidence": "high",
+      "single_specimen_family": true,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "explicit Auth safeguards and session-role state"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": "Chronology-only source-folder records: BLU-HIST-0014."
+    },
+    {
+      "family": "v0.7.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0020",
+      "last_specimen_archive_id": "BLU-HIST-0020",
+      "first_version_label": "v0.7.4.1",
+      "last_version_label": "v0.7.4.1",
+      "selection_basis": "single_readable_archive",
+      "chronology_confidence": "high",
+      "single_specimen_family": true,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "dense Persona/Anchors/Teaching control before Exec"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": null
+    },
+    {
+      "family": "v0.8.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0017",
+      "last_specimen_archive_id": "BLU-HIST-0062",
+      "first_version_label": "v0.8 pre-alpha",
+      "last_version_label": "v0.8 terminal specimen",
+      "selection_basis": "parsed_version_plus_internal_evidence",
+      "chronology_confidence": "medium",
+      "single_specimen_family": false,
+      "boundary_ambiguity": "BLU-HIST-0015 has an earlier filesystem fallback but a Beta label; fallback time alone cannot prove behavioral chronology.",
+      "primary_behavior_deltas": [
+        "Exec emergence",
+        "School state model",
+        "one-owner and fail-closed normalization"
+      ],
+      "drilldown_required": true,
+      "drilldown_specimens": [
+        "BLU-HIST-0015",
+        "BLU-HIST-0029",
+        "BLU-HIST-0030",
+        "BLU-HIST-0031",
+        "BLU-HIST-0055",
+        "BLU-HIST-0057"
+      ],
+      "notes": "BLU-HIST-0015 has an earlier filesystem fallback but a Beta label; fallback time alone cannot prove behavioral chronology."
+    },
+    {
+      "family": "v0.9.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0063",
+      "last_specimen_archive_id": "BLU-HIST-0093",
+      "first_version_label": "v0.9 first specimen",
+      "last_version_label": "v0.9.1 terminal rebuild",
+      "selection_basis": "internal_archive_date_and_version",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "MMU emergence",
+        "MoodLib",
+        "School/Teaching rebuild changes"
+      ],
+      "drilldown_required": true,
+      "drilldown_specimens": [
+        "BLU-HIST-0072",
+        "BLU-HIST-0084",
+        "BLU-HIST-0091",
+        "BLU-HIST-0093"
+      ],
+      "notes": "Chronology-only source-folder records: BLU-HIST-0090."
+    },
+    {
+      "family": "v0.10.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0094",
+      "last_specimen_archive_id": "BLU-HIST-0094",
+      "first_version_label": "v0.10",
+      "last_version_label": "v0.10",
+      "selection_basis": "single_readable_archive",
+      "chronology_confidence": "high",
+      "single_specimen_family": true,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "Behavior Router replaces Exec"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": null
+    },
+    {
+      "family": "v0.11.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0095",
+      "last_specimen_archive_id": "BLU-HIST-0110",
+      "first_version_label": "v0.11 first",
+      "last_version_label": "v0.11 last",
+      "selection_basis": "internal_archive_date_and_version",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "Exec restored",
+        "School remains removed pending rebuild"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": null
+    },
+    {
+      "family": "v0.12.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0111",
+      "last_specimen_archive_id": "BLU-HIST-0116",
+      "first_version_label": "v0.12 first",
+      "last_version_label": "v0.12 last",
+      "selection_basis": "internal_archive_date_and_version",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "orchestration growth without classroom owner"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": null
+    },
+    {
+      "family": "v0.13.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0117",
+      "last_specimen_archive_id": "BLU-HIST-0156",
+      "first_version_label": "v0.13 first",
+      "last_version_label": "v0.13 last",
+      "selection_basis": "internal_archive_date_and_version",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "reminder/time integration and Exec growth"
+      ],
+      "drilldown_required": true,
+      "drilldown_specimens": [
+        "BLU-HIST-0127"
+      ],
+      "notes": null
+    },
+    {
+      "family": "v0.14.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0157",
+      "last_specimen_archive_id": "BLU-HIST-0162",
+      "first_version_label": "v0.14 phase 2",
+      "last_version_label": "v0.14 phase 7",
+      "selection_basis": "internal_archive_date_and_phase",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "phase-based orchestration expansion"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": null
+    },
+    {
+      "family": "v0.15.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0163",
+      "last_specimen_archive_id": "BLU-HIST-0171",
+      "first_version_label": "v0.15 first",
+      "last_version_label": "v0.15 last",
+      "selection_basis": "internal_archive_date_and_version",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "continued Exec/ExecLib expansion"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": null
+    },
+    {
+      "family": "v0.16.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0172",
+      "last_specimen_archive_id": "BLU-HIST-0210",
+      "first_version_label": "v0.16 rX",
+      "last_version_label": "v0.16 last",
+      "selection_basis": "internal_archive_date_and_version",
+      "chronology_confidence": "medium",
+      "single_specimen_family": false,
+      "boundary_ambiguity": "BLU-HIST-0172 and BLU-HIST-0173 have identical normalized content manifests; both were inspected where the opening transition mattered.",
+      "primary_behavior_deltas": [
+        "mega-Exec peak",
+        "contraction",
+        "StateTree and memory packet concepts"
+      ],
+      "drilldown_required": true,
+      "drilldown_specimens": [
+        "BLU-HIST-0173",
+        "BLU-HIST-0183",
+        "BLU-HIST-0195",
+        "BLU-HIST-0200",
+        "BLU-HIST-0210",
+        "BLU-HIST-0223",
+        "BLU-HIST-0227",
+        "BLU-HIST-0228",
+        "BLU-HIST-0243",
+        "BLU-HIST-0244",
+        "BLU-HIST-0245"
+      ],
+      "notes": "BLU-HIST-0172 and BLU-HIST-0173 have identical normalized content manifests; both were inspected where the opening transition mattered."
+    },
+    {
+      "family": "v0.20.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0211",
+      "last_specimen_archive_id": "BLU-HIST-0243",
+      "first_version_label": "v0.20 first",
+      "last_version_label": "v0.20 last",
+      "selection_basis": "internal_archive_date_and_version",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "MMU prominence",
+        "Auth fix",
+        "memory alpha",
+        "ScopeLock/Wu Sao",
+        "Exec contraction"
+      ],
+      "drilldown_required": true,
+      "drilldown_specimens": [
+        "BLU-HIST-0210",
+        "BLU-HIST-0223",
+        "BLU-HIST-0227",
+        "BLU-HIST-0228",
+        "BLU-HIST-0243",
+        "BLU-HIST-0244",
+        "BLU-HIST-0245"
+      ],
+      "notes": null
+    },
+    {
+      "family": "v0.21.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0244",
+      "last_specimen_archive_id": "BLU-HIST-0245",
+      "first_version_label": "v0.21 first",
+      "last_version_label": "v0.21 last",
+      "selection_basis": "internal_cleanup_documents_and_version",
+      "chronology_confidence": "high",
+      "single_specimen_family": false,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "service extraction and thin-scheduler restructuring"
+      ],
+      "drilldown_required": true,
+      "drilldown_specimens": [
+        "BLU-HIST-0210",
+        "BLU-HIST-0223",
+        "BLU-HIST-0227",
+        "BLU-HIST-0228",
+        "BLU-HIST-0243",
+        "BLU-HIST-0244",
+        "BLU-HIST-0245"
+      ],
+      "notes": null
+    },
+    {
+      "family": "v0.22.x",
+      "family_source_type": "canonical_inventory_archive_records",
+      "first_specimen_archive_id": "BLU-HIST-0246",
+      "last_specimen_archive_id": "BLU-HIST-0246",
+      "first_version_label": "v0.22.0",
+      "last_version_label": "v0.22.0",
+      "selection_basis": "single_readable_archive",
+      "chronology_confidence": "high",
+      "single_specimen_family": true,
+      "boundary_ambiguity": null,
+      "primary_behavior_deltas": [
+        "compact CTS form identical in runtime members to current golden while retaining a distinct source role"
+      ],
+      "drilldown_required": false,
+      "drilldown_specimens": [],
+      "notes": "Seven runtime members are byte-identical to the current golden files, while historical and current source roles remain distinct."
+    }
+  ],
+  "explicit_gaps": [
+    "v0.5.x",
+    "v0.17.x",
+    "v0.18.x",
+    "v0.19.x"
+  ],
+  "drilldowns": [
+    {
+      "topic": "Exec emergence and School",
+      "record_ids": [
+        "BLU-HIST-0029",
+        "BLU-HIST-0030",
+        "BLU-HIST-0031",
+        "BLU-HIST-0055",
+        "BLU-HIST-0057"
+      ]
+    },
+    {
+      "topic": "MMU emergence and v0.9 rebuild",
+      "record_ids": [
+        "BLU-HIST-0072",
+        "BLU-HIST-0084",
+        "BLU-HIST-0091",
+        "BLU-HIST-0093"
+      ]
+    },
+    {
+      "topic": "time and reminders",
+      "record_ids": [
+        "BLU-HIST-0127"
+      ]
+    },
+    {
+      "topic": "mega-Exec growth and contraction",
+      "record_ids": [
+        "BLU-HIST-0183",
+        "BLU-HIST-0195",
+        "BLU-HIST-0200"
+      ]
+    },
+    {
+      "topic": "late memory and service restructuring",
+      "record_ids": [
+        "BLU-HIST-0210",
+        "BLU-HIST-0223",
+        "BLU-HIST-0227",
+        "BLU-HIST-0228",
+        "BLU-HIST-0243",
+        "BLU-HIST-0244",
+        "BLU-HIST-0245"
+      ]
+    }
+  ]
+}

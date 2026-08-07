@@ -355,3 +355,46 @@ last_reviewed: 2026-08-06
   unchanged.
 - No archive import, behavioral archaeology, or runtime implementation occurred
   during review integration or closure.
+
+## 2026-08-07 — BC-017 historical behavioral archaeology
+
+### What changed
+
+- Re-derived 16 available version families and preserved explicit gaps.
+- Selected readable family boundaries and focused change-point drilldowns.
+- Separated current truth, owner observations, archive evidence, inference, and
+  successor recommendations in a sanitized evidence register and report.
+- Added a behavior-centered recovery matrix and transition map.
+- Corrected BC-016 NB-1 and NB-4 without broadening the prior assignment.
+- Added evidence-integrity validation and focused negative tests.
+
+### What was tested or reviewed
+
+- Checked canonical archive-ID resolution, path sanitization, evidence labels,
+  recovery vocabulary, Faithfulness shipping status, payload exclusion, review
+  state, and golden checksums.
+- Re-ran the existing BC-016 inventory validator and tests after its two narrow
+  evidence corrections.
+- No historical behavior was executed; no Markdown declaration was treated as
+  runtime telemetry.
+
+### What worked
+
+- Boundary-first analysis exposed Exec emergence, School's explicit state
+  model, MMU introduction, reminder/time contracts, mega-Exec compensation, and
+  v0.21 service decomposition.
+- The archive evidence supports recovery of teaching/Persona guidance and thin
+  deterministic contracts, not historical module restoration.
+
+### What failed or remains unavailable
+
+- Sixty-three members in seven Deflate64 archives remain unreadable.
+- v0.4 boundary chronology, the v0.8 opening, durable host persistence,
+  autonomous wake, and the Kiddo incident mechanism remain unproven.
+
+### Known risks and next safe step
+
+- Historical declarations may still be mistaken for working runtime behavior;
+  the source-class labels and validator are mandatory safeguards.
+- Claude performs a separate read-only semantic review. Dad and Blu decide
+  integration. Do not start successor design, BC-018, BC-020, or BC-030.

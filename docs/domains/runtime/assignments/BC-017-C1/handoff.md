@@ -38,6 +38,6 @@ mark BC-017 done.
 
 - Exact base: `c323cff06c9f111408f4a416817d78fc0f3e2d2b`
 - Branch: `bc-017-c1-review-corrections`
-- Substantive correction commit: `PENDING_METADATA_COMMIT`
+- Substantive correction commit: `87c4e49333d30a471a00483fc1384e1918626ee1`
 - Metadata commit: reported externally because a commit cannot contain its own
   final SHA.

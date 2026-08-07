@@ -1,0 +1,28 @@
+{
+  "snapshot_id": "SNAP-KERNEL-001",
+  "filename": "Kernel.zip",
+  "sha256": "0195ab2623e2bdd9d2da5b8f18170f238bb4dbd5df489e543589de112eba6613",
+  "size_bytes": 19221667,
+  "zip_entries": 302,
+  "file_entries": 279,
+  "nested_zip_files": 244,
+  "top_level_root": "Kernel",
+  "branches": [
+    "Kernel/DevBuild",
+    "Kernel/Preview",
+    "Kernel/Release"
+  ],
+  "verification_status": "independently_verified",
+  "verified_by": "Codex",
+  "verified_at": "2026-08-07T02:07:25.807078+00:00",
+  "source_role": "historical_behavioral_reference",
+  "authority": "non_authoritative_for_current_runtime",
+  "payload_manifest_sha256": "38bc729f012243446ca29c3aed31802f2ec8d77473487cbd45a5bb710e3c88ff",
+  "live_root_manifest_sha256": "38bc729f012243446ca29c3aed31802f2ec8d77473487cbd45a5bb710e3c88ff",
+  "payload_match_status": "matched_path_and_hash",
+  "limitations": [
+    "The outer ZIP hash identifies the stable snapshot container and is not interchangeable with a live-folder or payload-manifest hash.",
+    "Path-and-hash equality proves source identity only; it does not prove historical behavior worked.",
+    "The snapshot is recorded but not committed to Blu_Core."
+  ]
+}

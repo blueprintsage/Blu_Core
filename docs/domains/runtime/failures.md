@@ -74,3 +74,21 @@ last_reviewed: 2026-08-06
 - A successor decision cannot repair current provenance. Current OPSEC remains
   nondeterministic and lane-underspecified even though the successor
   pre-ingress restraint is approved.
+
+## 2026-08-06 — BC-016 historical source-integration limits
+
+- Absolute local paths must not be committed as historical provenance. Use an
+  approved `source_root_id` plus a normalized relative path.
+- An outer ZIP SHA-256 and a folder or payload manifest SHA-256 are distinct
+  identities even when every payload file matches. Never substitute one for
+  the other.
+- Archive names, feature markers, headings, and implementation-style Markdown
+  do not prove behavior, stability, reliability, or recovery value.
+- Historical source availability after an audit does not retroactively falsify
+  or rewrite that audit's earlier honest unavailable-evidence record.
+- Duplicate archives must remain separate inventory records. Exact shared-hash
+  groups and near-duplicate relationships may guide sampling, but neither
+  authorizes silent deletion.
+- Numeric filename suffixes are not automatically dates. Two task-file suffixes
+  were initially parsed as short dates by the external discovery and were
+  corrected during integration to explicit filesystem-timestamp fallbacks.

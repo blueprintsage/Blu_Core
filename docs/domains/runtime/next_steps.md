@@ -14,11 +14,11 @@ Python runtime.
 
 ## Next safe step
 
-BC-017 is in review. Its implementation resolved BC-016 NB-1 and NB-4,
-completed bounded behavioral archaeology, and did not restore a runtime.
-Claude's next action is a separate read-only semantic review of the BC-017
-metadata commit, modifying only the assignment's `review.md`. Dad and Blu
-decide integration and closure.
+BC-017 remains in review after Claude returned three blocking record-production
+defects. BC-017-C1 corrects only the corrupted README, reproduction commands,
+and Exec-contraction chronology. Its next safe step is a separately authorized
+read-only semantic re-review of the BC-017-C1 metadata commit, modifying only
+the C1 `review.md`. Dad and Blu decide integration and closure.
 
 NB-2, NB-3, and NB-6 remain validator and evidence-hardening follow-ups. The
 remaining BC-016 notes stay preserved for an assignment that legitimately

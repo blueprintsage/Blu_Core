@@ -19,9 +19,11 @@ bounded future work and is not current architecture.
 **Historical archive evidence.** Blu moved from a dense pre-Exec
 Persona/Teaching/Anchors runtime to explicit orchestration: one output owner,
 selected-only state changes, validation, reminder state, and fail-closed
-behavior. Exec then absorbed Auth, mood, memory, retrieval, and feature patches,
-before late v0.20/v0.21 material contracted and decomposed it. [E-00020-TEACH,
-E-00030-EXEC, E-00195-MEGAEXEC, E-00245-RESTRUCTURE]
+behavior. Exec then absorbed Auth, mood, memory, retrieval, and feature patches.
+Within v0.16.0, a mega-Exec specimen is followed by a substantially contracted
+Exec; later v0.20/v0.21 evidence records further restructuring and
+decomposition. [E-00020-TEACH, E-00030-EXEC, E-00195-MEGAEXEC,
+E-00200-CONTRACTION, E-00245-RESTRUCTURE]
 
 **Current source truth.** The current Exec is compact relative to the historical
 mega-Exec and preserves route ownership, validation, ScopeLock, and failure
@@ -181,11 +183,19 @@ approved work. Never embed or publish protected answers.
 **Historical archive evidence.** Exec grew into thousands of lines; the
 BLU-HIST-0195 specimen has 5,536 split lines and contains feature-specific
 Auth, mood, memory, retrieval, and patch behavior. BLU-HIST-0200 contracts Exec
-to 1,272 lines, although complexity remains in its library. v0.21's
+to 1,272 lines within the same v0.16.0 family, although complexity remains in
+its library. v0.21's
 restructuring analysis explicitly says Exec absorbed behavior it should not own
 and that physical location confused model authority; its migration guide
 extracts service detail. [E-00195-MEGAEXEC, E-00200-CONTRACTION,
 E-00245-RESTRUCTURE, E-00245-MIGRATION]
+
+**Chronology note.** BC-017's direct specimen evidence places one concrete
+mega-Exec-to-contracted-Exec event between BLU-HIST-0195 and BLU-HIST-0200
+within v0.16.0. BC-016 selected BLU-HIST-0245 / v0.21 as a structural
+mega-Exec-to-compact-Exec transition representative. These are different
+evidentiary framings and must not be treated as identical chronology without
+further evidence.
 
 **Cross-version inference.** Much late Exec growth is compensatory complexity:
 more orchestration rules were added to contain interactions created by earlier

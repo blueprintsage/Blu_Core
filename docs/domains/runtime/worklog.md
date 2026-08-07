@@ -398,3 +398,28 @@ last_reviewed: 2026-08-06
   the source-class labels and validator are mandatory safeguards.
 - Claude performs a separate read-only semantic review. Dad and Blu decide
   integration. Do not start successor design, BC-018, BC-020, or BC-030.
+
+## 2026-08-07 — BC-017-C1 archaeology review corrections
+
+### What changed
+
+- Removed systematic leading diff markers from the archaeology README and
+  corrected its validator/test reproduction commands.
+- Corrected the direct mega-Exec-to-contracted-Exec event from v0.20 to its
+  evidenced v0.16.0 family.
+- Kept later v0.20/v0.21 restructuring distinct and disclosed BC-016's
+  different v0.21 structural-milestone framing.
+- Preserved Claude's review and all non-blocking notes.
+
+### What was tested or reviewed
+
+- Re-ran all required repository validator/test suites, canonical manifest
+  verification, golden checksums, protected-path checks, and the three manual
+  acceptance checks.
+
+### Known risks and next safe step
+
+- The correction resolves record-production blockers only; it does not close
+  BC-017 or convert green validation into semantic proof.
+- Claude may perform a separately authorized read-only re-review of BC-017-C1.
+  Dad and Blu decide integration and closure.

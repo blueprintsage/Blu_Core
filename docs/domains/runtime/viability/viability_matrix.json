@@ -1,0 +1,1894 @@
+{
+  "audit_id": "BC-015",
+  "audit_date": "2026-08-06",
+  "boundary": "Current classifications describe evidence for the CTS deployment. Proposed dispositions are non-final successor proposals.",
+  "classification_values": [
+    "live_and_stable",
+    "live_but_nondeterministic_or_host_dependent",
+    "declared_but_not_observably_functioning",
+    "conflicting_or_underspecified",
+    "explicitly_deferred_or_removed",
+    "new_successor_runtime_capability"
+  ],
+  "confidence_values": [
+    "high",
+    "medium",
+    "low",
+    "unresolved"
+  ],
+  "disposition_values": [
+    "implement_deterministically",
+    "keep_model_facing",
+    "recover_as_lightweight_profile",
+    "keep_contract_and_defer",
+    "remove",
+    "hybrid_split",
+    "architecture_decision_required"
+  ],
+  "inventory_counts": {
+    "components": 47,
+    "routes": 76,
+    "parity_requirements": 12,
+    "unresolved_items": 28
+  },
+  "route_inventory_ids": [
+    "restraint:1:EXECLIB.ANTIDRIFT.001",
+    "restraint:2:SERVICE.OPSRESTRAINT.001",
+    "restraint:3:RuntimeGate.Ingress",
+    "restraint:4:Exec.Scheduler",
+    "restraint:5:RuntimeGate.Egress",
+    "restraint:6:Exec",
+    "ingress:safety_precheck",
+    "ingress:unauthenticated_clone_first_read",
+    "ingress:unauthenticated_opsec_first_read",
+    "ingress:auth_first_read",
+    "ingress:slash_command_first_read",
+    "ingress:repo_bootstrap_first_read",
+    "ingress:workflow_resume_first_read",
+    "ingress:kernel_work_first_read",
+    "ingress:ordinary_conversation",
+    "lane:auth",
+    "lane:diagnostic",
+    "lane:static_render",
+    "lane:repo_lookup",
+    "lane:workflow_resume",
+    "lane:internal_library",
+    "lane:ordinary_conversation",
+    "lane:sandbox",
+    "lane:workflow",
+    "slash:/ID",
+    "slash:/echotrace",
+    "slash:/simcode",
+    "slash:/memory",
+    "slash:/commands",
+    "slash:/help",
+    "command:active:/ID <target> <answer>",
+    "command:active:/ID logout",
+    "command:active:/ID reset",
+    "command:active:/echotrace ingress",
+    "command:active:/echotrace scheduler",
+    "command:active:/echotrace egress",
+    "command:active:/echotrace all",
+    "command:active:/echotrace last",
+    "command:active:/echotrace <target>",
+    "command:active:/simcode <command>",
+    "command:active:/memory",
+    "command:active:/memory list",
+    "command:active:/memory list staged",
+    "command:active:/memory list <tag>",
+    "command:active:/memory tag auto",
+    "command:active:/memory import",
+    "command:active:/memory export",
+    "command:active:/commands",
+    "command:active:/help",
+    "command:deferred:/memory tag <id> <tag>",
+    "command:deferred:/memory keep",
+    "command:deferred:/memory archive",
+    "command:deferred:/memory trash",
+    "command:deferred:/memory purge",
+    "command:unavailable:/mood",
+    "command:unavailable:/verbosity",
+    "command:unavailable:/remind",
+    "command:unavailable:/cpm",
+    "command:unavailable:/DevMode",
+    "feature:PASS command",
+    "route.unauthenticated_clone_first_read",
+    "route.unauthenticated_opsec_first_read",
+    "route.auth_first_read",
+    "route.repo_bootstrap",
+    "route.workflow_resume",
+    "route.kernel_work",
+    "route.ordinary_conversation",
+    "hook:artifact_context",
+    "behavior:unknown_slash",
+    "owner_rule:1",
+    "owner_rule:2",
+    "owner_rule:3",
+    "owner_rule:4",
+    "owner_rule:5",
+    "owner_rule:6",
+    "owner_rule:7"
+  ],
+  "capabilities": [
+    {
+      "id": "CAP-001",
+      "name": "Deployment entry boundary",
+      "kind": "runtime_boundary",
+      "current_source_ids": [
+        "instructions.entry_boundary"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "00 Instructions"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-001",
+        "EV-021",
+        "EV-031",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [],
+      "host_dependencies": [
+        "GPT deployment loading"
+      ],
+      "current_owner": "00 Instructions",
+      "current_definition_status": "declared",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Use an explicit adapter entry and capability report.",
+      "proposed_disposition": "hybrid_split",
+      "responsibility_split": {
+        "python": [
+          "configuration validation"
+        ],
+        "model": [
+          "load model-facing sources"
+        ],
+        "profile": [],
+        "host": [
+          "deployment loading"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-001"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-002",
+      "name": "Persona, warmth, internal mood formation, and continuity inputs",
+      "kind": "model_facing_identity",
+      "current_source_ids": [
+        "persona.source_boundary",
+        "persona.execution_boundary",
+        "persona.continuity"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "Persona",
+        "EXECLIB.PERSONALIB.001",
+        "PHASE.PERSONA.PER_TURN.001",
+        "Persona Engine"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [
+        "PARITY-009"
+      ],
+      "covered_unresolved_ids": [
+        "UR-018",
+        "UR-026"
+      ],
+      "current_viability_class": "live_but_nondeterministic_or_host_dependent",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-006",
+        "EV-007",
+        "EV-008",
+        "EV-009",
+        "EV-015",
+        "EV-027",
+        "EV-033"
+      ],
+      "observable_behavior": "Dad and Blu observe warmth, presence, and relational posture; internal mood state is not directly observable.",
+      "known_failure_modes": [
+        "Context pressure can flatten warmth.",
+        "External continuity inputs may be absent."
+      ],
+      "host_dependencies": [],
+      "current_owner": "Persona",
+      "current_definition_status": "Persona defined; Persona Engine and per-turn phase referenced but undefined",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Keep identity and relational judgment model-facing with only narrow structured bridges.",
+      "proposed_disposition": "keep_model_facing",
+      "responsibility_split": {
+        "python": [
+          "bridge payload validation"
+        ],
+        "model": [
+          "identity",
+          "warmth",
+          "mood-source judgment"
+        ],
+        "profile": [
+          "operating posture"
+        ],
+        "host": [
+          "continuity retrieval"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-002",
+        "PROBE-003"
+      ],
+      "required_regression_tests": [
+        "Persona must not route or claim completion"
+      ],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-003",
+      "name": "Public mood surface and MoodLib reflection",
+      "kind": "command_and_render_surface",
+      "current_source_ids": [
+        "commands.not_live",
+        "execlib.moodlib"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "EXECLIB.MOODLIB.001"
+      ],
+      "covered_route_ids": [
+        "command:unavailable:/mood"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-010"
+      ],
+      "current_viability_class": "explicitly_deferred_or_removed",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-008",
+        "EV-015",
+        "EV-019",
+        "EV-024",
+        "EV-027",
+        "EV-033"
+      ],
+      "observable_behavior": "Owner observation confirms warmth remains observable while /mood is not live.",
+      "known_failure_modes": [
+        "MoodLib declares force-show behavior despite no public route."
+      ],
+      "host_dependencies": [],
+      "current_owner": "MoodLib support; no live command owner",
+      "current_definition_status": "support declared; public route unavailable",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Do not restore a public mood command without approval.",
+      "proposed_disposition": "keep_contract_and_defer",
+      "responsibility_split": {
+        "python": [],
+        "model": [
+          "internal mood shaping"
+        ],
+        "profile": [],
+        "host": [],
+        "deferred": [
+          "public mood command"
+        ]
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [
+        "/commands omits /mood"
+      ],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-004",
+      "name": "Operations Law, truth discipline, anti-drift, and correction",
+      "kind": "model_facing_law",
+      "current_source_ids": [
+        "operations.runtime_truth",
+        "operations.coherence_guard",
+        "operations.ownership"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "Operations_Law",
+        "EXECLIB.ANTIDRIFT.001",
+        "SERVICE.OPSRESTRAINT.001"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [
+        "PARITY-008",
+        "PARITY-010"
+      ],
+      "covered_unresolved_ids": [
+        "UR-001",
+        "UR-002"
+      ],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-004",
+        "EV-010",
+        "EV-018",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Mandatory restraint owners are undefined.",
+        "Model recognition can vary."
+      ],
+      "host_dependencies": [],
+      "current_owner": "Operations_Law",
+      "current_definition_status": "law defined; restraint components undefined",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Keep semantic judgment model-facing; implement explicit mechanical checks only.",
+      "proposed_disposition": "hybrid_split",
+      "responsibility_split": {
+        "python": [
+          "state and packet checks"
+        ],
+        "model": [
+          "truth",
+          "correction",
+          "anti-drift judgment"
+        ],
+        "profile": [],
+        "host": [
+          "source evidence"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-004"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-005",
+      "name": "Exec scheduling, restraints, ingress, locks, dependencies, and egress",
+      "kind": "runtime_control_plane",
+      "current_source_ids": [
+        "exec.restraint_chain",
+        "exec.ingress",
+        "exec.scheduler",
+        "exec.egress"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "Exec",
+        "RuntimeGate.Ingress",
+        "RuntimeGate.Egress",
+        "Exec.BootScheduler",
+        "Exec.Scheduler"
+      ],
+      "covered_route_ids": [
+        "restraint:1:EXECLIB.ANTIDRIFT.001",
+        "restraint:2:SERVICE.OPSRESTRAINT.001",
+        "restraint:3:RuntimeGate.Ingress",
+        "restraint:4:Exec.Scheduler",
+        "restraint:5:RuntimeGate.Egress",
+        "restraint:6:Exec",
+        "ingress:safety_precheck",
+        "ingress:unauthenticated_clone_first_read",
+        "ingress:unauthenticated_opsec_first_read",
+        "ingress:auth_first_read",
+        "ingress:slash_command_first_read",
+        "ingress:repo_bootstrap_first_read",
+        "ingress:workflow_resume_first_read",
+        "ingress:kernel_work_first_read",
+        "ingress:ordinary_conversation",
+        "lane:auth",
+        "lane:diagnostic",
+        "lane:static_render",
+        "lane:repo_lookup",
+        "lane:workflow_resume",
+        "lane:internal_library",
+        "lane:ordinary_conversation",
+        "lane:sandbox",
+        "lane:workflow",
+        "route.ordinary_conversation",
+        "owner_rule:1",
+        "owner_rule:2",
+        "owner_rule:3",
+        "owner_rule:4",
+        "owner_rule:5"
+      ],
+      "covered_parity_ids": [
+        "PARITY-001",
+        "PARITY-003",
+        "PARITY-004",
+        "PARITY-006"
+      ],
+      "covered_unresolved_ids": [
+        "UR-017"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-002",
+        "EV-005",
+        "EV-011",
+        "EV-012",
+        "EV-021",
+        "EV-022",
+        "EV-023",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Undefined mandatory owners.",
+        "Workflow lane conflict.",
+        "Model may simulate packets."
+      ],
+      "host_dependencies": [],
+      "current_owner": "Exec",
+      "current_definition_status": "extensively declared with incomplete dependencies",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Implement capability detection, locks, dependency allowlists, validation, and receipts.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "scheduler mechanics",
+          "locks",
+          "validation"
+        ],
+        "model": [
+          "ordinary task execution"
+        ],
+        "profile": [],
+        "host": [
+          "tool capabilities"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-005",
+        "PROBE-006",
+        "PROBE-007"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-006",
+      "name": "ScopeLock, terminal packets, artifact proof, and receipts",
+      "kind": "packet_contract",
+      "current_source_ids": [
+        "exec.terminal_packet",
+        "exec.scope_lock",
+        "schema.current_turn_execution_receipt"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [],
+      "covered_parity_ids": [
+        "PARITY-005"
+      ],
+      "covered_unresolved_ids": [
+        "UR-013",
+        "UR-014",
+        "UR-015"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-010",
+        "EV-011",
+        "EV-023",
+        "EV-024",
+        "EV-030",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Task/capability fields missing.",
+        "Receipt is only an alias."
+      ],
+      "host_dependencies": [],
+      "current_owner": "Exec and RuntimeGate.Egress",
+      "current_definition_status": "core packet fields declared; surrounding structures incomplete",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Define narrow schemas and deterministic validators.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "schemas",
+          "ScopeLock mechanics",
+          "receipt validation"
+        ],
+        "model": [
+          "semantic scope interpretation"
+        ],
+        "profile": [],
+        "host": [
+          "artifact proof"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-006",
+        "PROBE-007"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-007",
+      "name": "Auth and pending-auth handling",
+      "kind": "security_workflow",
+      "current_source_ids": [
+        "instructions.bootloader",
+        "commands.routes"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "SERVICE.AUTH.001"
+      ],
+      "covered_route_ids": [
+        "slash:/ID",
+        "command:active:/ID <target> <answer>",
+        "command:active:/ID logout",
+        "command:active:/ID reset",
+        "route.auth_first_read",
+        "owner_rule:6"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-003"
+      ],
+      "current_viability_class": "live_but_nondeterministic_or_host_dependent",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-002",
+        "EV-025",
+        "EV-033"
+      ],
+      "observable_behavior": "Dad and Blu report Admin authorization has worked, with nondeterministic recognition and enforcement.",
+      "known_failure_modes": [
+        "Service contract and exact renders undefined."
+      ],
+      "host_dependencies": [
+        "Session and protected challenge state"
+      ],
+      "current_owner": "SERVICE.AUTH.001",
+      "current_definition_status": "exclusive owner referenced but undefined",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Add deterministic authorization workflow support.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "auth state machine",
+          "authorization checks"
+        ],
+        "model": [
+          "approved interaction wording"
+        ],
+        "profile": [],
+        "host": [
+          "secure session storage"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-008",
+        "PROBE-009"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-008",
+      "name": "Current OPSEC interception and clone protection",
+      "kind": "security_behavior",
+      "current_source_ids": [
+        "instructions.opsec",
+        "exec.ingress",
+        "route.opsec_owner_join"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "SERVICE.OPSEC.001"
+      ],
+      "covered_route_ids": [
+        "route.unauthenticated_clone_first_read",
+        "route.unauthenticated_opsec_first_read",
+        "owner_rule:7"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-008",
+        "UR-028"
+      ],
+      "current_viability_class": "live_but_nondeterministic_or_host_dependent",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-002",
+        "EV-003",
+        "EV-026",
+        "EV-033"
+      ],
+      "observable_behavior": "Dad and Blu report current refusal/interception has worked but remains host/model-dependent.",
+      "known_failure_modes": [
+        "Owner undefined.",
+        "Lane class absent.",
+        "Recognition can miss protected intent."
+      ],
+      "host_dependencies": [
+        "Authentication context",
+        "security enforcement"
+      ],
+      "current_owner": "SERVICE.OPSEC.001",
+      "current_definition_status": "cross-role current behavior declared; service and lane contract incomplete",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Keep this current classification distinct from the successor restraint.",
+      "proposed_disposition": "hybrid_split",
+      "responsibility_split": {
+        "python": [
+          "intent/security decision"
+        ],
+        "model": [
+          "safe refusal wording"
+        ],
+        "profile": [],
+        "host": [
+          "pre-ingress enforcement"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-010",
+        "PROBE-011"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-009",
+      "name": "Successor OPSEC pre-ingress restraint",
+      "kind": "successor_security_restraint",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "new_successor_runtime_capability",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-029",
+        "EV-033"
+      ],
+      "observable_behavior": "No current behavior is claimed by this successor-only record.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": null,
+      "current_definition_status": "approved_for_successor; not a complete current CTS capability",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Mandatory deterministic pre-ingress restraint.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "block/permit decision"
+        ],
+        "model": [
+          "safe response"
+        ],
+        "profile": [],
+        "host": [
+          "enforcement placement"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [
+        "Runs before ordinary ingress"
+      ],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-010",
+      "name": "Commands, /commands, and /help",
+      "kind": "command_surface",
+      "current_source_ids": [
+        "commands.live",
+        "commands.routes",
+        "commands.help"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "COMMANDS"
+      ],
+      "covered_route_ids": [
+        "slash:/commands",
+        "slash:/help",
+        "command:active:/commands",
+        "command:active:/help"
+      ],
+      "covered_parity_ids": [
+        "PARITY-002",
+        "PARITY-011"
+      ],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-019",
+        "EV-022",
+        "EV-023",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Static renders may drift."
+      ],
+      "host_dependencies": [],
+      "current_owner": "COMMANDS",
+      "current_definition_status": "declared",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Represent command inventory as deterministic data.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "stem match",
+          "static renders"
+        ],
+        "model": [],
+        "profile": [],
+        "host": [
+          "input transport"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-012",
+        "PROBE-013",
+        "PROBE-014"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-011",
+      "name": "EchoTrace diagnostics",
+      "kind": "diagnostic_surface",
+      "current_source_ids": [
+        "exec.echotrace"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "EXEC.SPINE_TRACE",
+        "SERVICE.ECHOTRACE.001"
+      ],
+      "covered_route_ids": [
+        "slash:/echotrace",
+        "command:active:/echotrace ingress",
+        "command:active:/echotrace scheduler",
+        "command:active:/echotrace egress",
+        "command:active:/echotrace all",
+        "command:active:/echotrace last",
+        "command:active:/echotrace <target>"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-005",
+        "UR-022"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-012",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Support service undefined.",
+        "Alias coverage incomplete.",
+        "Trace can leak protected data."
+      ],
+      "host_dependencies": [],
+      "current_owner": "EXEC.SPINE_TRACE",
+      "current_definition_status": "owner declared; support and aliases incomplete",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Render safe diagnostics from actual receipts.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "receipt trace",
+          "safe fields"
+        ],
+        "model": [
+          "brief explanation"
+        ],
+        "profile": [],
+        "host": [
+          "session trace state"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-015"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-012",
+      "name": "SimCode Program",
+      "kind": "workflow_program",
+      "current_source_ids": [
+        "programs.simcode"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "PROGRAM.SIMCODE.001"
+      ],
+      "covered_route_ids": [
+        "slash:/simcode",
+        "command:active:/simcode <command>"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-020",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Critical dependencies and gate undefined.",
+        "No real sandbox proof."
+      ],
+      "host_dependencies": [
+        "Sandbox and artifacts"
+      ],
+      "current_owner": "PROGRAM.SIMCODE.001",
+      "current_definition_status": "Program declared; dependencies/gate incomplete",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Defer until a real sandbox boundary is specified.",
+      "proposed_disposition": "keep_contract_and_defer",
+      "responsibility_split": {
+        "python": [],
+        "model": [
+          "workflow explanation"
+        ],
+        "profile": [],
+        "host": [
+          "sandbox"
+        ],
+        "deferred": [
+          "implementation"
+        ]
+      },
+      "required_live_probes": [
+        "PROBE-016"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-013",
+      "name": "Memory Program, MMU, StateTree, MemoryPacket, and resume",
+      "kind": "memory_workflow",
+      "current_source_ids": [
+        "programs.memory",
+        "execlib.mmu",
+        "execlib.statetree_base",
+        "execlib.memorypacket"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "PROGRAM.MEMORY.001",
+        "EXECLIB.MMU.001",
+        "EXECLIB.STATETREE.001",
+        "EXECLIB.MEMORYPACKET.001"
+      ],
+      "covered_route_ids": [
+        "slash:/memory",
+        "route.workflow_resume",
+        "command:active:/memory",
+        "command:active:/memory list",
+        "command:active:/memory list staged",
+        "command:active:/memory list <tag>",
+        "command:active:/memory tag auto",
+        "command:active:/memory import",
+        "command:active:/memory export"
+      ],
+      "covered_parity_ids": [
+        "PARITY-011"
+      ],
+      "covered_unresolved_ids": [
+        "UR-011",
+        "UR-012",
+        "UR-019",
+        "UR-021"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-016",
+        "EV-019",
+        "EV-020",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "StateTree status conflict.",
+        "Workflow lane conflict.",
+        "Persistence host-conditional."
+      ],
+      "host_dependencies": [
+        "Session state",
+        "artifacts",
+        "optional persistence"
+      ],
+      "current_owner": "PROGRAM.MEMORY.001",
+      "current_definition_status": "declared with conflicts and incomplete fields",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Defer durability; preserve typed current-turn/session state only.",
+      "proposed_disposition": "keep_contract_and_defer",
+      "responsibility_split": {
+        "python": [
+          "packet checks",
+          "session state"
+        ],
+        "model": [
+          "intent interpretation"
+        ],
+        "profile": [],
+        "host": [
+          "artifacts/persistence"
+        ],
+        "deferred": [
+          "durable memory"
+        ]
+      },
+      "required_live_probes": [
+        "PROBE-017",
+        "PROBE-018",
+        "PROBE-019"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-014",
+      "name": "Deferred destructive memory forms",
+      "kind": "deferred_commands",
+      "current_source_ids": [
+        "commands.not_live",
+        "programs.memory"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [
+        "command:deferred:/memory tag <id> <tag>",
+        "command:deferred:/memory keep",
+        "command:deferred:/memory archive",
+        "command:deferred:/memory trash",
+        "command:deferred:/memory purge"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "explicitly_deferred_or_removed",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-019",
+        "EV-020",
+        "EV-022",
+        "EV-033"
+      ],
+      "observable_behavior": "The source explicitly marks these forms deferred.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": null,
+      "current_definition_status": "explicitly deferred",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Remain absent pending continuity lifecycle approval.",
+      "proposed_disposition": "keep_contract_and_defer",
+      "responsibility_split": {
+        "python": [],
+        "model": [],
+        "profile": [],
+        "host": [],
+        "deferred": [
+          "manual tag/keep/archive/trash/purge"
+        ]
+      },
+      "required_live_probes": [
+        "PROBE-020"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-015",
+      "name": "Date math, live time, reminders, and /remind",
+      "kind": "time_reminder",
+      "current_source_ids": [
+        "execlib.datelib",
+        "execlib.time_service",
+        "execlib.reminderlib",
+        "commands.not_live"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "EXECLIB.DATELIB.001",
+        "SERVICE.TIME.001",
+        "EXECLIB.REMINDERLIB.001"
+      ],
+      "covered_route_ids": [
+        "command:unavailable:/remind"
+      ],
+      "covered_parity_ids": [
+        "PARITY-012"
+      ],
+      "covered_unresolved_ids": [
+        "UR-019"
+      ],
+      "current_viability_class": "explicitly_deferred_or_removed",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-005",
+        "EV-014",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "Support contracts are declared, but /remind is unavailable and no live-time path was probed.",
+      "known_failure_modes": [
+        "No self-wake.",
+        "Time may be fabricated after lookup failure."
+      ],
+      "host_dependencies": [
+        "Clock",
+        "scheduler",
+        "notifications"
+      ],
+      "current_owner": "Time support; no live /remind owner",
+      "current_definition_status": "support declared; public route removed",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Split pure date math from host scheduling.",
+      "proposed_disposition": "hybrid_split",
+      "responsibility_split": {
+        "python": [
+          "date math",
+          "record validation"
+        ],
+        "model": [
+          "intent"
+        ],
+        "profile": [],
+        "host": [
+          "clock",
+          "scheduler"
+        ],
+        "deferred": [
+          "reminders without host support"
+        ]
+      },
+      "required_live_probes": [
+        "PROBE-021"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-016",
+      "name": "ArtifactLens, ContextIntake, and artifact proof",
+      "kind": "artifact_support",
+      "current_source_ids": [
+        "execlib.artifactlens",
+        "execlib.context_intake"
+      ],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "EXECLIB.ARTIFACTLENS.001",
+        "SERVICE.CONTEXTINTAKE.001"
+      ],
+      "covered_route_ids": [
+        "hook:artifact_context"
+      ],
+      "covered_parity_ids": [
+        "PARITY-007"
+      ],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-010",
+        "EV-013",
+        "EV-023",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Inventory mislabeled as reading.",
+        "Path mislabeled as artifact."
+      ],
+      "host_dependencies": [
+        "Artifact tools",
+        "file emission"
+      ],
+      "current_owner": "SERVICE.CONTEXTINTAKE.001",
+      "current_definition_status": "declared",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Keep source-state and artifact-proof checks deterministic.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "state ladder",
+          "proof checks"
+        ],
+        "model": [
+          "interpretation"
+        ],
+        "profile": [
+          "task profile"
+        ],
+        "host": [
+          "artifact tools"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-022"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-017",
+      "name": "Read Lane libraries",
+      "kind": "source_reading_support",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "EXECLIB.READLANE.SOURCELIB.001",
+        "EXECLIB.READLANE.CHUNKLIB.001",
+        "EXECLIB.READLANE.LEDGERLIB.001",
+        "EXECLIB.READLANE.INGESTLIB.001",
+        "EXECLIB.READLANE.RECOVERYLIB.001",
+        "EXECLIB.READLANE.VALIDATELIB.001"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-017",
+        "EV-021",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Component topology may be bloat.",
+        "OCR/vision host-dependent."
+      ],
+      "host_dependencies": [
+        "Parsers",
+        "OCR",
+        "vision"
+      ],
+      "current_owner": "Exec with Read Lane support",
+      "current_definition_status": "declared",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Reduce to tool adapters, coverage ledger, and task profiles.",
+      "proposed_disposition": "recover_as_lightweight_profile",
+      "responsibility_split": {
+        "python": [
+          "inventory",
+          "coverage ledger"
+        ],
+        "model": [
+          "reading/synthesis"
+        ],
+        "profile": [
+          "read strategy"
+        ],
+        "host": [
+          "parsers/OCR/vision"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-023"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-018",
+      "name": "GreetingLib",
+      "kind": "support_library",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "EXECLIB.GREETINGLIB.001"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "low",
+      "evidence_ids": [
+        "EV-015",
+        "EV-021",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": "EXECLIB.GREETINGLIB.001",
+      "current_definition_status": "declared",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Retain only if a standalone mechanism proves useful.",
+      "proposed_disposition": "architecture_decision_required",
+      "responsibility_split": {
+        "python": [
+          "optional repeat avoidance"
+        ],
+        "model": [
+          "greeting choice"
+        ],
+        "profile": [
+          "Companion"
+        ],
+        "host": [
+          "session state"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-019",
+      "name": "Repository bootstrap",
+      "kind": "host_repository_capability",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "SERVICE.REPOBOOT.001"
+      ],
+      "covered_route_ids": [
+        "route.repo_bootstrap"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-004"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-002",
+        "EV-012",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Service undefined.",
+        "Host access varies."
+      ],
+      "host_dependencies": [
+        "Repository lookup"
+      ],
+      "current_owner": "SERVICE.REPOBOOT.001",
+      "current_definition_status": "active route with undefined owner",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Put lookup behind adapter capabilities and receipts.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "request/receipt validation"
+        ],
+        "model": [
+          "source use"
+        ],
+        "profile": [],
+        "host": [
+          "repository lookup"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-024"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-020",
+      "name": "Kernel-work/BluCode route",
+      "kind": "internal_workflow",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "EXECLIB.BLUCODE.001"
+      ],
+      "covered_route_ids": [
+        "route.kernel_work"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-006"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-012",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Inferred join.",
+        "Undefined authorization contract."
+      ],
+      "host_dependencies": [],
+      "current_owner": "EXECLIB.BLUCODE.001",
+      "current_definition_status": "referenced but undefined",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Defer pending protected workflow approval.",
+      "proposed_disposition": "keep_contract_and_defer",
+      "responsibility_split": {
+        "python": [],
+        "model": [],
+        "profile": [],
+        "host": [
+          "protected workspace"
+        ],
+        "deferred": [
+          "BluCode"
+        ]
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-021",
+      "name": "GateKernel and Program gates",
+      "kind": "validation_support",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "SIMCODE_GATE",
+        "MEMORY_GATE",
+        "GateKernel"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-009",
+        "UR-016",
+        "UR-020"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-020",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Gate identities and packets absent."
+      ],
+      "host_dependencies": [],
+      "current_owner": "GateKernel (reference)",
+      "current_definition_status": "referenced but undefined",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Use versioned validators only with approved Programs.",
+      "proposed_disposition": "architecture_decision_required",
+      "responsibility_split": {
+        "python": [
+          "packet validators"
+        ],
+        "model": [
+          "workflow outcome"
+        ],
+        "profile": [],
+        "host": [],
+        "deferred": [
+          "unapproved Programs"
+        ]
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-022",
+      "name": "Error catalogs and renderer",
+      "kind": "error_support",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "ErrorMacros catalog",
+        "Error Macros catalog",
+        "error renderer"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-024",
+        "UR-025",
+        "UR-027"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-018",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Raw token leak.",
+        "Catalog names may be silently merged."
+      ],
+      "host_dependencies": [],
+      "current_owner": null,
+      "current_definition_status": "labels/identifiers only",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Approve one safe error envelope and renderer.",
+      "proposed_disposition": "architecture_decision_required",
+      "responsibility_split": {
+        "python": [
+          "error codes/render table"
+        ],
+        "model": [
+          "contextual explanation"
+        ],
+        "profile": [],
+        "host": [],
+        "deferred": []
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-023",
+      "name": "Humor references",
+      "kind": "expression_support",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "HumorLib",
+        "Humor service"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-023"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-009",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": "HumorLib and Humor service (labels)",
+      "current_definition_status": "referenced but undefined",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Keep humor model/profile-facing absent deterministic need.",
+      "proposed_disposition": "keep_model_facing",
+      "responsibility_split": {
+        "python": [],
+        "model": [
+          "humor judgment"
+        ],
+        "profile": [
+          "Companion/Creative"
+        ],
+        "host": [],
+        "deferred": []
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-024",
+      "name": "Runtime configuration owner",
+      "kind": "configuration",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [
+        "SYSTEM.RUNTIME.001"
+      ],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [
+        "UR-007"
+      ],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-002",
+        "EV-012",
+        "EV-024",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Fields absent.",
+        "Hardcoded paths may masquerade as truth."
+      ],
+      "host_dependencies": [],
+      "current_owner": "SYSTEM.RUNTIME.001",
+      "current_definition_status": "referenced but undefined",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Define minimal configuration and capability schema.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "schema/validation"
+        ],
+        "model": [],
+        "profile": [],
+        "host": [
+          "adapter values"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-025",
+      "name": "Source truth, work state, continuity, and regression models",
+      "kind": "support_contract_family",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-004",
+        "EV-010",
+        "EV-016",
+        "EV-018",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [
+        "Labels may lack receipts.",
+        "Continuity may become transcript recap."
+      ],
+      "host_dependencies": [],
+      "current_owner": "Operations/Exec support",
+      "current_definition_status": "declared models, not executing components",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Use small enums and receipt-backed transitions.",
+      "proposed_disposition": "hybrid_split",
+      "responsibility_split": {
+        "python": [
+          "enums",
+          "transition checks"
+        ],
+        "model": [
+          "semantic truth"
+        ],
+        "profile": [],
+        "host": [
+          "tool receipts"
+        ],
+        "deferred": []
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-026",
+      "name": "PASS",
+      "kind": "removed_surface",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [
+        "feature:PASS command"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "explicitly_deferred_or_removed",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-019",
+        "EV-033"
+      ],
+      "observable_behavior": "The current CTS explicitly states PASS is not live.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": null,
+      "current_definition_status": "removed from current command/Program/service/library surfaces",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Do not restore without separate evidence and approval.",
+      "proposed_disposition": "remove",
+      "responsibility_split": {
+        "python": [],
+        "model": [],
+        "profile": [],
+        "host": [],
+        "deferred": [
+          "PASS"
+        ]
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-027",
+      "name": "Other unavailable commands",
+      "kind": "removed_commands",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [
+        "command:unavailable:/verbosity",
+        "command:unavailable:/cpm",
+        "command:unavailable:/DevMode"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "explicitly_deferred_or_removed",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-019",
+        "EV-022",
+        "EV-033"
+      ],
+      "observable_behavior": "Commands explicitly marks these surfaces unavailable.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": null,
+      "current_definition_status": "explicitly unavailable",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Remain absent unless separately approved.",
+      "proposed_disposition": "remove",
+      "responsibility_split": {
+        "python": [],
+        "model": [],
+        "profile": [],
+        "host": [],
+        "deferred": [
+          "/verbosity",
+          "/cpm",
+          "/DevMode"
+        ]
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-028",
+      "name": "Unknown slash-command behavior",
+      "kind": "command_failure",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [
+        "behavior:unknown_slash"
+      ],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "declared_but_not_observably_functioning",
+      "classification_confidence": "medium",
+      "evidence_ids": [
+        "EV-019",
+        "EV-022",
+        "EV-023",
+        "EV-033"
+      ],
+      "observable_behavior": "No current live probe was executed for this capability.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": "Commands/Exec",
+      "current_definition_status": "declared",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Reject unknown stems deterministically before conversation.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "slash rejection"
+        ],
+        "model": [],
+        "profile": [],
+        "host": [],
+        "deferred": []
+      },
+      "required_live_probes": [
+        "PROBE-014"
+      ],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    },
+    {
+      "id": "CAP-029",
+      "name": "Legacy behavior recovery candidates",
+      "kind": "historical_analysis",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "conflicting_or_underspecified",
+      "classification_confidence": "unresolved",
+      "evidence_ids": [
+        "EV-028",
+        "EV-032",
+        "EV-033"
+      ],
+      "observable_behavior": "Owner observation exists, but the required archive is unavailable.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": null,
+      "current_definition_status": "historical source unavailable",
+      "legacy_behavior_evidence": [
+        {
+          "behavior": "Teaching posture/playbooks",
+          "evidence_status": "owner_observation_only",
+          "behavior_worth_recovering": "candidate",
+          "architecture_worth_reusing": false
+        },
+        {
+          "behavior": "Reminder/time, mood, PersonaLib, MMU, Read Lane, continuity, artifacts",
+          "evidence_status": "archive_unavailable",
+          "behavior_worth_recovering": "unresolved",
+          "architecture_worth_reusing": false
+        },
+        {
+          "behavior": "PASS",
+          "evidence_status": "archive_unavailable_and_currently_removed",
+          "behavior_worth_recovering": false,
+          "architecture_worth_reusing": false
+        },
+        {
+          "behavior": "Feature-specific Exec gates",
+          "evidence_status": "owner_observation_only",
+          "behavior_worth_recovering": false,
+          "architecture_worth_reusing": false
+        }
+      ],
+      "successor_delta": "Recover behavior only after direct evidence; default against legacy topology.",
+      "proposed_disposition": "recover_as_lightweight_profile",
+      "responsibility_split": {
+        "python": [],
+        "model": [],
+        "profile": [
+          "Teaching candidate"
+        ],
+        "host": [],
+        "deferred": [
+          "all other legacy recovery"
+        ]
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [
+        "Reopen when exact archive is supplied and checksum-recorded."
+      ],
+      "notes": []
+    },
+    {
+      "id": "CAP-030",
+      "name": "Smallest successor runtime control plane",
+      "kind": "successor_control_plane",
+      "current_source_ids": [],
+      "contract_ids": [],
+      "covered_component_ids": [],
+      "covered_route_ids": [],
+      "covered_parity_ids": [],
+      "covered_unresolved_ids": [],
+      "current_viability_class": "new_successor_runtime_capability",
+      "classification_confidence": "high",
+      "evidence_ids": [
+        "EV-030",
+        "EV-033"
+      ],
+      "observable_behavior": "Approved future boundary; not implemented.",
+      "known_failure_modes": [],
+      "host_dependencies": [],
+      "current_owner": null,
+      "current_definition_status": "approved architecture centerline; not current behavior",
+      "legacy_behavior_evidence": [],
+      "successor_delta": "Configuration/capabilities, typed packets, locks, validation, receipts, Auth hook, and OPSEC pre-ingress hook.",
+      "proposed_disposition": "implement_deterministically",
+      "responsibility_split": {
+        "python": [
+          "configuration",
+          "capabilities",
+          "packets",
+          "locks",
+          "validation",
+          "receipts"
+        ],
+        "model": [
+          "Persona",
+          "Operations",
+          "task execution"
+        ],
+        "profile": [
+          "Teaching and other postures"
+        ],
+        "host": [
+          "tools",
+          "repository",
+          "artifacts",
+          "time",
+          "scheduling"
+        ],
+        "deferred": [
+          "persistence",
+          "unsupported reminders",
+          "SimCode",
+          "PASS"
+        ]
+      },
+      "required_live_probes": [],
+      "required_regression_tests": [],
+      "open_decisions": [],
+      "notes": []
+    }
+  ]
+}

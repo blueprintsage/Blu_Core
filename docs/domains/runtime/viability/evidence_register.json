@@ -1,0 +1,626 @@
+{
+  "audit_id": "BC-015",
+  "audit_date": "2026-08-06",
+  "boundary": "Evidence registry for classification only. Declarations and static checks do not prove runtime execution.",
+  "entries": [
+    {
+      "id": "EV-001",
+      "evidence_class": "golden_declaration",
+      "source_role": "deployment_instruction",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/00_Instructions.md",
+      "source_heading_or_locator": "## Runtime Entry Boundary",
+      "summary": "Declares the compact host entry boundary and assigns detailed law downstream.",
+      "supports": [
+        "CAP-001"
+      ],
+      "limitations": "Declaration only; no hosted execution probe.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-002",
+      "evidence_class": "golden_declaration",
+      "source_role": "deployment_instruction",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/00_Instructions.md",
+      "source_heading_or_locator": "## Bootloader",
+      "summary": "Declares restraint order, Exec output ownership, Auth exclusivity, configuration ownership, and OPSEC exclusivity.",
+      "supports": [
+        "CAP-005",
+        "CAP-007",
+        "CAP-008",
+        "CAP-019",
+        "CAP-024"
+      ],
+      "limitations": "Declaration only; referenced services are not defined here.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-003",
+      "evidence_class": "golden_declaration",
+      "source_role": "deployment_instruction",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/00_Instructions.md",
+      "source_heading_or_locator": "## OPSEC / Privacy",
+      "summary": "Declares protected categories and unauthenticated refusal/clone-protection handling.",
+      "supports": [
+        "CAP-008"
+      ],
+      "limitations": "Protected exact render strings and service contract are absent.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-004",
+      "evidence_class": "golden_declaration",
+      "source_role": "deployment_instruction",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/00_Instructions.md",
+      "source_heading_or_locator": "## Execution Law; ## Truth Discipline; ## No Runtime Theater",
+      "summary": "Declares narrow execution, capability honesty, and the distinction between declaration and execution.",
+      "supports": [
+        "CAP-004",
+        "CAP-022",
+        "CAP-025"
+      ],
+      "limitations": "Model-facing law; repeatability is unproven.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-005",
+      "evidence_class": "golden_declaration",
+      "source_role": "deployment_instruction",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/00_Instructions.md",
+      "source_heading_or_locator": "## Loop Discipline",
+      "summary": "Declares hosted per-turn operation and denies hidden continuation without real tools.",
+      "supports": [
+        "CAP-005",
+        "CAP-015"
+      ],
+      "limitations": "Host behavior is conditional and unprobed.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-006",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/01_Persona.md",
+      "source_heading_or_locator": "## Source-Only Declaration; ## Execution Non-Interference",
+      "summary": "Defines Persona as model-facing source and denies routing, validation, commit, or print ownership.",
+      "supports": [
+        "CAP-002"
+      ],
+      "limitations": "Semantic source, not deterministic execution proof.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-007",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/01_Persona.md",
+      "source_heading_or_locator": "## Warmth & Presence; ## Relational Floor",
+      "summary": "Declares warmth, presence, honesty, brevity, and relational posture.",
+      "supports": [
+        "CAP-002"
+      ],
+      "limitations": "Declaration alone cannot establish observable consistency.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-008",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/01_Persona.md",
+      "source_heading_or_locator": "## Mood Source Boundary; ## Mood Formation Order",
+      "summary": "Separates internal Persona mood-source shaping from public mood rendering.",
+      "supports": [
+        "CAP-002",
+        "CAP-003"
+      ],
+      "limitations": "Internal state is not directly observable; public rendering belongs downstream.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-009",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/01_Persona.md",
+      "source_heading_or_locator": "## Repo Continuity Sources; ## Humor Relation",
+      "summary": "References PEL, Identity_Lore, Persona Engine, HumorLib, and Humor service without defining all runtime contracts.",
+      "supports": [
+        "CAP-002",
+        "CAP-023"
+      ],
+      "limitations": "External sources and referenced owners were not supplied as current execution evidence.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-010",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/02_Operations_Law.md",
+      "source_heading_or_locator": "Runtime Truth, Coherence Guard, Ownership, Source Authority, Artifact, Continuity, System Component, and Error doctrines",
+      "summary": "Defines model-facing truth, anti-drift, source authority, ownership boundaries, artifact proof, continuity, and fail-closed doctrine.",
+      "supports": [
+        "CAP-004",
+        "CAP-006",
+        "CAP-016",
+        "CAP-025"
+      ],
+      "limitations": "Semantic law is not a repeatable deterministic enforcement mechanism.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-011",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/03_Exec.md",
+      "source_heading_or_locator": "§1–§5",
+      "summary": "Declares hosted scheduler boundary, restraint chain, terminal packet, ScopeLock, and component termination.",
+      "supports": [
+        "CAP-005",
+        "CAP-006"
+      ],
+      "limitations": "Packets and enforcement are declared but not execution-proven.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-012",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/03_Exec.md",
+      "source_heading_or_locator": "§6–§11",
+      "summary": "Declares runtime configuration, ingress order, scheduler, egress, EchoTrace, and fail-closed behavior.",
+      "supports": [
+        "CAP-005",
+        "CAP-011",
+        "CAP-019",
+        "CAP-020",
+        "CAP-024"
+      ],
+      "limitations": "Multiple required owners are undefined and no live trace was run.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-013",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/04_Exec_Library.md",
+      "source_heading_or_locator": "### ArtifactLensLib; ### ContextIntake Service",
+      "summary": "Declares artifact classification and staged source-context coordination.",
+      "supports": [
+        "CAP-016"
+      ],
+      "limitations": "Artifact/tool access remains host-conditional and unprobed.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-014",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/04_Exec_Library.md",
+      "source_heading_or_locator": "### DateLib; ### Time Service; ### ReminderLib",
+      "summary": "Separates deterministic date/time shaping from host live-time acquisition and current-turn reminder scans.",
+      "supports": [
+        "CAP-015"
+      ],
+      "limitations": "No live /remind route; no autonomous wake; host lookup unproven.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-015",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/04_Exec_Library.md",
+      "source_heading_or_locator": "### GreetingLib; ### PersonaLib; ### MoodLib",
+      "summary": "Declares greeting selection, Persona bridge payloads, and downstream public mood reflection.",
+      "supports": [
+        "CAP-002",
+        "CAP-003",
+        "CAP-018"
+      ],
+      "limitations": "Library declarations do not prove scheduling or state persistence.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-016",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/04_Exec_Library.md",
+      "source_heading_or_locator": "### MMULib; ### StateTree Library; ### MemoryPacket Library",
+      "summary": "Declares continuity shaping, transition validation, and portable memory packets; StateTree status conflicts.",
+      "supports": [
+        "CAP-013",
+        "CAP-025"
+      ],
+      "limitations": "No durable persistence proof; repeated StateTree declarations conflict.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-017",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/04_Exec_Library.md",
+      "source_heading_or_locator": "### Read Lane SourceLib through ### Read Lane ValidateLib",
+      "summary": "Declares six source inventory, chunking, ledger, ingestion, recovery, and validation helpers.",
+      "supports": [
+        "CAP-017"
+      ],
+      "limitations": "Tool-dependent ingestion/recovery is unproven and the component split is not itself evidence of good architecture.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-018",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/04_Exec_Library.md",
+      "source_heading_or_locator": "### Source Truth Model; ### Work State Model; ### Validation + Regression Model",
+      "summary": "Declares state vocabularies and detectable overclaim/failure patterns.",
+      "supports": [
+        "CAP-004",
+        "CAP-022",
+        "CAP-025"
+      ],
+      "limitations": "Models define checks but do not execute them.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-019",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/05_Commands.md",
+      "source_heading_or_locator": "§2–§9; PASS Removal Note",
+      "summary": "Declares live, deferred, unavailable, static-render, unknown-command, and PASS removal surfaces.",
+      "supports": [
+        "CAP-003",
+        "CAP-010",
+        "CAP-013",
+        "CAP-014",
+        "CAP-026",
+        "CAP-027",
+        "CAP-028"
+      ],
+      "limitations": "Routing and exact renders were not live-probed.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-020",
+      "evidence_class": "golden_declaration",
+      "source_role": "kernel_runtime_capsule",
+      "source_identity": "Blu v0.22.0 CTS",
+      "source_location": "kernel/golden/v0.22.0/06_Programs.md",
+      "source_heading_or_locator": "§1–§8",
+      "summary": "Declares SimCode and Memory workflows, gates, artifact truth, memory states, and failure handling.",
+      "supports": [
+        "CAP-012",
+        "CAP-013",
+        "CAP-014",
+        "CAP-021"
+      ],
+      "limitations": "Program and gate declarations do not prove execution; Memory fields and gate owners are incomplete.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-021",
+      "evidence_class": "contract_extraction",
+      "source_role": "downstream_descriptive_contract",
+      "source_identity": "BC-010 runtime contracts",
+      "source_location": "contracts/runtime/component_registry.json",
+      "source_heading_or_locator": "components[]",
+      "summary": "Provides the 47-component inventory floor and definition-status distinctions.",
+      "supports": [
+        "CAP-001",
+        "CAP-002",
+        "CAP-003",
+        "CAP-004",
+        "CAP-005",
+        "CAP-007",
+        "CAP-008",
+        "CAP-010",
+        "CAP-011",
+        "CAP-012",
+        "CAP-013",
+        "CAP-014",
+        "CAP-015",
+        "CAP-016",
+        "CAP-017",
+        "CAP-018",
+        "CAP-019",
+        "CAP-020",
+        "CAP-021",
+        "CAP-022",
+        "CAP-023",
+        "CAP-024"
+      ],
+      "limitations": "Downstream extraction; registry presence is not runtime proof.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-022",
+      "evidence_class": "contract_extraction",
+      "source_role": "downstream_descriptive_contract",
+      "source_identity": "BC-010 runtime contracts",
+      "source_location": "contracts/runtime/route_registry.json",
+      "source_heading_or_locator": "route registry",
+      "summary": "Provides the route, command, restraint, ingress, and one-owner inventory floor.",
+      "supports": [
+        "CAP-005",
+        "CAP-007",
+        "CAP-008",
+        "CAP-010",
+        "CAP-011",
+        "CAP-012",
+        "CAP-013",
+        "CAP-014",
+        "CAP-015",
+        "CAP-019",
+        "CAP-020",
+        "CAP-026",
+        "CAP-027",
+        "CAP-028"
+      ],
+      "limitations": "Downstream extraction with explicit unresolved joins and lane gaps.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-023",
+      "evidence_class": "contract_extraction",
+      "source_role": "downstream_descriptive_contract",
+      "source_identity": "BC-010 runtime contracts",
+      "source_location": "contracts/runtime/parity_matrix.json",
+      "source_heading_or_locator": "requirements[]",
+      "summary": "Provides 12 unexecuted behavioral requirements and candidate cases.",
+      "supports": [
+        "CAP-002",
+        "CAP-004",
+        "CAP-005",
+        "CAP-006",
+        "CAP-010",
+        "CAP-013",
+        "CAP-015",
+        "CAP-016",
+        "CAP-028"
+      ],
+      "limitations": "Candidate parity cases are not passing tests.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-024",
+      "evidence_class": "contract_extraction",
+      "source_role": "downstream_descriptive_contract",
+      "source_identity": "BC-010 runtime contracts",
+      "source_location": "contracts/runtime/unresolved_register.json",
+      "source_heading_or_locator": "items[]",
+      "summary": "Preserves 28 source conflicts, undefined owners, missing fields, and host-capability gaps.",
+      "supports": [
+        "CAP-002",
+        "CAP-003",
+        "CAP-004",
+        "CAP-005",
+        "CAP-006",
+        "CAP-007",
+        "CAP-008",
+        "CAP-011",
+        "CAP-012",
+        "CAP-013",
+        "CAP-015",
+        "CAP-016",
+        "CAP-019",
+        "CAP-020",
+        "CAP-021",
+        "CAP-022",
+        "CAP-023",
+        "CAP-024"
+      ],
+      "limitations": "Open items are not resolved by this audit.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-025",
+      "evidence_class": "owner_observation",
+      "source_role": "approved_owner_observation",
+      "source_identity": "Dad and Blu BC-015 packet",
+      "source_location": "docs/domains/runtime/assignments/BC-015/assignment.md",
+      "source_heading_or_locator": "Approved owner observations — Auth",
+      "summary": "Auth has observably authorized Admin-level users, but recognition and enforcement are nondeterministic and host/model-dependent.",
+      "supports": [
+        "CAP-007"
+      ],
+      "limitations": "Owner observation, not a repeatable automated test; protected details are intentionally omitted.",
+      "observed_by": "Dad and Blu",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-026",
+      "evidence_class": "owner_observation",
+      "source_role": "approved_owner_observation",
+      "source_identity": "Dad and Blu BC-015 packet",
+      "source_location": "docs/domains/runtime/assignments/BC-015/assignment.md",
+      "source_heading_or_locator": "Approved owner observations — OPSEC",
+      "summary": "OPSEC refusal/interception has observably protected ID challenges and kernel-copy/clone requests, but is nondeterministic and host/model-dependent.",
+      "supports": [
+        "CAP-008"
+      ],
+      "limitations": "Owner observation, not a repeatable automated test; no protected content is disclosed.",
+      "observed_by": "Dad and Blu",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-027",
+      "evidence_class": "owner_observation",
+      "source_role": "approved_owner_observation",
+      "source_identity": "Dad and Blu BC-015 packet",
+      "source_location": "docs/domains/runtime/assignments/BC-015/assignment.md",
+      "source_heading_or_locator": "Approved owner observations — Persona warmth and mood",
+      "summary": "Blu's warmth, presence, and relational posture remain observable; public /mood is not live.",
+      "supports": [
+        "CAP-002",
+        "CAP-003"
+      ],
+      "limitations": "Owner observation does not establish repeatability or expose internal mood state.",
+      "observed_by": "Dad and Blu",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-028",
+      "evidence_class": "owner_observation",
+      "source_role": "approved_owner_observation",
+      "source_identity": "Dad and Blu BC-015 packet",
+      "source_location": "docs/domains/runtime/assignments/BC-015/assignment.md",
+      "source_heading_or_locator": "Approved owner observations — Legacy Teaching and capability Markdown",
+      "summary": "Older Teaching-oriented Markdown and libraries sometimes produced useful behavior, while the legacy Exec was bloated and gate-heavy.",
+      "supports": [
+        "CAP-029"
+      ],
+      "limitations": "Historical owner observation only; not archive inspection or proof of stability.",
+      "observed_by": "Dad and Blu",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-029",
+      "evidence_class": "project_decision",
+      "source_role": "approved_successor_decision",
+      "source_identity": "Runtime Decisions",
+      "source_location": "docs/domains/runtime/decisions.md",
+      "source_heading_or_locator": "2026-08-06 — Successor-runtime Auth and OPSEC route boundary",
+      "summary": "Approves Auth workflow support and OPSEC as a mandatory successor pre-ingress security restraint without rewriting the current CTS.",
+      "supports": [
+        "CAP-009"
+      ],
+      "limitations": "Successor-only decision; must not be cited as current golden behavior.",
+      "observed_by": "Dad and Blu",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-030",
+      "evidence_class": "project_decision",
+      "source_role": "approved_architecture_centerline",
+      "source_identity": "Migration Centerline",
+      "source_location": "docs/architecture/migration_centerline.md",
+      "source_heading_or_locator": "## First implementation boundary",
+      "summary": "Approves a first executable slice around configuration, capability detection, packets, profile resolution, ScopeLock, owner routing, terminal validation, and receipts.",
+      "supports": [
+        "CAP-006",
+        "CAP-030"
+      ],
+      "limitations": "Future architecture decision, not evidence that current CTS executes these mechanics.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-031",
+      "evidence_class": "automated_static_check",
+      "source_role": "repository_static_validation",
+      "source_identity": "Golden checksum verification",
+      "source_location": "kernel/golden/v0.22.0/SHA256SUMS",
+      "source_heading_or_locator": "all eight entries",
+      "summary": "All seven Markdown files and the source CTS ZIP matched their recorded SHA-256 values before audit work.",
+      "supports": [
+        "CAP-001"
+      ],
+      "limitations": "Integrity proof only; says nothing about behavior.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    },
+    {
+      "id": "EV-032",
+      "evidence_class": "unavailable_evidence",
+      "source_role": "historical_behavioral_reference",
+      "source_identity": "2026-05-02_1333_Blu_v0.15.2_Baseline.zip",
+      "source_location": null,
+      "source_heading_or_locator": null,
+      "summary": "The required historical baseline archive was not present in the attachment bundle or repository; its contents were not reconstructed.",
+      "supports": [
+        "CAP-029"
+      ],
+      "limitations": "Historical member evidence, checksum, and direct behavioral inspection remain unavailable.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06",
+      "archive_filename": "2026-05-02_1333_Blu_v0.15.2_Baseline.zip",
+      "archive_sha256": null,
+      "member_path": null
+    },
+    {
+      "id": "EV-033",
+      "evidence_class": "extraction_inference",
+      "source_role": "audit_analysis",
+      "source_identity": "BC-015 inventory synthesis",
+      "source_location": "docs/domains/runtime/viability/viability_matrix.json",
+      "source_heading_or_locator": "coverage unions",
+      "summary": "Groups registry members into capability records while retaining exact covered IDs.",
+      "supports": [
+        "CAP-001",
+        "CAP-002",
+        "CAP-003",
+        "CAP-004",
+        "CAP-005",
+        "CAP-006",
+        "CAP-007",
+        "CAP-008",
+        "CAP-009",
+        "CAP-010",
+        "CAP-011",
+        "CAP-012",
+        "CAP-013",
+        "CAP-014",
+        "CAP-015",
+        "CAP-016",
+        "CAP-017",
+        "CAP-018",
+        "CAP-019",
+        "CAP-020",
+        "CAP-021",
+        "CAP-022",
+        "CAP-023",
+        "CAP-024",
+        "CAP-025",
+        "CAP-026",
+        "CAP-027",
+        "CAP-028",
+        "CAP-029",
+        "CAP-030"
+      ],
+      "limitations": "Grouping is an audit inference and does not merge or redefine source contracts.",
+      "observed_by": "Codex",
+      "observed_date": "2026-08-06"
+    }
+  ]
+}

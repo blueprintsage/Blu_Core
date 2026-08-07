@@ -9,7 +9,7 @@ last_reviewed: 2026-08-06
 - Assignment: BC-016 — Historical Archive Inventory Integration
 - Exact base: `fdb6c7e150d3717172e08a1bc349a428187df45a`
 - Branch: `bc-016-historical-archive-inventory`
-- Inventory work commit: pending; recorded by the authorized metadata-only follow-up commit
+- Inventory work commit: `9f6d705723a3ee6d26e47b80c634bc3c58495c83`
 - Metadata record commit: pending; exact SHA reported externally
 - Semantic reviewer: Claude
 - Push status: pending
@@ -90,5 +90,5 @@ contains both and matches them.
 ## Working tree and push
 
 - Pre-commit working tree: contains only BC-016 collision-domain changes.
-- Inventory work commit: pending at the time this receipt was first written.
+- Inventory work commit: `9f6d705723a3ee6d26e47b80c634bc3c58495c83`; this is Claude's semantic-review target.
 - Metadata record and push status: pending.

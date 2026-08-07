@@ -343,3 +343,15 @@ last_reviewed: 2026-08-06
 - Exact base: `fdb6c7e150d3717172e08a1bc349a428187df45a`
 - Branch: `bc-016-historical-archive-inventory`
 - Inventory work commit: recorded by the authorized metadata-only follow-up.
+
+## 2026-08-06 — BC-016 historical archive inventory closed
+
+- Dad and Blu authorized final closure after Claude's review was integrated.
+- Claude's disposition is `approve-with-notes`; no blocking findings remained,
+  and BC-016 moved to `done`.
+- All NB-1 through NB-10 remain preserved in the review record and carried
+  forward under the runtime next-step boundaries.
+- Inventory identities and the immutable current CTS authority boundary remain
+  unchanged.
+- No archive import, behavioral archaeology, or runtime implementation occurred
+  during review integration or closure.

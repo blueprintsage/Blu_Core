@@ -25,7 +25,7 @@ canonical_base: 7aed76e
 | BC-010-C1 | Runtime contract extraction corrections | Codex | done | `docs/domains/runtime/assignments/BC-010-C1/assignment.md` | `38611bf4b8051c858dcbbc30a07904d0117211b3` | Repair work commit `63c8b692403fe5ec1a9433a8313a7980fbd55437`; closed after its remaining OPSEC classification issue was corrected by BC-010-C2; integrated reviewed state before closure `8a37ae3c62829f16f949f5896d2bef0542721565` |
 | BC-010-C2 | OPSEC route classification repair | Codex | done | `docs/domains/runtime/assignments/BC-010-C2/assignment.md` | `424f80b254a02f057da6c82db5230377076fc415` | Repair work commit `06292ce0e2f326ef84988e030c7fe14402192859`; closed after Claude's `approve-with-notes` review with no blockers; integrated reviewed state before closure `8a37ae3c62829f16f949f5896d2bef0542721565` |
 | BC-015 | Runtime viability audit | Codex | done | `docs/domains/runtime/assignments/BC-015/assignment.md` | `4b51427b361283715a24110409e031e191b52452` | Audit work commit `9936cc4be2f7f397deebccdf7400e8b7b774df08`; review commit `4ed7626`; Claude disposition `approve-with-notes` with no blockers; integrated reviewed state before closure `1f07333457b18895fbb04d5c776e3259d870f2f6` |
-| BC-016 | Historical Archive Inventory Integration | Codex | review | `docs/domains/runtime/assignments/BC-016/assignment.md` | `fdb6c7e150d3717172e08a1bc349a428187df45a` | Work commit `9f6d705723a3ee6d26e47b80c634bc3c58495c83`; sanitized historical source map, independently verified snapshot receipt, reconciliation, milestones, static validator, and tests; no archives or behavioral archaeology; Claude review required |
+| BC-016 | Historical Archive Inventory Integration | Codex | done | `docs/domains/runtime/assignments/BC-016/assignment.md` | `fdb6c7e150d3717172e08a1bc349a428187df45a` | Work commit `9f6d705723a3ee6d26e47b80c634bc3c58495c83`; metadata commit `2685dd5a3d4e81498e5b72cc83fad5d664a4d76a`; Claude review `1e7796191360cb5b81ab70a716ffda1e97f77264`; disposition `approve-with-notes` with no blockers; all NB-1 through NB-10 remain preserved and carried forward; no archives or behavioral archaeology |
 | BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
 | BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
 
@@ -37,6 +37,13 @@ canonical_base: 7aed76e
 
 ## Completed
 
+- BC-016 — Historical Archive Inventory Integration closed after Claude's
+  `approve-with-notes` review with no blocking findings. Inventory work commit:
+  `9f6d705723a3ee6d26e47b80c634bc3c58495c83`; metadata commit:
+  `2685dd5a3d4e81498e5b72cc83fad5d664a4d76a`; Claude review commit:
+  `1e7796191360cb5b81ab70a716ffda1e97f77264`. All non-blocking findings NB-1
+  through NB-10 remain preserved and carried forward. The closure performed no
+  archive import, behavioral archaeology, or runtime implementation.
 - BC-015 — Runtime viability audit closed after Claude's
   `approve-with-notes` review with no blocking findings. Audit work commit:
   `9936cc4be2f7f397deebccdf7400e8b7b774df08`; review commit: `4ed7626`;

@@ -1,6 +1,6 @@
 # BC-016 — Review Record
 
-status: review
+status: done
 owner: Claude
 last_reviewed: 2026-08-07
 reviewer: Claude
@@ -839,3 +839,17 @@ None is blocking. Before BC-017 is authorized, Dad and Blu should decide on:
 BC-016 remains `review`. Dad and Blu own final closure and the authorization of
 BC-017. This review does not authorize behavioral archaeology, archive import,
 milestone changes, or any successor-runtime implementation.
+
+## Final closure authorization
+
+- Claude disposition: `approve-with-notes`.
+- Blocking findings: none.
+- Final authority approval: Dad, Project Owner.
+- Closure authorization: Blu, Project Lead.
+- Integrated Claude review SHA:
+  `1e7796191360cb5b81ab70a716ffda1e97f77264`.
+- Final assignment status: `done`; BC-016 is closed.
+- All non-blocking findings NB-1 through NB-10 remain preserved above and are
+  carried forward under the runtime next-step boundaries.
+- This closure authorizes no behavioral archaeology, archive import, or
+  successor-runtime implementation.

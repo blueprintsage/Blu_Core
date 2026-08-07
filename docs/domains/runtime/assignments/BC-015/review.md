@@ -1,6 +1,6 @@
 # BC-015 — Review Record
 
-status: review
+status: done
 owner: Claude
 last_reviewed: 2026-08-06
 reviewer: Claude
@@ -666,3 +666,14 @@ BC-015 remains `review`. Dad and Blu own final closure and all
 successor-architecture decisions. This review does not approve implementation of
 the proposed control plane, does not authorize BC-020 or BC-030, and does not
 resolve any of the 28 current-source gaps.
+
+## Final closure authorization
+
+- Integrated main state before closure:
+  `1f07333457b18895fbb04d5c776e3259d870f2f6`
+- Authorized by: Dad, Project Owner; Blu, Project Lead
+- Final assignment status: `done`
+- Date: 2026-08-06
+- Closure basis: Claude disposition `approve-with-notes`; no blocking findings.
+- Non-blocking notes remain preserved and must be reconsidered before they feed
+  a successor-runtime specification.

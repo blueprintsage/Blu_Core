@@ -297,8 +297,7 @@
         "MMU prominence",
         "Auth fix",
         "memory alpha",
-        "ScopeLock/Wu Sao",
-        "Exec contraction"
+        "ScopeLock/Wu Sao"
       ],
       "drilldown_required": true,
       "drilldown_specimens": [

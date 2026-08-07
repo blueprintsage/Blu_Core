@@ -24,7 +24,7 @@ source; it does not assert successful execution.
 | late v0.16 | memory-model change | StateTree, Memory Program, and MemoryPacket distinguish staged, in-session, and persistent concepts. | historical declared | E-00210-MEMORY |
 | first v0.20 | secondary discovery | MMU is prominent; Read Lane evidence is secondary and insufficient for promotion. | historical declared | E-00211-MMU |
 | v0.20 | validation/security refinement | Auth receives a targeted fix and ScopeLock/Wu Sao appear in late orchestration. | mechanically scaffolded | E-00223-AUTH; E-00243-SCOPELOCK |
-| v0.20 contraction | Exec simplification | Exec contracts sharply, but some complexity remains displaced into ExecLib. | mechanically scaffolded | E-00195-MEGAEXEC; E-00200-CONTRACTION |
+| v0.16.x contraction | Exec simplification | Exec contracts sharply within the v0.16.0 family, but some complexity remains displaced into ExecLib. | mechanically scaffolded | E-00195-MEGAEXEC; E-00200-CONTRACTION |
 | v0.21 | ownership decomposition | Restructuring analysis identifies authority confusion from Exec absorption and extracts service detail behind a thinner scheduler. | historical declared | E-00245-RESTRUCTURE; E-00245-MIGRATION |
 | v0.21 → v0.22 | behavior survival | output ownership, validation, fail-closed routing, anti-drift authority, and ScopeLock survive in a compact Exec. | cross-version persistent | E-00243-SCOPELOCK; E-00246-EXEC; E-CURRENT-EXEC |
 | current CTS | host boundary exposed | current-turn routing survives, but durable persistence, background wake, and named Auth/OPSEC service implementations are not proven inside the seven files. | current source truth / unavailable | E-CURRENT-INSTRUCTIONS; E-CURRENT-EXEC; E-CURRENT-EXECLIB |

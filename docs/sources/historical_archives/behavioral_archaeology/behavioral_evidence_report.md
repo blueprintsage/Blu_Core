@@ -28,10 +28,15 @@ mega-Exec and preserves route ownership, validation, ScopeLock, and failure
 rules. Several routed service names do not have implementations within the
 seven golden files. [E-CURRENT-EXEC, E-CURRENT-EXECLIB]
 
-**Owner observation.** Dad identifies v0.7.4.1 as the most natural, stable, and
-useful version, reports early School as its strongest period, and reports a
-Kiddo password/new-schedule failure. These observations are not runtime
-telemetry. [O-01, O-02, O-03]
+**Owner observation.** Dad identifies v0.7.4.1 as Blu's strongest and most
+natural historical heuristic feel and as highly useful, but not as her most
+reliable or stable version. Dad reports that pre-Exec v0.7.4 hallucinated and
+drifted easily and that Exec later improved reliability and control. Dad
+remembers School / classroom behavior as strong and useful approximately during
+v0.8.x through v0.13.x, imperfect, and eventually abandoned as development
+focus shifted toward stabilizing Blu's heuristics. Dad also reports a Kiddo
+password/new-schedule failure. These observations are not runtime telemetry.
+[O-01, O-02, O-03]
 
 **Cross-version inference.** The durable value is in behavior contracts and
 model-facing guidance, not historical module boundaries. The evidence supports
@@ -48,12 +53,13 @@ conversational cadence, and Instructions deny background access. Auth and OPSEC
 concepts already exist before Exec. [E-00020-INSTRUCTIONS, E-00020-PERSONA,
 E-00020-TEACH, E-00013-AUTH]
 
-**Owner observation.** Dad's quality judgment applies to the whole experienced
-version, not to any one file or mechanism. [O-01]
+**Owner observation.** Dad's judgment concerns v0.7.4.1's strong, natural
+heuristic feel and usefulness—not reliability or stability. He reports that
+pre-Exec v0.7.4 hallucinated and drifted easily. [O-01]
 
-**Cross-version inference.** Dense, coherent model-facing guidance may have
-contributed to the reported quality, but the archive contains no telemetry that
-establishes causation.
+**Cross-version inference.** Dense, coherent model-facing guidance is
+independently present alongside Dad's heuristic-feel observation. The archive
+contains no telemetry from which to infer causation.
 
 **Successor recommendation.** Preserve the pedagogical and Persona-level
 qualities as bounded guidance and regression scenarios. Do not infer that a
@@ -72,6 +78,10 @@ DateLib, one-owner/selected-only constraints, and fail-closed behavior.
 state ownership auditable. Its benefits were arbitration, validation, explicit
 state mutation, and anti-drift—not its later size.
 
+**Owner observation.** Dad reports that Exec later improved Blu's reliability
+and control relative to the easily hallucinating and drifting pre-Exec v0.7.4
+experience. This is owner experience, not archive telemetry. [O-01]
+
 **Successor recommendation.** Retain regression tests for one output owner,
 selected-only mutation, source authority, ScopeLock, and fail-closed routing.
 
@@ -85,13 +95,17 @@ through different routing structures. This is mechanical scaffolding, not proof
 of reliable classroom execution. [E-00020-TEACH, E-00031-SCHOOL,
 E-00094-ROUTER]
 
-**Owner observation.** Dad reports that School was strongest early and later
-degraded. Dad also reports the Kiddo password/new-schedule incident. [O-02,
-O-03]
+**Owner observation.** Dad remembers the School / classroom system as strong
+and useful approximately during v0.8.x through v0.13.x, but not perfect. He
+remembers it being abandoned as development focus shifted toward stabilizing
+Blu's heuristics. Dad also reports the Kiddo password/new-schedule incident.
+[O-02, O-03]
 
 **Cross-version inference.** The incident's causal mechanism is unavailable.
 The sources establish a risky boundary class—authority gates plus mutable
-schedule/course state—but not the cause.
+schedule/course state—but not the cause. Archive evidence establishes
+structural changes and removal or archival, not experienced quality or
+progressive degradation.
 
 **Successor recommendation.** Recover teaching guidance independently. Reject
 wholesale School Engine restoration. Any future classroom state requires a

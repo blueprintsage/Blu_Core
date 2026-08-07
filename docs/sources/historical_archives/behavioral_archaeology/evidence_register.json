@@ -304,14 +304,14 @@
       "id": "F-OWNER-V07",
       "label": "owner_observation",
       "grade": "O",
-      "claim": "Dad reports v0.7.4.1 as Blu's most natural, stable, and useful historical version.",
+      "claim": "Dad reports v0.7.4.1 as Blu's strongest and most natural historical heuristic feel and as highly useful, but not as the most reliable or stable; he reports easy pre-Exec hallucination and drift, with later Exec improving reliability and control.",
       "owner_observation_id": "O-01"
     },
     {
       "id": "F-OWNER-SCHOOL",
       "label": "owner_observation",
       "grade": "O",
-      "claim": "Dad reports that School was strongest near its first appearance and later degraded.",
+      "claim": "Dad remembers School / classroom behavior as strong and useful approximately during v0.8.x through v0.13.x, imperfect, and eventually abandoned as development focus shifted toward stabilizing Blu's heuristics; he does not report progressive degradation.",
       "owner_observation_id": "O-02"
     },
     {
@@ -472,7 +472,7 @@
       "id": "F-V07-QUALITY-INFERENCE",
       "label": "inference",
       "grade": "C",
-      "claim": "Dense Persona, Teaching, and Anchors material may help explain the reported v0.7 quality, but no historical telemetry proves causation.",
+      "claim": "Dense Persona, Teaching, and Anchors material is independently present alongside Dad's v0.7 heuristic-feel observation, but the evidence does not establish a causal relationship.",
       "supporting_finding_ids": [
         "F-TEACH-PRE-SCHOOL",
         "F-OWNER-V07"

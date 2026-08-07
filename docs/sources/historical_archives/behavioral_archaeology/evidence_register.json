@@ -1,0 +1,515 @@
+{
+  "schema_version": "1.0.0",
+  "assignment": "BC-017",
+  "authority": "historical sources are non-authoritative for current runtime",
+  "labels": [
+    "current_source_truth",
+    "owner_observation",
+    "owner_observed_failure",
+    "historical_declared",
+    "historical_mechanically_scaffolded",
+    "cross_version_persistent",
+    "inference",
+    "unavailable"
+  ],
+  "grades": {
+    "A": "direct primary-source support",
+    "B": "direct support with bounded limitation",
+    "C": "weak or incomplete support",
+    "O": "owner observation kept separate from archive proof",
+    "U": "unavailable or unproven"
+  },
+  "source_aliases": {
+    "historical_inventory": "docs/sources/historical_archives/kernel_archive_inventory.json",
+    "golden_kernel": "kernel/golden/v0.22.0",
+    "faithfulness_sidecar": "Dad-supplied external design sidecar; absolute location deliberately unpublished"
+  },
+  "locators": [
+    {
+      "id": "E-CURRENT-INSTRUCTIONS",
+      "source_class": "current_source_truth",
+      "source_record_id": "CTS-GOLDEN-v0.22.0",
+      "member_path": "kernel/golden/v0.22.0/00_Instructions.md",
+      "sha256": "5b85ba935633ea341253bec58eacb69204e02d43dec41b858eb4dbf442f8d729"
+    },
+    {
+      "id": "E-CURRENT-PERSONA",
+      "source_class": "current_source_truth",
+      "source_record_id": "CTS-GOLDEN-v0.22.0",
+      "member_path": "kernel/golden/v0.22.0/01_Persona.md",
+      "sha256": "779bfc47ebcd22386a91db228d3a3d827a92f9c471ccee36546880a16c6e4e79"
+    },
+    {
+      "id": "E-CURRENT-OPS",
+      "source_class": "current_source_truth",
+      "source_record_id": "CTS-GOLDEN-v0.22.0",
+      "member_path": "kernel/golden/v0.22.0/02_Operations_Law.md",
+      "sha256": "d097eee5e5b64243234644b064831afdf42829bef1dddf5e7128343b60045fab"
+    },
+    {
+      "id": "E-CURRENT-EXEC",
+      "source_class": "current_source_truth",
+      "source_record_id": "CTS-GOLDEN-v0.22.0",
+      "member_path": "kernel/golden/v0.22.0/03_Exec.md",
+      "sha256": "e4158bb18a5dd046c90e4b348a6f3b37299447a3e670d914e8140fbf07eed0e1"
+    },
+    {
+      "id": "E-CURRENT-EXECLIB",
+      "source_class": "current_source_truth",
+      "source_record_id": "CTS-GOLDEN-v0.22.0",
+      "member_path": "kernel/golden/v0.22.0/04_Exec_Library.md",
+      "sha256": "7fd95333652533c1a8d50b6bdc867802157ef15500bab3db27d639dc8545b058"
+    },
+    {
+      "id": "E-00013-AUTH",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0013",
+      "member_path_suffix": "01_Core_Blu_Safeguards.md",
+      "sections": [
+        "session role state",
+        "challenge and lock flow"
+      ]
+    },
+    {
+      "id": "E-00020-TEACH",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0020",
+      "member_path_suffix": "06_Teaching.md",
+      "sections": [
+        "tiers",
+        "walkthroughs",
+        "verification",
+        "drills",
+        "troubleshooting"
+      ]
+    },
+    {
+      "id": "E-00020-PERSONA",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0020",
+      "member_path_suffix": "01_Persona.md",
+      "sections": [
+        "emotion and mood ribbons",
+        "drift check"
+      ]
+    },
+    {
+      "id": "E-00020-INSTRUCTIONS",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0020",
+      "member_path_suffix": "00_Instructions.md",
+      "sections": [
+        "background-access limitation"
+      ]
+    },
+    {
+      "id": "E-00029-NOEXEC",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0029",
+      "member_path_suffix": "04_Engine.md",
+      "sections": [
+        "pre-Exec routing"
+      ]
+    },
+    {
+      "id": "E-00030-EXEC",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0030",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "single output lane",
+        "module proposals",
+        "selection and suppression",
+        "reminder due and acknowledgement state"
+      ]
+    },
+    {
+      "id": "E-00031-SCHOOL",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0031",
+      "member_path_suffix": "10_School.md",
+      "sections": [
+        "school state",
+        "class blocks",
+        "grade and gates",
+        "selected-only mutation"
+      ]
+    },
+    {
+      "id": "E-00057-EXEC",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0057",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "ABI",
+        "fail closed",
+        "DateLib",
+        "one-owner rule"
+      ]
+    },
+    {
+      "id": "E-00072-MMU",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0072",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "MMU candidate classification",
+        "promotion validation",
+        "quarantine",
+        "typed pools",
+        "compact preload"
+      ]
+    },
+    {
+      "id": "E-00093-MOOD",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0093",
+      "member_path_suffix": "08_Exec_Library.md",
+      "sections": [
+        "MoodLib"
+      ]
+    },
+    {
+      "id": "E-00094-ROUTER",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0094",
+      "member_path_suffix": "Behavior_Router.md",
+      "sections": [
+        "Behavior Router"
+      ]
+    },
+    {
+      "id": "E-00127-TIME",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0127",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "reminder and time routing"
+      ]
+    },
+    {
+      "id": "E-00195-MEGAEXEC",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0195",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "feature-specific auth",
+        "mood",
+        "memory and retrieval gates"
+      ],
+      "metric": {
+        "splitlines": 5536
+      }
+    },
+    {
+      "id": "E-00200-CONTRACTION",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0200",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "contracted Exec"
+      ],
+      "metric": {
+        "splitlines": 1272
+      }
+    },
+    {
+      "id": "E-00210-MEMORY",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0210",
+      "member_path_suffix": "09_Programs.md",
+      "sections": [
+        "StateTree",
+        "Memory Program",
+        "MemoryPacket"
+      ]
+    },
+    {
+      "id": "E-00211-MMU",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0211",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "MMU prominence",
+        "secondary Read Lane evidence"
+      ]
+    },
+    {
+      "id": "E-00223-AUTH",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0223",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "Auth fix"
+      ]
+    },
+    {
+      "id": "E-00243-SCOPELOCK",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0243",
+      "member_path_suffix": "08_Exec.md",
+      "sections": [
+        "ScopeLock",
+        "Wu Sao"
+      ]
+    },
+    {
+      "id": "E-00245-RESTRUCTURE",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0245",
+      "member_path_suffix": "RESTRUCTURE_ANALYSIS.md",
+      "sections": [
+        "Exec absorbed behavior",
+        "physical location and authority confusion",
+        "thin scheduler recommendation"
+      ]
+    },
+    {
+      "id": "E-00245-MIGRATION",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0245",
+      "member_path_suffix": "MIGRATION_GUIDE.md",
+      "sections": [
+        "service detail extraction"
+      ]
+    },
+    {
+      "id": "E-00246-EXEC",
+      "source_class": "historical_archive",
+      "source_record_id": "BLU-HIST-0246",
+      "member_path_suffix": "03_Exec.md",
+      "sha256": "e4158bb18a5dd046c90e4b348a6f3b37299447a3e670d914e8140fbf07eed0e1"
+    },
+    {
+      "id": "E-SIDECAR-FAITH",
+      "source_class": "external_sidecar",
+      "source_record_id": "EXECLIB.FAITHFULNESS.001",
+      "relative_path_alias": "faithfulness_sidecar",
+      "sha256": "122889417f3560b60226f35f88777a4d9b8da5cd1a8d26e237b04a315e1f8de0",
+      "status": "DRAFT"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-TEACH-PRE-SCHOOL",
+      "label": "historical_declared",
+      "grade": "A",
+      "claim": "A dense model-facing teaching framework existed in v0.7 before the School engine.",
+      "locator_ids": [
+        "E-00020-TEACH",
+        "E-00031-SCHOOL"
+      ]
+    },
+    {
+      "id": "F-OWNER-V07",
+      "label": "owner_observation",
+      "grade": "O",
+      "claim": "Dad reports v0.7.4.1 as Blu's strongest and most natural historical heuristic feel and as highly useful, but not as the most reliable or stable; he reports easy pre-Exec hallucination and drift, with later Exec improving reliability and control.",
+      "owner_observation_id": "O-01"
+    },
+    {
+      "id": "F-OWNER-SCHOOL",
+      "label": "owner_observation",
+      "grade": "O",
+      "claim": "Dad remembers School / classroom behavior as strong and useful approximately during v0.8.x through v0.13.x, imperfect, and eventually abandoned as development focus shifted toward stabilizing Blu's heuristics; he does not report progressive degradation.",
+      "owner_observation_id": "O-02"
+    },
+    {
+      "id": "F-OWNER-INCIDENT",
+      "label": "owner_observed_failure",
+      "grade": "O",
+      "claim": "Dad reports a Kiddo password/new-schedule incident; its mechanism is not established by archive evidence.",
+      "owner_observation_id": "O-03"
+    },
+    {
+      "id": "F-EXEC-EMERGENCE",
+      "label": "historical_mechanically_scaffolded",
+      "grade": "A",
+      "claim": "The first concrete Exec appears in BLU-HIST-0030 after a pre-Exec Engine specimen and acts as a reminder-centric single-output dispatcher.",
+      "locator_ids": [
+        "E-00029-NOEXEC",
+        "E-00030-EXEC"
+      ]
+    },
+    {
+      "id": "F-SCHOOL-SCAFFOLD",
+      "label": "historical_mechanically_scaffolded",
+      "grade": "A",
+      "claim": "The first School specimen defines explicit state, commands, class blocks, grades, gates, and selected-only mutations; this proves scaffolding, not reliable execution.",
+      "locator_ids": [
+        "E-00031-SCHOOL"
+      ]
+    },
+    {
+      "id": "F-EXEC-BENEFITS",
+      "label": "cross_version_persistent",
+      "grade": "A",
+      "claim": "Output arbitration, route ownership, selected-only state, validation, fail-closed handling, anti-drift authority, and later ScopeLock persist as valuable orchestration contracts.",
+      "locator_ids": [
+        "E-00030-EXEC",
+        "E-00057-EXEC",
+        "E-00243-SCOPELOCK",
+        "E-CURRENT-EXEC"
+      ]
+    },
+    {
+      "id": "F-EXEC-COMPLEXITY",
+      "label": "historical_mechanically_scaffolded",
+      "grade": "A",
+      "claim": "Exec accumulated feature-specific auth, mood, memory, and retrieval behavior; late restructuring records identify this accumulation and recommend a thin scheduler.",
+      "locator_ids": [
+        "E-00195-MEGAEXEC",
+        "E-00200-CONTRACTION",
+        "E-00245-RESTRUCTURE",
+        "E-00245-MIGRATION"
+      ]
+    },
+    {
+      "id": "F-REMINDER-WAKE",
+      "label": "historical_declared",
+      "grade": "A",
+      "claim": "Historical reminder logic represented due times, warnings, acknowledgement, suppression, and escalation, while the Markdown runtime explicitly lacked autonomous wake-up.",
+      "locator_ids": [
+        "E-00020-INSTRUCTIONS",
+        "E-00030-EXEC",
+        "E-00057-EXEC"
+      ]
+    },
+    {
+      "id": "F-MMU",
+      "label": "historical_mechanically_scaffolded",
+      "grade": "A",
+      "claim": "MMU introduced candidate classification, validation, quarantine, precedence, typed pools, and compact preload without replacing platform memory.",
+      "locator_ids": [
+        "E-00072-MMU"
+      ]
+    },
+    {
+      "id": "F-MEMORY-LATE",
+      "label": "historical_declared",
+      "grade": "B",
+      "claim": "Later memory designs distinguish staged, in-session committed, and persistent concepts through StateTree, Memory Program, and MemoryPacket forms.",
+      "locator_ids": [
+        "E-00210-MEMORY",
+        "E-CURRENT-EXECLIB"
+      ]
+    },
+    {
+      "id": "F-AUTH",
+      "label": "cross_version_persistent",
+      "grade": "A",
+      "claim": "Auth evolves from session role and bounded challenge state into a routed service contract; the current seven-file CTS does not define the routed service implementation or secret material.",
+      "locator_ids": [
+        "E-00013-AUTH",
+        "E-00223-AUTH",
+        "E-CURRENT-EXEC",
+        "E-CURRENT-EXECLIB"
+      ]
+    },
+    {
+      "id": "F-MOOD",
+      "label": "cross_version_persistent",
+      "grade": "A",
+      "claim": "Mood moves from Persona-owned reflective tone to engine-rendered state and MoodLib, then returns in the current CTS to Persona-shaped replies with reflective-only library support.",
+      "locator_ids": [
+        "E-00020-PERSONA",
+        "E-00093-MOOD",
+        "E-CURRENT-PERSONA",
+        "E-CURRENT-EXECLIB"
+      ]
+    },
+    {
+      "id": "F-READ-LANE",
+      "label": "historical_declared",
+      "grade": "C",
+      "claim": "Read Lane evidence is secondary at BLU-HIST-0211; MMU is the representative behavior and Read Lane needs more evidence.",
+      "locator_ids": [
+        "E-00211-MMU"
+      ]
+    },
+    {
+      "id": "F-OPSEC-CURRENT-GAP",
+      "label": "current_source_truth",
+      "grade": "A",
+      "claim": "Current CTS routes OPSEC to a named service but the seven golden files do not define that service or conclusively establish its pre-ingress mechanism.",
+      "locator_ids": [
+        "E-CURRENT-EXEC",
+        "E-CURRENT-EXECLIB"
+      ]
+    },
+    {
+      "id": "F-V022-IDENTITY",
+      "label": "cross_version_persistent",
+      "grade": "A",
+      "claim": "The historical v0.22 Exec member and current golden Exec are byte-identical but retain distinct historical-reference and current-runtime source roles.",
+      "locator_ids": [
+        "E-00246-EXEC",
+        "E-CURRENT-EXEC"
+      ]
+    },
+    {
+      "id": "F-SIDECAR-SCAN",
+      "label": "historical_declared",
+      "grade": "B",
+      "claim": "The Faithfulness draft was not found by filename, library ID, or exact content hash in 1,985 readable nested-archive members; 63 Deflate64 members remained unreadable.",
+      "locator_ids": [
+        "E-SIDECAR-FAITH"
+      ],
+      "limitations": [
+        "Unreadable member contents spanned seven archives; their central-directory filenames contained no match."
+      ]
+    },
+    {
+      "id": "F-SIDECAR-USE",
+      "label": "inference",
+      "grade": "B",
+      "claim": "Faithfulness is classified as unshipped successor-design evidence, not historical shipped behavior.",
+      "supporting_finding_ids": [
+        "F-SIDECAR-SCAN"
+      ]
+    },
+    {
+      "id": "F-V07-QUALITY-INFERENCE",
+      "label": "inference",
+      "grade": "C",
+      "claim": "Dense Persona, Teaching, and Anchors material is independently present alongside Dad's v0.7 heuristic-feel observation, but the evidence does not establish a causal relationship.",
+      "supporting_finding_ids": [
+        "F-TEACH-PRE-SCHOOL",
+        "F-OWNER-V07"
+      ]
+    },
+    {
+      "id": "F-PERSISTENCE-UNPROVEN",
+      "label": "unavailable",
+      "grade": "U",
+      "claim": "Durable host persistence, background wake behavior, and historical runtime reliability are not proven by the archive Markdown.",
+      "locator_ids": [
+        "E-00020-INSTRUCTIONS",
+        "E-CURRENT-INSTRUCTIONS"
+      ]
+    }
+  ],
+  "faithfulness_sidecar": {
+    "classification": "unshipped_sidecar_design",
+    "version": "v0.1.0-draft",
+    "date": "2026-05-08",
+    "archive_scan": {
+      "nested_archives_name_scanned": 244,
+      "readable_members_content_scanned": 1985,
+      "filename_hits": 0,
+      "library_id_hits": 0,
+      "exact_sha256_hits": 0,
+      "unreadable_deflate64_members": 63,
+      "affected_record_ids": [
+        "BLU-HIST-0045",
+        "BLU-HIST-0046",
+        "BLU-HIST-0060",
+        "BLU-HIST-0074",
+        "BLU-HIST-0078",
+        "BLU-HIST-0081",
+        "BLU-HIST-0082"
+      ]
+    },
+    "use_boundary": "May inform successor design only; it is not evidence of shipped historical behavior."
+  }
+}

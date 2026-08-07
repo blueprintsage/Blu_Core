@@ -725,7 +725,7 @@
       "notes": [
         "Identity covers direct branch-root Markdown files only; nested archives are separate records.",
         "The branch label is historical source organization and does not mean current Blu runtime authority.",
-        "Normalized member content matches external archive record BLU-HIST-0247; container and file-set hashes remain distinct identities."
+        "The DevBuild file-set content manifest has no recorded canonical-inventory content-manifest match."
       ]
     },
     {
@@ -121802,9 +121802,9 @@
       "branch": "release",
       "relative_path": "Release/!Archives/v0.20.x/2026-05-08_0000_Blu_v0.20.0_Alpha_R1.zip",
       "sha256": "8c907b8ab8792e11d8776c59e13759610546c120438a3a58297112a40a0b05e4",
-      "reason_selected": "MMU/Read Lane representative",
+      "reason_selected": "MMU representative; Read Lane secondary",
       "questions_it_can_help_answer": [
-        "Inspect MMU or Read Lane prominence and its relationship to Exec-era structure."
+        "Inspect MMU prominence and secondary Read Lane evidence in relation to Exec-era structure."
       ],
       "overlapping_archives_it_replaces": [
         "BLU-HIST-0212",
@@ -121833,7 +121833,7 @@
         "BLU-HIST-0235",
         "BLU-HIST-0236"
       ],
-      "selection_confidence": "high"
+      "selection_confidence": "medium"
     },
     {
       "archive_id": "BLU-HIST-0245",

@@ -1,6 +1,6 @@
 # BC-018-C1 — Cross-Turn Security State Correction
 
-status: review
+status: done
 owner: Codex
 reviewer: Claude
 project_lead: Blu
@@ -166,3 +166,23 @@ NN-1 through NN-5 in Claude's immutable `approve-with-notes` review:
   authorization state, modern PASS/SkillForge sources, and Claude's review;
 - create one substantive correction commit and the normal metadata-only receipt
   commit, push the branch, and leave BC-018 and BC-018-C1 at `review`.
+
+### 2026-08-08 — Final closure authorization
+
+Dad and Blu authorized administrative closure from exact integrated main base
+`ce1cc235057a5de3d71fefbcee32e5617197cbb0` on branch
+`bc-018-closure`.
+
+- Final status: `done`.
+- Final semantic disposition: `approve-with-notes`.
+- Final blocking findings: zero.
+- Claude re-review commit:
+  `1f440546a076c9359afaf5e832882e588d71dfa6`.
+- Closure preserves the seven-component, eight-packet, nine-interface design;
+  `PendingAuthorizationState` remains a state record and
+  `SecurityDecision` remains `PASS`, `BLOCK`, or `ASK`.
+- SUR-011 remains unresolved for future security-authorized policy work.
+  SUR-012 remains `blocking_for_BC020: true` for the future BC-020 host-evidence
+  matrix.
+- Closure is administrative only and authorizes no runtime implementation,
+  BC-020 work, or BC-030 work.

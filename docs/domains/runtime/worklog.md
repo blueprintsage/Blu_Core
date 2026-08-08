@@ -680,3 +680,48 @@ last_reviewed: 2026-08-08
 - Branch: `bc-018-c1-closure-prep`
 - Substantive correction commit:
   `90e30c6d685eaa35c9bdf1a666179c9882877d85`
+
+## 2026-08-08 — BC-018 and BC-018-C1 closed
+
+### What changed
+
+- Dad and Blu authorized final administrative closure from integrated main at
+  `ce1cc235057a5de3d71fefbcee32e5617197cbb0`.
+- BC-018 and BC-018-C1 moved from `review` to `done` in their assignment
+  records and the global assignment index.
+- The original BC-018 `return-for-correction` review remains immutable history.
+  The final C1 re-review remains `approve-with-notes`, with BF-1, BF-2, and
+  BF-3 resolved and zero blocking findings.
+- Exact lineage through the specification, corrections, reviews, closure-prep
+  correction, metadata, and main integration merge was recorded without
+  rewriting history.
+- Runtime next steps now identify BC-020 and BC-030 as `ready_for_spec` while
+  retaining their global `spec-needed`, unstarted state.
+- SUR-011 remains a future security-policy input. SUR-012 remains
+  `blocking_for_BC020: true` for host-session evidence integrity and rollback
+  resistance.
+- The canonical manifest was regenerated after closure metadata changed.
+
+### What was tested or reviewed
+
+- Re-ran all five repository validators and unit-test suites.
+- Verified complete canonical manifest coverage including `.gitattributes`,
+  all eight golden CTS checksums, protected paths, architecture invariants,
+  review-record immutability, publication safety, runtime non-implementation,
+  and PASS/SkillForge isolation.
+- Exact commands and results are recorded in the BC-018 and BC-018-C1
+  validation records.
+
+### Known risks and next safe step
+
+- All Claude non-blocking notes remain preserved. Closure resolves none of the
+  remaining future policy or host-specific mechanics.
+- BC-020 and BC-030 may proceed only after Dad or Blu supplies a separately
+  approved packet, named base, and owner. Neither assignment was started.
+- No successor runtime implementation is authorized.
+
+### Commit identity
+
+- Closure base: `ce1cc235057a5de3d71fefbcee32e5617197cbb0`.
+- Branch: `bc-018-closure`.
+- Substantive closure commit: recorded by the metadata-only follow-up commit.

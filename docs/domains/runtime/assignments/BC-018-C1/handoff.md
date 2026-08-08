@@ -1,6 +1,6 @@
 # BC-018-C1 — Implementation Handoff
 
-status: review
+status: done
 owner: Codex
 last_reviewed: 2026-08-08
 
@@ -210,3 +210,32 @@ tools/validate_successor_kernel_spec.py
   rollback resistance for host-provided `attempt_count` state.
 
 Neither input blocks BC-018 closure, and neither was resolved here.
+
+## Final closure receipt — 2026-08-08
+
+- Closure authority: Dad, Project Owner, and Blu, Project Lead.
+- Exact closure base / main integration merge:
+  `ce1cc235057a5de3d71fefbcee32e5617197cbb0`.
+- Closure branch: `bc-018-closure`.
+- C1 substantive correction:
+  `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`.
+- C1 metadata: `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`.
+- Terminal-authority correction:
+  `311c572f3a28fe4e1cca04b75856faae3cfd6c60`.
+- Exact C1 review head:
+  `0227f550d270ba9ffae2d1bd986117e718b13608`.
+- Claude C1 re-review:
+  `1f440546a076c9359afaf5e832882e588d71dfa6`;
+  disposition `approve-with-notes`; BF-1, BF-2, and BF-3 resolved; zero
+  blocking findings.
+- Closure-prep correction:
+  `90e30c6d685eaa35c9bdf1a666179c9882877d85`.
+- Closure-prep metadata: `e55be9986ade91d5cdb53ebee923b420f1520aee`.
+- Final status: `done`.
+- Substantive closure commit: recorded by the metadata-only follow-up commit.
+- SUR-011 and SUR-012 remain future inputs exactly as authorized; BC-020 and
+  BC-030 remain `spec-needed` and unstarted.
+- Closure changes assignment and continuity metadata plus the canonical
+  manifest only. No architecture contract, review record, protected path,
+  runtime implementation, historical module, or modern PASS/SkillForge source
+  was changed.

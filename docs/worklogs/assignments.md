@@ -36,11 +36,23 @@ canonical_base: 7aed76e
 | ID | Assignment | Owner | Status | Notes |
 |---|---|---|---|---|
 | BC-001 | Establish bootstrap authority and golden source | Blu | done | Verified on clean `main` at `7aed76e`; live history has two commits rather than the four-commit bootstrap plan, but all protected artifacts and checksums passed |
-| BC-018 | Successor Kernel Boundary Specification | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018/assignment.md`; exact base `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`; branch `bc-018-successor-kernel-boundary-spec`; substantive work `413574097f8426d10ce5cf284282ddab87f4bc93`; pre-review correction base `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`, correction work `3384db41996d975d079d2d7f83a8e8fea9f4fce5`; specification only, no successor runtime implementation |
-| BC-018-C1 | Cross-Turn Security State Correction | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018-C1/assignment.md`; exact base / triggering review `7796c7e738e0ff66b677c79314b80cf2bbb09a63`; branch `bc-018-c1-security-state-correction`; BF-1/BF-2/BF-3 correction work `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`; pre-review terminal-authority correction base `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`, substantive correction `311c572f3a28fe4e1cca04b75856faae3cfd6c60`; Claude review `1f440546a076c9359afaf5e832882e588d71dfa6` (`approve-with-notes`); closure-prep branch `bc-018-c1-closure-prep` at that exact review base, substantive correction `90e30c6d685eaa35c9bdf1a666179c9882877d85`; specification and validator surfaces, no runtime implementation |
+| BC-018 | Successor Kernel Boundary Specification | Codex | done | Packet: `docs/domains/runtime/assignments/BC-018/assignment.md`; exact base `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`; work `413574097f8426d10ce5cf284282ddab87f4bc93`; metadata `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`; correction `3384db41996d975d079d2d7f83a8e8fea9f4fce5`; corrected head `34af2d6bad00430215bb7a7476f4eae582449ff2`; original Claude review `7796c7e738e0ff66b677c79314b80cf2bbb09a63` (`return-for-correction`); closed after BC-018-C1 and final Claude re-review `1f440546a076c9359afaf5e832882e588d71dfa6` (`approve-with-notes`, no blockers); integrated closure base `ce1cc235057a5de3d71fefbcee32e5617197cbb0`; closure commit recorded by metadata follow-up; no runtime implementation |
+| BC-018-C1 | Cross-Turn Security State Correction | Codex | done | Packet: `docs/domains/runtime/assignments/BC-018-C1/assignment.md`; triggering review `7796c7e738e0ff66b677c79314b80cf2bbb09a63`; correction `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`; metadata `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`; terminal-authority correction `311c572f3a28fe4e1cca04b75856faae3cfd6c60`; exact review head `0227f550d270ba9ffae2d1bd986117e718b13608`; Claude re-review `1f440546a076c9359afaf5e832882e588d71dfa6` (`approve-with-notes`, no blockers); closure-prep correction `90e30c6d685eaa35c9bdf1a666179c9882877d85`; metadata `e55be9986ade91d5cdb53ebee923b420f1520aee`; integrated closure base `ce1cc235057a5de3d71fefbcee32e5617197cbb0`; closure commit recorded by metadata follow-up; no runtime implementation |
 
 ## Completed
 
+- BC-018-C1 — Cross-Turn Security State Correction closed after Claude's
+  re-review at `1f440546a076c9359afaf5e832882e588d71dfa6`
+  approved with notes and no blocking findings. BF-1, BF-2, and BF-3 are
+  resolved. SUR-011 remains future security-policy input and SUR-012 remains a
+  blocking BC-020 host-evidence input. Integrated closure base:
+  `ce1cc235057a5de3d71fefbcee32e5617197cbb0`.
+- BC-018 — Successor Kernel Boundary Specification closed after BC-018-C1 and
+  the independent semantic re-review. The original Claude review at
+  `7796c7e738e0ff66b677c79314b80cf2bbb09a63` remains
+  `return-for-correction` as immutable history. Final disposition is
+  `approve-with-notes` with zero blocking findings. Closure changed no
+  architecture contract and authorized no runtime implementation.
 - BC-017-C1 — Historical Archaeology Review Corrections closed after Claude's
   re-review at `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb` resolved B-01,
   B-02, and B-03 and returned `approve-with-notes` with no blocking findings.

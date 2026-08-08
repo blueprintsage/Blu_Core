@@ -1,6 +1,6 @@
 # BC-018 — Design Handoff
 
-status: review
+status: done
 owner: Codex
 last_reviewed: 2026-08-08
 
@@ -150,3 +150,29 @@ docs/worklogs/assignments.md
 tests/successor_kernel/test_validate_successor_kernel_spec.py
 tools/validate_successor_kernel_spec.py
 ```
+
+## Final closure receipt — 2026-08-08
+
+- Closure authority: Dad, Project Owner, and Blu, Project Lead.
+- Exact closure base / main integration merge:
+  `ce1cc235057a5de3d71fefbcee32e5617197cbb0`.
+- Closure branch: `bc-018-closure`.
+- Authorized base: `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`.
+- Specification: `413574097f8426d10ce5cf284282ddab87f4bc93`.
+- Specification metadata: `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`.
+- Pre-review correction: `3384db41996d975d079d2d7f83a8e8fea9f4fce5`.
+- Corrected review head: `34af2d6bad00430215bb7a7476f4eae582449ff2`.
+- Original Claude review:
+  `7796c7e738e0ff66b677c79314b80cf2bbb09a63`;
+  disposition `return-for-correction`; BF-1, BF-2, and BF-3 preserved as
+  historical blocking findings.
+- C1 correction lineage is recorded in the BC-018-C1 handoff.
+- Final Claude re-review:
+  `1f440546a076c9359afaf5e832882e588d71dfa6`;
+  disposition `approve-with-notes`; zero blocking findings.
+- Final status: `done`.
+- Substantive closure commit: recorded by the metadata-only follow-up commit.
+- Closure changes assignment and continuity metadata plus the canonical
+  manifest only. No architecture contract, review record, protected path,
+  runtime implementation, historical module, or modern PASS/SkillForge source
+  was changed.

@@ -1,6 +1,6 @@
 # BC-018 — Validation Record
 
-status: review
+status: done
 owner: Codex
 last_reviewed: 2026-08-08
 
@@ -117,3 +117,65 @@ packet count: 8, unchanged
 The corrected canonical manifest contains 185 entries, excludes itself, and
 verified against staged Git-blob bytes with zero missing entries and zero
 mismatches.
+
+## Final closure validation — 2026-08-08
+
+Commands run from `bc-018-closure` at exact base
+`ce1cc235057a5de3d71fefbcee32e5617197cbb0`:
+
+```text
+git diff --check
+python tools/validate_runtime_contracts.py
+python -m unittest discover -s tests/contracts -p "test_*.py"
+python tools/validate_viability_audit.py
+python -m unittest discover -s tests/viability -p "test_*.py"
+python tools/validate_historical_archive_inventory.py
+python -m unittest discover -s tests/historical_archives -p "test_*.py"
+python tools/validate_historical_behavioral_archaeology.py
+python -m unittest discover -s tests/historical_archaeology -p "test_*.py"
+python tools/validate_successor_kernel_spec.py
+python -m unittest discover -s tests/successor_kernel -p "test_*.py"
+canonical LF/Git-blob MANIFEST regeneration and complete tracked-set
+  verification from the staged index
+PowerShell SHA-256 verification against
+  kernel/golden/v0.22.0/SHA256SUMS
+protected-path, architecture/contract, review-record, runtime-implementation,
+  historical-module, publication-safety, and PASS/SkillForge isolation checks
+```
+
+Results:
+
+```text
+git diff --check: passed
+runtime contract validator: passed
+contract tests: Ran 21, OK
+viability audit validator: passed
+viability tests: Ran 9, OK
+historical inventory validator: passed
+historical inventory tests: Ran 12, OK
+historical archaeology validator: passed
+historical archaeology tests: Ran 18, OK
+successor specification validator: passed
+successor specification tests: Ran 40, OK
+components: 7
+packets: 8
+interfaces: 9
+SecurityDecision statuses: PASS, BLOCK, ASK
+PendingAuthorizationState: state record, not a packet
+state lifetimes: none, turn, host_session, durable_external
+bare session lifetime: absent
+canonical manifest: complete, self-excluded, 0 missing, 0 extra,
+  0 duplicate, 0 mismatch; .gitattributes covered
+golden CTS SHA-256: 8/8 passed
+protected-path diff: empty
+architecture/contract diff: empty
+BC-018 and BC-018-C1 review-record diff: empty
+successor runtime implementation diff: empty
+historical module/archive payload diff: empty
+modern PASS/SkillForge and Blu_KB_Preview diff: empty
+private or protected publication hits: 0
+```
+
+Closure changes only assignment/continuity Markdown and the canonical manifest.
+It records status and integrity without changing the successor architecture or
+authorizing implementation.

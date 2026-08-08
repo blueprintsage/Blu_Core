@@ -154,3 +154,58 @@ tools/validate_successor_kernel_spec.py
   correlated.
 - Confirm binding success `ASK` and binding failure `UNAVAILABLE` are mutually
   exclusive and still yield one terminal packet per host turn.
+
+## Closure-prep correction — 2026-08-08
+
+### Identity
+
+- Exact base / Claude review commit:
+  `1f440546a076c9359afaf5e832882e588d71dfa6`
+- Branch: `bc-018-c1-closure-prep`
+- Substantive correction commit: recorded by the metadata-only follow-up
+- Review disposition preserved: `approve-with-notes`
+- Assignment status preserved: `review`
+
+### Result
+
+- Rebuilt `MANIFEST.sha256` from the complete self-excluding tracked index and
+  restored `.gitattributes` coverage.
+- Added a focused tracked-path completeness guard so validating listed hashes
+  cannot hide an omitted tracked file.
+- Corrected only the Turn N+1 diagram path: Host Adapter correlation and pending
+  context return to Security Restraint, which permits an attempt before the
+  Authorization Evaluator receives bounded evidence.
+- Set SUR-012 `blocking_for_BC020` to `true`; SUR-002 is unchanged.
+- Registered NN-4 under SUR-011 and NN-5 under SUR-012/BC-020 without choosing
+  either future policy.
+- Preserved seven components, eight packets, nine interfaces, and
+  `SecurityDecision` statuses `PASS`, `BLOCK`, and `ASK`.
+- Did not modify Claude's review, CTS, runtime code, BC-020/BC-030 authorization
+  state, or modern PASS/SkillForge sources.
+
+### Exact substantive correction files
+
+```text
+MANIFEST.sha256
+contracts/successor/unresolved_register.json
+docs/architecture/successor_component_graph.md
+docs/architecture/successor_migration_sequence.md
+docs/domains/runtime/assignments/BC-018-C1/assignment.md
+docs/domains/runtime/assignments/BC-018-C1/handoff.md
+docs/domains/runtime/assignments/BC-018-C1/validation.md
+docs/domains/runtime/failures.md
+docs/domains/runtime/next_steps.md
+docs/domains/runtime/worklog.md
+docs/worklogs/assignments.md
+tests/successor_kernel/test_validate_successor_kernel_spec.py
+tools/validate_successor_kernel_spec.py
+```
+
+### Remaining future inputs
+
+- NN-4: security-authorized policy work alongside SUR-011 must decide the
+  behavior of an uncorrelated intervening turn while authorization is pending.
+- NN-5: the BC-020/SUR-012 host-evidence matrix must evaluate integrity and
+  rollback resistance for host-provided `attempt_count` state.
+
+Neither input blocks BC-018 closure, and neither was resolved here.

@@ -31,7 +31,8 @@ collision domain, tests, review, and revertible commit.
      `SUR-001`;
    - test ordering, content minimization, redaction authorization, the
      cross-turn Auth re-entry loop, sole attempt-policy ownership, finite
-     repetition, expiry, replay rejection, fail-closed exhaustion, and one
+     repetition, expiry, replay rejection, fail-closed exhaustion, deliberate
+     handling of an uncorrelated intervening turn under `SUR-011`, and one
      terminal packet per host turn without publishing protected details or
      entering ordinary routing.
 
@@ -68,6 +69,8 @@ collision domain, tests, review, and revertible commit.
 8. **BC-020 Chat and Codex adapter specification, then implementations**
    - map each host's real capabilities, freshness, errors, receipts, time,
      scheduling, artifacts, tools, identity evidence, and limitations;
+   - require the `SUR-012` host-evidence matrix to cover integrity and rollback
+     resistance for host-provided authorization attempt state;
    - do not claim parity when a host cannot furnish equivalent evidence.
 
 9. **Model execution integration and behavioral parity matrix**
@@ -110,7 +113,8 @@ typed ordinary versus pre-ingress service authority; receipt and error
 requirements; and a prohibition on host assumptions in the core. Its packet
 should require a per-host capability/freshness matrix, host-session and pending-
 request binding matrix, receipt matrix, identity-evidence matrix,
-scheduling/time distinction, error mapping, and conformance fixtures.
+scheduling/time distinction, authorization attempt-state integrity and rollback
+resistance, error mapping, and conformance fixtures.
 `SUR-002`, `SUR-005`, `SUR-006`, and `SUR-012` are BC-020 inputs, not reasons to
 postpone the specification.
 

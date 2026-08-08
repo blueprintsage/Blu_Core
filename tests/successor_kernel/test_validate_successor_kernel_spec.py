@@ -9,7 +9,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "tools"))
 
-from validate_successor_kernel_spec import validate  # noqa: E402
+from validate_successor_kernel_spec import (  # noqa: E402
+    _validate_manifest_coverage,
+    validate,
+)
 
 
 class SuccessorKernelSpecValidationTests(unittest.TestCase):
@@ -18,6 +21,7 @@ class SuccessorKernelSpecValidationTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         for source in (
             "AGENTS.md",
+            "MANIFEST.sha256",
             "contracts/runtime",
             "contracts/successor",
             "docs/architecture",
@@ -63,6 +67,21 @@ class SuccessorKernelSpecValidationTests(unittest.TestCase):
     def test_missing_required_file_fails(self):
         (self.root / "contracts/successor/error_model.json").unlink()
         self.assert_error("missing required file")
+
+    def test_manifest_coverage_rejects_missing_tracked_file(self):
+        case_root = self.root / "manifest_case"
+        case_root.mkdir()
+        (case_root / "MANIFEST.sha256").write_text(
+            "0" * 64 + "  AGENTS.md\n", encoding="utf-8"
+        )
+        errors = _validate_manifest_coverage(
+            case_root,
+            {".gitattributes", "AGENTS.md", "MANIFEST.sha256"},
+        )
+        self.assertTrue(
+            any("tracked file missing from MANIFEST.sha256: .gitattributes" in error for error in errors),
+            errors,
+        )
 
     def test_malformed_json_fails(self):
         self.components.write_text("{not json", encoding="utf-8")

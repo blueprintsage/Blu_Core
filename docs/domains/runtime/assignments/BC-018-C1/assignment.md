@@ -144,3 +144,25 @@ terminal path before any `ControlDecision` exists:
 - add four focused negative tests while preserving all existing tests;
 - append one narrow substantive commit and one metadata-only receipt commit,
   then push without merging or starting re-review.
+
+### 2026-08-08 — Closure-prep integrity and consistency correction
+
+Authorized by Dad through direct instruction at Claude's exact review commit
+`1f440546a076c9359afaf5e832882e588d71dfa6` on branch
+`bc-018-c1-closure-prep`.
+
+This amendment authorizes only the pre-closure corrections identified as
+NN-1 through NN-5 in Claude's immutable `approve-with-notes` review:
+
+- regenerate the canonical self-excluding manifest from complete tracked
+  Git-blob/LF-normalized coverage and add a narrow completeness guard;
+- make the Turn N+1 component graph show Security Restraint attempt permission
+  before Authorization Evaluator evaluation;
+- set SUR-012 `blocking_for_BC020` to `true` without changing SUR-002;
+- carry NN-4 into SUR-011 security-policy work and NN-5 into the BC-020/SUR-012
+  host-evidence matrix without resolving either question;
+- preserve the seven components, eight packets, nine interfaces,
+  `SecurityDecision` statuses, current CTS, runtime boundary, BC-020/BC-030
+  authorization state, modern PASS/SkillForge sources, and Claude's review;
+- create one substantive correction commit and the normal metadata-only receipt
+  commit, push the branch, and leave BC-018 and BC-018-C1 at `review`.

@@ -15,14 +15,18 @@ Python runtime.
 
 ## Next safe step
 
-BC-018-C1 corrects the three blocking cross-turn security-state findings and
-the pre-review terminal-authority gap on the existing
-`bc-018-c1-security-state-correction` branch. It remains in `review` after
-Codex handoff.
+BC-018-C1 includes the reviewed cross-turn security-state and terminal-authority
+corrections plus the authorized closure-prep integrity pass on
+`bc-018-c1-closure-prep`. It remains in `review`; neither BC-018 nor BC-018-C1
+is marked done. Claude's `approve-with-notes` review at
+`1f440546a076c9359afaf5e832882e588d71dfa6` remains immutable history. Dad and
+Blu decide integration and closure.
 
-Claude performs the separately authorized independent semantic re-review of
-the C1 substantive commit. Dad and Blu decide integration and closure. The
-original BC-018 review remains historical evidence and must not be rewritten.
+Two non-blocking security inputs remain explicit and unresolved: the policy for
+an uncorrelated intervening turn travels with SUR-011 to security-authorized
+OPSEC/Auth policy work, and integrity/rollback resistance for host-provided
+authorization attempt state travels with SUR-012 to the BC-020 host-evidence
+matrix.
 
 BC-018-C1 confirms that BC-020 and BC-030 are both `ready_for_spec` against the
 corrected generic adapter/security-state target and unchanged generic

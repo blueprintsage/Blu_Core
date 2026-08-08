@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-06
+last_reviewed: 2026-08-08
 
 ## 2026-08-05 — Bootstrap
 
@@ -516,7 +516,35 @@ last_reviewed: 2026-08-06
 
 - Exact base: `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`
 - Branch: `bc-018-successor-kernel-boundary-spec`
-- Substantive work commit: recorded by the metadata-only follow-up
+- Substantive work commit: `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`
+
+## 2026-08-08 — BC-018-C1 pre-review terminal-authority correction
+
+### What changed
+
+- Defined successful host-session binding and unavailable binding as mutually
+  exclusive Turn N terminal outcomes.
+- Kept `SecurityDecision` at `PASS`, `BLOCK`, and `ASK`; provider-caused
+  `UNAVAILABLE` is selected by Validation and Egress under the originating
+  `SecurityDecision` before any `ControlDecision` exists.
+- Made unbound proposed pending state inactive, non-resumable, and permanently
+  non-correlatable by future host events.
+- Updated packet, interface, error, architecture, validator, assignment, and
+  continuity surfaces without changing the seven-component/eight-packet design.
+- Added four focused negative tests while preserving the existing 35.
+
+### Validation and next step
+
+- Exact final suite, manifest, golden, and protected-path receipts are appended
+  to `assignments/BC-018-C1/validation.md`.
+- Claude may perform the separately authorized semantic re-review only after
+  this correction is committed and pushed. Do not begin BC-020, BC-030, or
+  runtime implementation.
+
+### Commit identity
+
+- Correction base: `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`
+- Substantive correction commit: `311c572f3a28fe4e1cca04b75856faae3cfd6c60`
 
 ## 2026-08-08 — BC-018 pre-review contract correction
 
@@ -559,3 +587,68 @@ last_reviewed: 2026-08-06
 
 - Correction base: `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`
 - Correction substantive commit: recorded by the metadata-only follow-up
+
+## 2026-08-08 — BC-018-C1 cross-turn security state correction
+
+### What changed
+
+- Replaced the ambiguous pre-ingress loop with an explicit Turn N / Turn N+1
+  model and one terminal packet per host turn.
+- Removed bare `session` from persistence lifetimes; all deterministic-core
+  components are now turn-local, with cross-turn state accepted only from an
+  evidenced `host_session` or explicit receipted continuity operation.
+- Added `PendingAuthorizationState` as a state record while preserving seven
+  components and eight packets.
+- Separated attempt-policy authority (Security Restraint), evidence/result
+  authority (Authorization Evaluator), and substrate/correlation evidence
+  (Host Adapter).
+- Required finite attempts, expiry, binding, replay rejection, fail-closed
+  exhaustion, and explicit cancellation/reset behavior without publishing
+  protected values.
+- Bound `AuthorizationResult` validity to turn, evidenced host-session, or
+  receipted durable-external scope; made ServiceExchange authority classes
+  machine-checkable.
+- Resolved directly related N1, N5, and N8 ownership, service-authority, and
+  state-lifetime traceability notes.
+
+### What was tested or reviewed
+
+- All five repository validators passed.
+- Unit suites passed: contracts 21, viability 9, historical archives 12,
+  historical archaeology 18, successor kernel 35.
+- The successor suite includes ten new required negative cases for bare
+  session, missing substrate, two-terminal turns, expiry, finite attempts,
+  replay, AuthorizationResult validity, pre-ingress service authority,
+  duplicate attempt ownership, and Turn Controller cross-turn state.
+- Final Git, manifest, golden, protected-path, and publication-safety receipts
+  are recorded in `assignments/BC-018-C1/validation.md`.
+
+### What worked
+
+- The correction validates without an eighth component or ninth packet.
+- BC-020 retains a coherent generic authorization-evidence target and BC-030's
+  continuity boundary remains unchanged in authority.
+
+### What failed or remains unavailable
+
+- The first branch-creation attempt was denied Git metadata access before any
+  checkout change; retry with the required repository permission succeeded.
+- Exact protected attempt values, lockout/backoff rules, evidence classes,
+  assurance thresholds, and host-specific binding mechanics remain future
+  security/BC-020 inputs.
+- No runtime, host adapter, Auth/OPSEC code, session store, persistence, or
+  modern PASS/SkillForge work was implemented.
+
+### Known risks and next safe step
+
+- Static validation proves the declared structure, not host capability or
+  runtime security behavior.
+- Claude performs the separately authorized semantic re-review of the C1
+  substantive commit. Dad and Blu decide integration. Do not begin BC-020,
+  BC-030, or runtime implementation.
+
+### Commit identity
+
+- Exact base: `7796c7e738e0ff66b677c79314b80cf2bbb09a63`
+- Branch: `bc-018-c1-security-state-correction`
+- Substantive work commit: recorded by the metadata-only follow-up

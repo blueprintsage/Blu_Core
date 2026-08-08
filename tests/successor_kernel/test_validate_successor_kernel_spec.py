@@ -22,6 +22,7 @@ class SuccessorKernelSpecValidationTests(unittest.TestCase):
             "contracts/successor",
             "docs/architecture",
             "docs/domains/runtime/assignments/BC-018",
+            "docs/domains/runtime/assignments/BC-018-C1",
             "docs/domains/runtime/decisions.md",
             "docs/domains/runtime/viability",
             "docs/sources/historical_archives/behavioral_archaeology",
@@ -155,6 +156,108 @@ class SuccessorKernelSpecValidationTests(unittest.TestCase):
         data["pre_ingress_authorization_loop"]["authorization_owner"] = "security_restraint"
         self.save(self.packets, data)
         self.assert_error("Auth is merged into OPSEC")
+
+    def test_bare_session_lifetime_cannot_claim_cross_turn_kernel_persistence(self):
+        data = self.load(self.components)
+        auth = next(x for x in data["components"] if x["component_id"] == "authorization_evaluator")
+        auth["state_lifetime"] = ["turn", "session"]
+        self.save(self.components, data)
+        self.assert_error("bare session lifetime claims unexplained cross-turn kernel persistence")
+
+    def test_pending_authorization_requires_evidenced_substrate(self):
+        data = self.load(self.packets)
+        pending = next(x for x in data["state_records"] if x["state_record_id"] == "PendingAuthorizationState")
+        pending["substrate_provider"] = None
+        pending["allowed_storage_lifetimes"] = []
+        self.save(self.packets, data)
+        self.assert_error("lacks evidenced host_session or continuity-backed substrate")
+
+    def test_cross_turn_authorization_allows_one_terminal_per_host_turn(self):
+        data = self.load(self.packets)
+        data["pre_ingress_authorization_loop"]["maximum_terminal_packets_per_host_turn"] = 2
+        self.save(self.packets, data)
+        self.assert_error("two TerminalPackets for one host turn")
+
+    def test_pre_ingress_unavailable_cannot_require_control_decision(self):
+        data = self.load(self.packets)
+        data["pre_ingress_terminal_authority_contract"]["control_decision_required"] = True
+        self.save(self.packets, data)
+        self.assert_error("pre-ingress UNAVAILABLE improperly requires ControlDecision")
+
+    def test_pre_ingress_unavailable_requires_security_decision_authority(self):
+        data = self.load(self.packets)
+        data["pre_ingress_terminal_authority_contract"]["authority_ref_type"] = None
+        self.save(self.packets, data)
+        self.assert_error("pre-ingress UNAVAILABLE lacks SecurityDecision authority")
+
+    def test_unbound_pending_authorization_cannot_remain_resumable(self):
+        data = self.load(self.packets)
+        pending = next(x for x in data["state_records"] if x["state_record_id"] == "PendingAuthorizationState")
+        pending["activation_contract"]["unbound_request_correlatable"] = True
+        pending["activation_contract"]["unavailable_binding_becomes_active"] = True
+        pending["activation_contract"]["binding_unavailable"] = "status=pending and resumable"
+        self.save(self.packets, data)
+        self.assert_error("unbound PendingAuthorizationState remains resumable")
+
+    def test_binding_failure_cannot_emit_ask_then_unavailable(self):
+        data = self.load(self.packets)
+        data["pre_ingress_terminal_authority_contract"]["binding_resolution_terminal_count"] = 2
+        self.save(self.packets, data)
+        self.assert_error("binding failure can emit ASK followed by UNAVAILABLE")
+
+    def test_pending_authorization_requires_expiry(self):
+        data = self.load(self.packets)
+        pending = next(x for x in data["state_records"] if x["state_record_id"] == "PendingAuthorizationState")
+        pending["required_fields"].remove("expires_at")
+        data["pre_ingress_authorization_loop"]["repetition_contract"]["expiry_required"] = False
+        self.save(self.packets, data)
+        self.assert_error("outstanding authorization request lacks expiry")
+
+    def test_pending_authorization_requires_finite_attempt_bound(self):
+        data = self.load(self.packets)
+        pending = next(x for x in data["state_records"] if x["state_record_id"] == "PendingAuthorizationState")
+        pending["required_fields"].remove("maximum_attempts")
+        data["pre_ingress_authorization_loop"]["repetition_contract"]["maximum_attempts"] = None
+        self.save(self.packets, data)
+        self.assert_error("lacks finite retry/attempt bound")
+
+    def test_pending_authorization_requires_replay_rule(self):
+        data = self.load(self.packets)
+        data["pre_ingress_authorization_loop"]["repetition_contract"]["replay_rule_required"] = False
+        pending = next(x for x in data["state_records"] if x["state_record_id"] == "PendingAuthorizationState")
+        pending["invariants"] = [x for x in pending["invariants"] if "replay" not in x]
+        self.save(self.packets, data)
+        self.assert_error("replayable authorization request lacks replay rule")
+
+    def test_authorization_result_requires_evidenced_validity_lifetime(self):
+        data = self.load(self.packets)
+        data["authorization_result_validity_contract"]["allowed_validity_lifetimes"].append("session")
+        data["authorization_result_validity_contract"]["bare_session_allowed"] = True
+        self.save(self.packets, data)
+        self.assert_error("claims session validity without evidenced lifetime binding")
+
+    def test_pre_ingress_authority_cannot_dispatch_ordinary_service(self):
+        data = self.load(self.packets)
+        authority = data["service_exchange_authority_contract"]["pre_ingress_authorization"]
+        authority["allowed_interface"] = "IF-TIME-PROVIDER"
+        authority["allowed_service_id"] = "tool_call"
+        authority["ordinary_control_decision_authority"] = True
+        self.save(self.packets, data)
+        self.assert_error("can authorize an ordinary service")
+
+    def test_attempt_policy_has_one_authoritative_owner(self):
+        data = self.load(self.components)
+        auth = next(x for x in data["components"] if x["component_id"] == "authorization_evaluator")
+        auth["owns"].append("authorization_attempt_permission")
+        self.save(self.components, data)
+        self.assert_error("attempt policy is not owned solely by security_restraint")
+
+    def test_turn_controller_cannot_declare_hidden_cross_turn_state(self):
+        data = self.load(self.components)
+        controller = next(x for x in data["components"] if x["component_id"] == "turn_controller")
+        controller["state_lifetime"] = ["turn", "host_session"]
+        self.save(self.components, data)
+        self.assert_error("Turn Controller declares hidden cross-turn state")
 
     def test_persona_cannot_own_routing(self):
         data = self.load(self.components)

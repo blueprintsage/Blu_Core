@@ -1,5 +1,6 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "1.1.1",
+  "corrected_by": "BC-018-C1",
   "implementation_state": "generic_contracts_only",
   "ingress_contract": {
     "host_adapter_boundary": "raw_host_event -> raw_host_input only",
@@ -9,19 +10,29 @@
     "ordinary_routing_precondition": "SecurityDecision status=PASS"
   },
   "pre_ingress_authorization_contract": {
+    "turn_model": "cross_turn",
     "missing_evidence": "SecurityDecision ASK with safe authorization_request_ref",
-    "evidence_collection": "validation_egress and host_adapter_boundary obtain explicit evidence without ordinary routing",
+    "turn_n_terminal": "after the host_session binding attempt, Validation and Egress emits exactly one TerminalPacket under the originating SecurityDecision: ASK on binding success or provider-caused UNAVAILABLE on binding failure; the host turn then ends",
+    "evidence_collection": "on a new host turn, host_adapter_boundary correlates explicit provider evidence to the still-valid pending request and current evidenced host_session without ordinary routing",
     "evaluation": "authorization_evaluator returns AuthorizationResult bound to authorization_request_ref",
-    "reentry": "AuthorizationResult -> security_restraint -> new SecurityDecision",
+    "reentry": "in Turn N+1, AuthorizationResult plus PendingAuthorizationState -> security_restraint -> new SecurityDecision",
     "route_gate": "only SecurityDecision PASS reaches turn_controller",
-    "owners_separate": true
+    "owners_separate": true,
+    "one_terminal_packet_per_host_turn": true,
+    "missing_host_session_substrate": "the proposed pending interaction remains inactive and non-resumable; Validation and Egress emits terminal UNAVAILABLE under the originating SecurityDecision with owner security_restraint, without ControlDecision or ordinary routing",
+    "security_decision_statuses_unchanged": ["PASS", "BLOCK", "ASK"]
+  },
+  "host_session_state_contract": {
+    "provider": "host_adapter_boundary when the host genuinely supports evidenced cross-turn state",
+    "required_evidence_fields": ["host_session_id_or_opaque_binding_ref", "provider", "verification_or_binding_method", "scope", "created_or_observed_at", "state_record_identity", "expires_at_or_lifetime_boundary", "receipt_or_evidence_ref", "availability_or_failure_result"],
+    "security_rules": ["the deterministic core never invents host_session state", "conversation history or model memory is not a security state store", "a returned authorization event is accepted only through provider-evidenced correlation to the outstanding request", "absence of evidenced host_session state makes ordinary cross-turn authorization continuation UNAVAILABLE", "an unbound proposed PendingAuthorizationState never becomes active or resumable and no future event may correlate to its authorization_request_ref", "host_session state is not promoted to durable_external without an explicit continuity operation and receipt"]
   },
   "interfaces": [
     {
       "interface_id": "IF-MODEL-EXECUTION", "name": "Model Execution", "provider_domain": "model_facing", "consumer": "turn_controller and validation_egress", "purpose": "Generate candidates and structured requests under CTS, ScopeLock, capability, source, and authorization context.", "request_packets": ["TurnRequest", "ControlDecision", "ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["accept only allowed context", "label service requests as candidates", "never self-certify host side effects"], "failure_behavior": "ERROR or ASK", "host_specific": false, "provider_binding": null
     },
     {
-      "interface_id": "IF-HOST-CAPABILITY", "name": "Host Capability Provider", "provider_domain": "host_adapter", "consumer": "turn_controller", "purpose": "Translate raw_host_event to raw_host_input, report verified availability separately from declaration, and translate generic service requests without constructing TurnRequest.", "request_packets": ["ServiceExchange"], "response_packets": ["CapabilityReport", "ServiceExchange"], "required_behavior": ["raw_host_event produces raw_host_input only", "never construct TurnRequest", "include verification method", "include scope and limitations", "include receipt or failure reason", "scope reports to turn or timestamp"], "failure_behavior": "UNAVAILABLE or ERROR", "host_specific": false, "provider_binding": null
+      "interface_id": "IF-HOST-CAPABILITY", "name": "Host Capability Provider", "provider_domain": "host_adapter", "consumer": "turn_controller, security_restraint, and authorization_evaluator", "purpose": "Translate raw_host_event to raw_host_input, report verified availability separately from declaration, translate generic service requests, and expose evidenced host-session state when genuinely supported without constructing TurnRequest or owning security policy.", "request_packets": ["ServiceExchange"], "response_packets": ["CapabilityReport", "ServiceExchange"], "required_behavior": ["raw_host_event produces raw_host_input only", "never construct TurnRequest", "include verification method", "include scope and limitations", "include receipt or failure reason", "scope reports to turn or timestamp", "when host_session state is supported, return provider, binding method, state identity, freshness, expiry, and receipt evidence", "correlate a returned authorization event to the outstanding request through provider evidence rather than string equality", "return UNAVAILABLE when evidenced host_session state is absent", "never use model memory or conversation history as a security state store", "never own OPSEC, authorization, or attempt policy"], "failure_behavior": "UNAVAILABLE or ERROR; security-sensitive cross-turn continuation fails closed", "host_specific": false, "provider_binding": null
     },
     {
       "interface_id": "IF-TIME-PROVIDER", "name": "Time Provider", "provider_domain": "host_service", "consumer": "host_adapter_boundary", "purpose": "Supply verified current time and timezone evidence; never perform scheduling by implication.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return timestamp", "return timezone or offset", "return verification receipt"], "failure_behavior": "UNAVAILABLE", "host_specific": false, "provider_binding": null
@@ -30,7 +41,7 @@
       "interface_id": "IF-SCHEDULING-PROVIDER", "name": "Scheduling Provider", "provider_domain": "host_service", "consumer": "host_adapter_boundary", "purpose": "Create, update, cancel, and identify future schedules with explicit recurrence semantics.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return provider schedule id", "return normalized schedule", "return action receipt", "distinguish recurrence from one-time execution"], "failure_behavior": "UNAVAILABLE or ERROR", "host_specific": false, "provider_binding": null
     },
     {
-      "interface_id": "IF-AUTHORIZATION-PROVIDER", "name": "Authorization Evidence Provider", "provider_domain": "host_service", "consumer": "authorization_evaluator", "purpose": "Supply explicit identity, credential, role, consent, or policy evidence bound to a safe authorization_request_ref when the host can establish it.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange", "AuthorizationResult"], "required_behavior": ["accept the safe authorization_request_ref without ordinary routing", "name evidence type", "name assurance and scope", "avoid exposing protected secrets", "return unavailable when identity is not established", "return AuthorizationResult to security_restraint for pre-ingress re-entry"], "failure_behavior": "UNAVAILABLE; never infer identity from conversational tone and never bypass security_restraint", "host_specific": false, "provider_binding": null
+      "interface_id": "IF-AUTHORIZATION-PROVIDER", "name": "Authorization Evidence Provider", "provider_domain": "host_service", "consumer": "authorization_evaluator", "purpose": "Supply explicit identity, credential, role, consent, or policy evidence bound to a safe authorization_request_ref and evidenced host-session request binding when the host can establish it.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange", "AuthorizationResult"], "required_behavior": ["accept only ServiceExchange authority_class pre_ingress_authorization with service_id authorization_evidence", "require the safe authorization_request_ref and host_session_binding_ref without ordinary ControlDecision authority", "limit evaluation to the bound action, resource, and evidence scope", "name evidence type", "name assurance and scope", "avoid exposing protected secrets", "return unavailable when identity or request binding is not established", "return AuthorizationResult with evidenced validity_lifetime to security_restraint for pre-ingress re-entry", "never dispatch ordinary services under pre-ingress authority"], "failure_behavior": "UNAVAILABLE; never infer identity from conversational tone, accept request-ref string equality alone, or bypass security_restraint", "host_specific": false, "provider_binding": null
     },
     {
       "interface_id": "IF-CONTINUITY-PROVIDER", "name": "Continuity Provider", "provider_domain": "continuity_provider", "consumer": "turn_controller", "purpose": "Read and write namespaced, versioned continuity with provenance, conflict handling, and durability receipts.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["support read and write", "declare lifetime", "enforce namespace and scope", "return version and provenance", "return conflict and receipt"], "failure_behavior": "UNAVAILABLE or conflict without fabricated state", "host_specific": false, "provider_binding": null

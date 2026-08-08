@@ -13,6 +13,7 @@ from typing import Any
 
 SPEC_DIR = Path("contracts/successor")
 ASSIGNMENT_DIR = Path("docs/domains/runtime/assignments/BC-018")
+CORRECTION_ASSIGNMENT_DIR = Path("docs/domains/runtime/assignments/BC-018-C1")
 REQUIRED = {
     SPEC_DIR / "README.md",
     SPEC_DIR / "component_registry.json",
@@ -30,6 +31,10 @@ REQUIRED = {
     ASSIGNMENT_DIR / "handoff.md",
     ASSIGNMENT_DIR / "validation.md",
     ASSIGNMENT_DIR / "review.md",
+    CORRECTION_ASSIGNMENT_DIR / "assignment.md",
+    CORRECTION_ASSIGNMENT_DIR / "handoff.md",
+    CORRECTION_ASSIGNMENT_DIR / "validation.md",
+    CORRECTION_ASSIGNMENT_DIR / "review.md",
 }
 JSON_FILES = {path for path in REQUIRED if path.suffix == ".json"}
 ALLOWED_DOMAINS = {
@@ -37,7 +42,25 @@ ALLOWED_DOMAINS = {
     "continuity_provider", "hybrid", "deferred", "reject",
 }
 ALLOWED_COMPONENT_STATUS = {"approved_boundary", "candidate", "deferred", "rejected"}
-ALLOWED_LIFETIMES = {"none", "turn", "session", "host_session", "durable_external"}
+ALLOWED_LIFETIMES = {"none", "turn", "host_session", "durable_external"}
+PENDING_AUTH_REQUIRED_FIELDS = {
+    "state_record_ref", "authorization_request_ref", "protected_action_scope",
+    "protected_resource_scope", "request_binding", "issued_at", "expires_at",
+    "attempt_count", "maximum_attempts", "retry_allowed",
+    "lockout_or_block_state", "host_session_binding",
+    "last_authorization_result_ref", "status", "storage_lifetime",
+    "provenance_receipt_ref",
+}
+HOST_SESSION_EVIDENCE_FIELDS = {
+    "host_session_id_or_opaque_binding_ref", "provider",
+    "verification_or_binding_method", "scope", "created_or_observed_at",
+    "state_record_identity", "expires_at_or_lifetime_boundary",
+    "receipt_or_evidence_ref", "availability_or_failure_result",
+}
+PRE_INGRESS_FORBIDDEN_SERVICES = {
+    "arbitrary_tool", "source_lookup", "scheduling", "unrelated_continuity_write",
+    "model_execution", "ordinary_service_dispatch",
+}
 REQUIRED_BEHAVIORS = {
     "ordinary conversation", "Persona", "Operations truth law", "command detection",
     "route selection", "owner locking", "ScopeLock", "task packets",
@@ -99,6 +122,7 @@ def validate(root: Path) -> list[str]:
     requirements = data["traceability.json"].get("requirements", [])
     packet_contract = data["packet_registry.json"]
     interface_contract = data["interface_registry.json"]
+    state_records = packet_contract.get("state_records", [])
 
     for records, key, label in (
         (components, "component_id", "component"),
@@ -109,6 +133,7 @@ def validate(root: Path) -> list[str]:
         (unresolved, "id", "unresolved item"),
         (evidence_catalog, "evidence_ref", "evidence"),
         (requirements, "successor_requirement_id", "traceability requirement"),
+        (state_records, "state_record_id", "state record"),
     ):
         _validate_unique(errors, records, key, label)
 
@@ -132,6 +157,8 @@ def validate(root: Path) -> list[str]:
         if isinstance(owns, list) and isinstance(does_not_own, list) and set(owns) & set(does_not_own):
             errors.append(f"component owns and disowns same responsibility: {component_id}")
         lifetimes = component.get("state_lifetime")
+        if isinstance(lifetimes, list) and "session" in lifetimes:
+            errors.append(f"bare session lifetime claims unexplained cross-turn kernel persistence: {component_id}")
         if not isinstance(lifetimes, list) or not lifetimes or set(lifetimes) - ALLOWED_LIFETIMES:
             errors.append(f"stateful component lacks valid lifetime: {component_id}")
         if "host_dependencies" not in component or not isinstance(component.get("host_dependencies"), list):
@@ -144,6 +171,15 @@ def validate(root: Path) -> list[str]:
         if "durable_external" in (lifetimes or []) and component.get("domain") != "continuity_provider":
             if "continuity_provider_boundary" not in component.get("dependencies", []):
                 errors.append(f"durable component lacks continuity-provider dependency: {component_id}")
+        if component.get("domain") == "deterministic_core" and set(lifetimes or []) - {"none", "turn"}:
+            errors.append(f"deterministic component declares hidden cross-turn state: {component_id}")
+
+    lifetime_values = set(data["component_registry.json"].get("state_lifetime_values", []))
+    lifetime_contract = data["component_registry.json"].get("state_lifetime_contract", {})
+    if lifetime_values != ALLOWED_LIFETIMES or lifetime_contract.get("bare_session_allowed") is not False:
+        errors.append("state lifetime taxonomy permits bare session persistence")
+    if "evidenced host_session" not in str(lifetime_contract.get("cross_turn_rule", "")):
+        errors.append("cross-turn state rule lacks evidenced host_session or durable_external substrate")
 
     deterministic_owners: dict[str, str] = {}
     for component in components:
@@ -164,6 +200,15 @@ def validate(root: Path) -> list[str]:
     controller = by_component.get("turn_controller", {})
     egress = by_component.get("validation_egress", {})
     adapter = by_component.get("host_adapter_boundary", {})
+
+    attempt_owners = [
+        item.get("component_id") for item in components
+        if "authorization_attempt_permission" in item.get("owns", [])
+    ]
+    if attempt_owners != ["security_restraint"]:
+        errors.append("authorization attempt policy is not owned solely by security_restraint")
+    if controller.get("state_lifetime") != ["turn"] or "cross_turn_state_storage" not in controller.get("does_not_own", []):
+        errors.append("Turn Controller declares hidden cross-turn state")
 
     turn_request = by_packet.get("TurnRequest", {})
     if turn_request.get("producer") != "turn_controller":
@@ -214,6 +259,106 @@ def validate(root: Path) -> list[str]:
         errors.append("validation egress lacks pre-ingress SecurityDecision dependency")
     if "authorization_evaluator" in controller.get("dependencies", []) or "AuthorizationResult_when_required" in controller.get("inputs", []):
         errors.append("pre-ingress Auth is incorrectly routed through turn_controller")
+    if auth_loop.get("turn_model") != "cross_turn" or interface_auth.get("turn_model") != "cross_turn":
+        errors.append("pre-ingress authorization path is not explicitly cross-turn")
+    if auth_loop.get("maximum_terminal_packets_per_host_turn") != 1 or interface_auth.get("one_terminal_packet_per_host_turn") is not True:
+        errors.append("cross-turn authorization path can produce two TerminalPackets for one host turn")
+    if auth_loop.get("turn_n", {}).get("ordinary_routing") is not False:
+        errors.append("authorization ASK turn enters ordinary routing")
+
+    terminal_authority = packet_contract.get("pre_ingress_terminal_authority_contract", {})
+    security_decision = by_packet.get("SecurityDecision", {})
+    validation_result = by_packet.get("ValidationResult", {})
+    terminal_packet = by_packet.get("TerminalPacket", {})
+    security_invariants = " ".join(security_decision.get("invariants", [])).lower()
+    validation_invariants = " ".join(validation_result.get("invariants", [])).lower()
+    terminal_invariants = " ".join(terminal_packet.get("invariants", [])).lower()
+    if (set(terminal_authority.get("security_decision_statuses", [])) != {"PASS", "BLOCK", "ASK"} or
+            "status is pass, block, or ask" not in security_invariants):
+        errors.append("SecurityDecision status vocabulary is expanded beyond PASS, BLOCK, ASK")
+    if terminal_authority.get("control_decision_required") is not False:
+        errors.append("pre-ingress UNAVAILABLE improperly requires ControlDecision")
+    if (terminal_authority.get("authority_ref_type") != "SecurityDecision" or
+            "originating securitydecision" not in validation_invariants or
+            "originating securitydecision" not in terminal_invariants):
+        errors.append("pre-ingress UNAVAILABLE lacks SecurityDecision authority")
+    if (set(terminal_authority.get("pre_ingress_terminal_statuses", [])) != {"BLOCK", "ASK", "UNAVAILABLE"} or
+            terminal_authority.get("owner") != "security_restraint" or
+            terminal_authority.get("ordinary_routing") is not False):
+        errors.append("pre-ingress terminal authority contract is incomplete")
+    if (terminal_authority.get("binding_resolution_terminal_count") != 1 or
+            "mutually exclusive" not in str(auth_loop.get("turn_n", {}).get("terminal_selection_point", "")).lower() or
+            "instead of a second terminal packet" not in terminal_invariants):
+        errors.append("binding failure can emit ASK followed by UNAVAILABLE")
+
+    pending = next((item for item in state_records if item.get("state_record_id") == "PendingAuthorizationState"), {})
+    pending_fields = set(pending.get("required_fields", []))
+    if not pending or pending.get("semantic_owner") != "security_restraint":
+        errors.append("PendingAuthorizationState lacks security_restraint semantic ownership")
+    allowed_pending_lifetimes = set(pending.get("allowed_storage_lifetimes", []))
+    if (pending.get("substrate_provider") != "host_adapter_boundary" or
+            not allowed_pending_lifetimes or
+            allowed_pending_lifetimes - {"host_session", "durable_external"}):
+        errors.append("pending authorization request lacks evidenced host_session or continuity-backed substrate")
+    if not PENDING_AUTH_REQUIRED_FIELDS <= pending_fields:
+        errors.append("PendingAuthorizationState required fields are incomplete")
+    repetition = auth_loop.get("repetition_contract", {})
+    if "expires_at" not in pending_fields or repetition.get("expiry_required") is not True:
+        errors.append("outstanding authorization request lacks expiry")
+    max_attempts = repetition.get("maximum_attempts")
+    if "maximum_attempts" not in pending_fields or max_attempts != "policy_defined_finite_positive_integer":
+        errors.append("outstanding authorization request lacks finite retry/attempt bound")
+    pending_invariants = " ".join(pending.get("invariants", [])).lower()
+    if repetition.get("replay_rule_required") is not True or "replay" not in pending_invariants:
+        errors.append("replayable authorization request lacks replay rule")
+    if (repetition.get("request_binding_required") is not True or
+            "request_binding" not in pending_fields or "host_session_binding" not in pending_fields):
+        errors.append("pending authorization request lacks request and host-session binding")
+    if "fail_closed" not in str(repetition.get("exhaustion_behavior", "")):
+        errors.append("authorization exhaustion does not fail closed")
+    activation = pending.get("activation_contract", {})
+    if (activation.get("unbound_request_correlatable") is not False or
+            activation.get("unavailable_binding_becomes_active") is not False or
+            "never becomes active or resumable" not in str(activation.get("binding_unavailable", "")).lower()):
+        errors.append("unbound PendingAuthorizationState remains resumable after substrate failure")
+
+    host_session_contract = interface_contract.get("host_session_state_contract", {})
+    if not HOST_SESSION_EVIDENCE_FIELDS <= set(host_session_contract.get("required_evidence_fields", [])):
+        errors.append("host_session state boundary lacks required provider evidence fields")
+    host_security_rules = " ".join(host_session_contract.get("security_rules", [])).lower()
+    if "model memory" not in host_security_rules or "conversation history" not in host_security_rules:
+        errors.append("host_session state boundary permits model memory or conversation history as security storage")
+    if ("evidenced_host_session_state_substrate" not in adapter.get("owns", []) or
+            "pending_request_event_correlation" not in adapter.get("owns", [])):
+        errors.append("host adapter lacks evidenced host-session substrate and request correlation ownership")
+
+    authorization_result = by_packet.get("AuthorizationResult", {})
+    authorization_result_fields = set(authorization_result.get("required_fields", []))
+    validity = packet_contract.get("authorization_result_validity_contract", {})
+    allowed_validity = set(validity.get("allowed_validity_lifetimes", []))
+    required_result_fields = {
+        "authorization_result_ref", "action_scope", "resource_scope", "result",
+        "assurance", "issued_at", "expires_at", "validity_lifetime",
+        "provider_ref", "evidence_refs", "revocation_reset_state",
+    }
+    if not required_result_fields <= authorization_result_fields:
+        errors.append("AuthorizationResult evidenced validity fields are incomplete")
+    if allowed_validity != {"turn", "host_session", "durable_external"} or validity.get("bare_session_allowed") is not False:
+        errors.append("AuthorizationResult claims session validity without evidenced lifetime binding")
+
+    service_exchange = by_packet.get("ServiceExchange", {})
+    authority_contract = packet_contract.get("service_exchange_authority_contract", {})
+    pre_ingress_authority = authority_contract.get("pre_ingress_authorization", {})
+    if "authority_class" not in service_exchange.get("required_fields", []):
+        errors.append("ServiceExchange authority class is not machine-checkable")
+    if set(authority_contract.get("allowed_authority_classes", [])) != {"ordinary_control", "pre_ingress_authorization"}:
+        errors.append("ServiceExchange authority classes are incomplete or expanded")
+    if (pre_ingress_authority.get("allowed_interface") != "IF-AUTHORIZATION-PROVIDER" or
+            pre_ingress_authority.get("allowed_service_id") != "authorization_evidence" or
+            pre_ingress_authority.get("ordinary_control_decision_authority") is not False or
+            not {"authorization_request_ref", "host_session_binding_ref"} <= set(pre_ingress_authority.get("required_fields", [])) or
+            not PRE_INGRESS_FORBIDDEN_SERVICES <= set(pre_ingress_authority.get("forbidden_service_classes", []))):
+        errors.append("pre_ingress_authorization ServiceExchange can authorize an ordinary service")
 
     component_text = " ".join(
         f"{item.get('component_id', '')} {item.get('name', '')}".lower() for item in components
@@ -270,6 +415,19 @@ def validate(root: Path) -> list[str]:
         unknown = set(requirement.get("evidence_ref", [])) - evidence_refs
         for item in sorted(unknown):
             errors.append(f"traceability evidence ref is unknown: {requirement.get('successor_requirement_id')} -> {item}")
+    lifetime_requirement = next(
+        (item for item in requirements if item.get("successor_requirement_id") == "SKR-015"), {}
+    )
+    if "bare session" not in str(lifetime_requirement.get("requirement", "")):
+        errors.append("revised state-lifetime rule lacks traceability")
+
+    time_arithmetic = by_behavior.get("time arithmetic", {})
+    if (time_arithmetic.get("deterministic_owner") != "turn_controller" or
+            "supplied_time_arithmetic" not in controller.get("owns", [])):
+        errors.append("supplied-time arithmetic ownership is inconsistent")
+    mood = by_behavior.get("Mood", {})
+    if mood.get("deterministic_owner") is not None or "model_execution_boundary" not in str(mood.get("model_owner", "")):
+        errors.append("optional profile behavior is incorrectly owned by Turn Controller")
 
     expected_statuses = {"PASS", "BLOCK", "ASK", "UNAVAILABLE", "INVALID", "ERROR"}
     if {item.get("status") for item in statuses} != expected_statuses:
@@ -278,7 +436,10 @@ def validate(root: Path) -> list[str]:
     for runtime_root in PROHIBITED_RUNTIME_ROOTS:
         if (root / runtime_root).exists():
             errors.append(f"Python runtime package added in BC-018: {runtime_root}")
-    for base in (root / SPEC_DIR, root / "docs/architecture", root / ASSIGNMENT_DIR):
+    for base in (
+        root / SPEC_DIR, root / "docs/architecture", root / ASSIGNMENT_DIR,
+        root / CORRECTION_ASSIGNMENT_DIR,
+    ):
         if base.is_dir():
             for path in base.rglob("*.py"):
                 errors.append(f"Python runtime/control-plane code in specification surface: {path.relative_to(root)}")

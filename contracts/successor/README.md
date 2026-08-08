@@ -4,6 +4,7 @@ status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-08
 assignment: BC-018
+correction: BC-018-C1
 
 ## Purpose
 
@@ -24,7 +25,9 @@ The immutable current source authority remains the seven-file CTS source set:
   required recoverable behavior.
 - `interface_registry.json`: generic model, host, authorization, source,
   skill, artifact, scheduling, time, and continuity interfaces.
-- `packet_registry.json`: the minimum eight-packet control vocabulary.
+- `packet_registry.json`: the minimum eight-packet control vocabulary plus the
+  non-packet `PendingAuthorizationState` state record and typed service
+  authority classes.
 - `error_model.json`: common terminal statuses and failure policies.
 - `unresolved_register.json`: questions BC-018 does not force closed.
 - `traceability.json`: evidence catalog and backward requirement traces.
@@ -35,6 +38,9 @@ The immutable current source authority remains the seven-file CTS source set:
 - A typed request is not proof that a provider exists or acted.
 - Host services are credited only through verified capability evidence and
   receipts.
+- Cross-turn state is credited only through an evidenced `host_session` or an
+  explicitly requested, receipted `durable_external` operation. A bare
+  `session` label, conversation history, and model memory are not substrates.
 - Durable state is credited only through a continuity-provider receipt.
 - Natural-language source support remains partly model-dependent until a real
   verifier can establish claim/evidence relations.

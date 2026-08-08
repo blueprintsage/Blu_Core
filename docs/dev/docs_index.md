@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/dev
-last_reviewed: 2026-08-05
+last_reviewed: 2026-08-08
 
 ## Read first
 
@@ -105,6 +105,10 @@ contracts/successor/traceability.json
 BC-018 specifies deterministic, model-facing, host, adapter, and continuity
 boundaries. These records are design artifacts, not a Python runtime and not a
 replacement for the current CTS.
+
+BC-018-C1 adds the evidenced cross-turn authorization state correction under
+`docs/domains/runtime/assignments/BC-018-C1/`. It preserves the seven-component,
+eight-packet design and adds no runtime implementation.
 
 ## Historical archive source map
 

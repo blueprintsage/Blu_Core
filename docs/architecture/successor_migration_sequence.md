@@ -4,6 +4,7 @@ status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-08
 assignment: BC-018
+correction: BC-018-C1
 
 ## Boundary
 
@@ -15,7 +16,9 @@ collision domain, tests, review, and revertible commit.
 
 1. **Core data contracts and fixtures**
    - implement the eight packet types and six statuses;
-   - validate field, lifetime, identity, and cross-reference invariants;
+   - implement `PendingAuthorizationState` as a state record, not a packet;
+   - validate field, evidenced lifetime, identity, authority-class, and
+     cross-reference invariants;
    - use no host, model, or continuity implementation.
 
 2. **Capability and state-transition validation primitives**
@@ -26,18 +29,25 @@ collision domain, tests, review, and revertible commit.
 3. **Pre-ingress Security Restraint**
    - begin only after a security-authorized OPSEC policy packet resolves
      `SUR-001`;
-   - test ordering, content minimization, redaction authorization, the bounded
-     Auth re-entry loop, and fail-closed behavior without publishing protected
-     details or entering ordinary routing.
+   - test ordering, content minimization, redaction authorization, the
+     cross-turn Auth re-entry loop, sole attempt-policy ownership, finite
+     repetition, expiry, replay rejection, fail-closed exhaustion, and one
+     terminal packet per host turn without publishing protected details or
+     entering ordinary routing.
 
 4. **Authorization Evaluator**
    - begin only after accepted evidence and assurance rules resolve `SUR-002`;
-   - test action/resource scope, session creation/expiry/reset, unavailable
-     evidence, safe request binding, and return to OPSEC for a new pre-ingress
-     decision.
+   - test action/resource scope, evidence sufficiency, assurance,
+     host-session-bound or continuity-receipted validity, expiry/reset,
+     unavailable evidence, safe request binding, and return to OPSEC for a new
+     pre-ingress decision without owning retry policy.
 
 5. **Turn Controller**
    - normalize allowed turns;
+   - remain turn-local and accept any optional cross-turn context only as
+     evidenced input supplied for the current turn;
+   - perform only deterministic arithmetic over supplied time values; current
+     time still requires provider evidence;
    - validate capabilities;
    - implement a separately approved minimal route catalog;
    - lock one owner, build/revise ScopeLock, and authorize declared exchanges.
@@ -51,7 +61,8 @@ collision domain, tests, review, and revertible commit.
 
 7. **Generic adapter conformance harness**
    - create provider-neutral tests for capability discovery, service exchange,
-     receipts, host errors, and output delivery;
+     host-session state evidence, pending-request correlation, receipts, host
+     errors, and output delivery;
    - keep all concrete hosts out of the core.
 
 8. **BC-020 Chat and Codex adapter specification, then implementations**
@@ -93,12 +104,15 @@ collision domain, tests, review, and revertible commit.
 Result: `ready_for_spec`.
 
 BC-020 now has a generic adapter target: `CapabilityReport`, `ServiceExchange`,
-and `TerminalPacket` delivery; nine generic interfaces; explicit capability
-truth; receipt and error requirements; and a prohibition on host assumptions in
-the core. Its packet should require a per-host capability/freshness matrix,
-receipt matrix, identity-evidence matrix, scheduling/time distinction, error
-mapping, and conformance fixtures. `SUR-002`, `SUR-005`, and `SUR-006` are
-BC-020 inputs, not reasons to postpone the specification.
+`PendingAuthorizationState` correlation, evidenced `host_session` state, and
+`TerminalPacket` delivery; nine generic interfaces; explicit capability truth;
+typed ordinary versus pre-ingress service authority; receipt and error
+requirements; and a prohibition on host assumptions in the core. Its packet
+should require a per-host capability/freshness matrix, host-session and pending-
+request binding matrix, receipt matrix, identity-evidence matrix,
+scheduling/time distinction, error mapping, and conformance fixtures.
+`SUR-002`, `SUR-005`, `SUR-006`, and `SUR-012` are BC-020 inputs, not reasons to
+postpone the specification.
 
 BC-018 does not activate BC-020 and implements no adapter.
 

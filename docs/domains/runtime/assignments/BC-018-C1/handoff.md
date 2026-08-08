@@ -10,7 +10,7 @@ last_reviewed: 2026-08-08
 - Parent: BC-018
 - Base commit: `7796c7e738e0ff66b677c79314b80cf2bbb09a63`
 - Work branch: `bc-018-c1-security-state-correction`
-- Work commit: recorded by the metadata-only follow-up
+- Work commit: `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`
 - Push status: pending at substantive handoff; final push reported externally
 - Working-tree status: expected clean after the two authorized commits
 

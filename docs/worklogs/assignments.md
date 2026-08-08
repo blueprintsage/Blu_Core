@@ -37,7 +37,7 @@ canonical_base: 7aed76e
 |---|---|---|---|---|
 | BC-001 | Establish bootstrap authority and golden source | Blu | done | Verified on clean `main` at `7aed76e`; live history has two commits rather than the four-commit bootstrap plan, but all protected artifacts and checksums passed |
 | BC-018 | Successor Kernel Boundary Specification | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018/assignment.md`; exact base `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`; branch `bc-018-successor-kernel-boundary-spec`; substantive work `413574097f8426d10ce5cf284282ddab87f4bc93`; pre-review correction base `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`, correction work `3384db41996d975d079d2d7f83a8e8fea9f4fce5`; specification only, no successor runtime implementation |
-| BC-018-C1 | Cross-Turn Security State Correction | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018-C1/assignment.md`; exact base / triggering review `7796c7e738e0ff66b677c79314b80cf2bbb09a63`; branch `bc-018-c1-security-state-correction`; BF-1/BF-2/BF-3 correction only; substantive commit recorded by metadata follow-up; specification and validator surfaces, no runtime implementation |
+| BC-018-C1 | Cross-Turn Security State Correction | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018-C1/assignment.md`; exact base / triggering review `7796c7e738e0ff66b677c79314b80cf2bbb09a63`; branch `bc-018-c1-security-state-correction`; BF-1/BF-2/BF-3 correction only; substantive work `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`; specification and validator surfaces, no runtime implementation |
 
 ## Completed
 

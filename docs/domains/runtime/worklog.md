@@ -516,7 +516,7 @@ last_reviewed: 2026-08-08
 
 - Exact base: `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`
 - Branch: `bc-018-successor-kernel-boundary-spec`
-- Substantive work commit: recorded by the metadata-only follow-up
+- Substantive work commit: `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`
 
 ## 2026-08-08 — BC-018 pre-review contract correction
 

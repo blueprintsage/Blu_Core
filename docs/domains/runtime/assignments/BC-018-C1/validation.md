@@ -93,6 +93,9 @@ The successor suite has 35 tests. Ten C1 negative cases require rejection of:
   manifest and reported it stale. After the required repository permission,
   the regenerated 188-entry manifest staged and verified 188/188 with zero
   missing entries or mismatches.
+- The first substantive commit attempt was denied the same Git index lock and
+  left `HEAD` at the exact base with all staged content intact. The authorized
+  retry succeeded as `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`.
 
 ## Validation boundary
 

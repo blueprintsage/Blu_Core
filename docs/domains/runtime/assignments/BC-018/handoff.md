@@ -171,7 +171,8 @@ tools/validate_successor_kernel_spec.py
   `1f440546a076c9359afaf5e832882e588d71dfa6`;
   disposition `approve-with-notes`; zero blocking findings.
 - Final status: `done`.
-- Substantive closure commit: recorded by the metadata-only follow-up commit.
+- Substantive closure commit:
+  `373092e98fef4d291365462baaa7f1ea2a8f065b`.
 - Closure changes assignment and continuity metadata plus the canonical
   manifest only. No architecture contract, review record, protected path,
   runtime implementation, historical module, or modern PASS/SkillForge source

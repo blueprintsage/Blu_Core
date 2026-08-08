@@ -232,7 +232,8 @@ Neither input blocks BC-018 closure, and neither was resolved here.
   `90e30c6d685eaa35c9bdf1a666179c9882877d85`.
 - Closure-prep metadata: `e55be9986ade91d5cdb53ebee923b420f1520aee`.
 - Final status: `done`.
-- Substantive closure commit: recorded by the metadata-only follow-up commit.
+- Substantive closure commit:
+  `373092e98fef4d291365462baaa7f1ea2a8f065b`.
 - SUR-011 and SUR-012 remain future inputs exactly as authorized; BC-020 and
   BC-030 remain `spec-needed` and unstarted.
 - Closure changes assignment and continuity metadata plus the canonical

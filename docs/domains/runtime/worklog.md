@@ -724,4 +724,5 @@ last_reviewed: 2026-08-08
 
 - Closure base: `ce1cc235057a5de3d71fefbcee32e5617197cbb0`.
 - Branch: `bc-018-closure`.
-- Substantive closure commit: recorded by the metadata-only follow-up commit.
+- Substantive closure commit:
+  `373092e98fef4d291365462baaa7f1ea2a8f065b`.

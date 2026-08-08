@@ -73,6 +73,7 @@ integration. Do not begin successor design, BC-018, BC-020, or BC-030.
 - Main integration merge and closure base:
   `b88902d997685057ee0e76709df7117f8a83f295`.
 - Final status: `done`.
-- Substantive closure commit: recorded by the metadata-only closure commit.
+- Substantive closure commit:
+  `b0182581c16bbb4dbeced715ae6e35bcee8bf097`.
 - The closure preserves all non-blocking notes, changes no archaeology
   finding, and authorizes no successor design or runtime implementation.

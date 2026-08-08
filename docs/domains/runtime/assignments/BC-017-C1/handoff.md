@@ -53,5 +53,6 @@ mark BC-017 done.
   `b88902d997685057ee0e76709df7117f8a83f295`.
 - Closure authority: Dad, Project Owner, and Blu, Project Lead.
 - Final status: `done`.
-- Substantive closure commit: recorded by the metadata-only closure commit.
+- Substantive closure commit:
+  `b0182581c16bbb4dbeced715ae6e35bcee8bf097`.
 - No C2 assignment was created because no new blocker appeared.

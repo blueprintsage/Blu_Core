@@ -637,3 +637,26 @@ require the archaeology to be redone.
 BC-017 is **not** marked `done`. Review status remains pending closure by Dad
 and Blu after these corrections are integrated and re-reviewed. Correction work
 was not started by the reviewer.
+
+## Closure record — 2026-08-08
+
+This original review remains an immutable audit record. Its disposition stays
+`return-for-correction`, and B-01, B-02, and B-03 remain recorded above rather
+than being rewritten as if BC-017 passed its first review.
+
+- BC-017-C1 correction commit:
+  `87c4e49333d30a471a00483fc1384e1918626ee1`.
+- BC-017-C1 metadata commit:
+  `fd7f1707e242aa0e9621ab9f7293364860cab21d`.
+- Claude's independent C1 re-review:
+  `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb`.
+- Final semantic disposition: `approve-with-notes`.
+- B-01: resolved.
+- B-02: resolved.
+- B-03: resolved.
+- Blocking findings at closure: none.
+- Closure authority: Dad, Project Owner, and Blu, Project Lead.
+- Final BC-017 status: `done`.
+
+The final re-review and its non-blocking notes remain authoritative for closure.
+No original finding or review conclusion above is altered by this receipt.

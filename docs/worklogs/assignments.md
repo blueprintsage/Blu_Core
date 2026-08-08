@@ -26,8 +26,8 @@ canonical_base: 7aed76e
 | BC-010-C2 | OPSEC route classification repair | Codex | done | `docs/domains/runtime/assignments/BC-010-C2/assignment.md` | `424f80b254a02f057da6c82db5230377076fc415` | Repair work commit `06292ce0e2f326ef84988e030c7fe14402192859`; closed after Claude's `approve-with-notes` review with no blockers; integrated reviewed state before closure `8a37ae3c62829f16f949f5896d2bef0542721565` |
 | BC-015 | Runtime viability audit | Codex | done | `docs/domains/runtime/assignments/BC-015/assignment.md` | `4b51427b361283715a24110409e031e191b52452` | Audit work commit `9936cc4be2f7f397deebccdf7400e8b7b774df08`; review commit `4ed7626`; Claude disposition `approve-with-notes` with no blockers; integrated reviewed state before closure `1f07333457b18895fbb04d5c776e3259d870f2f6` |
 | BC-016 | Historical Archive Inventory Integration | Codex | done | `docs/domains/runtime/assignments/BC-016/assignment.md` | `fdb6c7e150d3717172e08a1bc349a428187df45a` | Work commit `9f6d705723a3ee6d26e47b80c634bc3c58495c83`; metadata commit `2685dd5a3d4e81498e5b72cc83fad5d664a4d76a`; Claude review `1e7796191360cb5b81ab70a716ffda1e97f77264`; disposition `approve-with-notes` with no blockers; all NB-1 through NB-10 remain preserved and carried forward; no archives or behavioral archaeology |
-| BC-017 | Historical Behavioral Archaeology | Codex | review | `docs/domains/runtime/assignments/BC-017/assignment.md` | `4abae4865067d8a6ae0651017d4a564c09dde47b` | Substantive work commit `dcad56f7d50252ab70e993aef7a763ed2bd3617b`; owner-observation correction `110ce2e82e39f60fa2158494888359389b70600a`; Claude review `c323cff06c9f111408f4a416817d78fc0f3e2d2b` returned three blockers for BC-017-C1; no archive import or runtime implementation |
-| BC-017-C1 | Historical Archaeology Review Corrections | Codex | review | `docs/domains/runtime/assignments/BC-017-C1/assignment.md` | `c323cff06c9f111408f4a416817d78fc0f3e2d2b` | B-01/B-02/B-03 correction only; substantive correction commit `87c4e49333d30a471a00483fc1384e1918626ee1`; independent re-review pending |
+| BC-017 | Historical Behavioral Archaeology | Codex | done | `docs/domains/runtime/assignments/BC-017/assignment.md` | `4abae4865067d8a6ae0651017d4a564c09dde47b` | Work `dcad56f7d50252ab70e993aef7a763ed2bd3617b`; metadata `01a004835dbd3e3e2702ba34dcc06f81f2a600f8`; owner correction `110ce2e82e39f60fa2158494888359389b70600a`; original Claude review `c323cff06c9f111408f4a416817d78fc0f3e2d2b` returned B-01/B-02/B-03; closed after C1 and Claude re-review `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb` approved with notes and no blockers; integrated reviewed state `b88902d997685057ee0e76709df7117f8a83f295` |
+| BC-017-C1 | Historical Archaeology Review Corrections | Codex | done | `docs/domains/runtime/assignments/BC-017-C1/assignment.md` | `c323cff06c9f111408f4a416817d78fc0f3e2d2b` | B-01/B-02/B-03 correction only; work `87c4e49333d30a471a00483fc1384e1918626ee1`; metadata `fd7f1707e242aa0e9621ab9f7293364860cab21d`; Claude re-review `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb`; `approve-with-notes`, no blockers; integrated reviewed state `b88902d997685057ee0e76709df7117f8a83f295` |
 | BC-020 | Define Chat and Codex capability adapter contracts |  | spec-needed |  | main after BC-010 integration | `adapters/` and adapter-domain documentation |
 | BC-030 | Define Local Mirror continuity schema and lifecycle |  | spec-needed |  | main after approved prerequisites | continuity schema and continuity-domain documentation; no persistence claim |
 
@@ -39,6 +39,19 @@ canonical_base: 7aed76e
 
 ## Completed
 
+- BC-017-C1 — Historical Archaeology Review Corrections closed after Claude's
+  re-review at `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb` resolved B-01,
+  B-02, and B-03 and returned `approve-with-notes` with no blocking findings.
+  Correction work commit: `87c4e49333d30a471a00483fc1384e1918626ee1`;
+  metadata commit: `fd7f1707e242aa0e9621ab9f7293364860cab21d`.
+- BC-017 — Historical Behavioral Archaeology closed after the BC-017-C1
+  correction and independent semantic re-review. Original work commit:
+  `dcad56f7d50252ab70e993aef7a763ed2bd3617b`; metadata commit:
+  `01a004835dbd3e3e2702ba34dcc06f81f2a600f8`; owner-observation correction:
+  `110ce2e82e39f60fa2158494888359389b70600a`; original Claude review:
+  `c323cff06c9f111408f4a416817d78fc0f3e2d2b`. The original
+  `return-for-correction` decision remains preserved as audit history. Closure
+  performed no new archaeology, archive import, or runtime implementation.
 - BC-016 — Historical Archive Inventory Integration closed after Claude's
   `approve-with-notes` review with no blocking findings. Inventory work commit:
   `9f6d705723a3ee6d26e47b80c634bc3c58495c83`; metadata commit:

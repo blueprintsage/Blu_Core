@@ -1,13 +1,13 @@
 # BC-017-C1 Semantic Review
 
-status: pending
+status: done
 review_state: read-only-review-ready
 semantic_review: complete
 disposition: approve-with-notes
 owner: Claude
 reviewer: Claude (independent semantic reviewer)
 review_date: 2026-08-07
-last_reviewed: 2026-08-07
+last_reviewed: 2026-08-08
 assignment: BC-017-C1
 parent_assignment: BC-017
 
@@ -320,3 +320,20 @@ Carried into closure and future work:
 Neither BC-017 nor BC-017-C1 is marked `done` by this review. Both remain
 `review` pending Dad and Blu's integration and closure decision. No correction
 work was started by the reviewer.
+
+## Final closure authorization — 2026-08-08
+
+- Claude disposition remains `approve-with-notes`.
+- Final reviewed head:
+  `fd7f1707e242aa0e9621ab9f7293364860cab21d`.
+- Integrated Claude re-review SHA:
+  `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb`.
+- Main integration merge and closure base:
+  `b88902d997685057ee0e76709df7117f8a83f295`.
+- Blocking findings: none; B-01, B-02, and B-03 remain resolved.
+- Final authority approval: Dad, Project Owner.
+- Closure authorization: Blu, Project Lead.
+- Final assignment status: `done`; BC-017-C1 is closed.
+- The non-blocking notes above remain preserved for future hardening.
+- This closure starts no successor assignment, architecture work, or runtime
+  implementation.

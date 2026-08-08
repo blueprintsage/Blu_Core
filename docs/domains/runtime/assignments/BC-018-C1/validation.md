@@ -170,6 +170,8 @@ does not prove host support or runtime enforcement.
 
 Exact base / Claude review commit:
 `1f440546a076c9359afaf5e832882e588d71dfa6`.
+Substantive correction commit:
+`90e30c6d685eaa35c9bdf1a666179c9882877d85`.
 
 Commands:
 

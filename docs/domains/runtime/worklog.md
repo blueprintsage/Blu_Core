@@ -678,4 +678,5 @@ last_reviewed: 2026-08-08
 
 - Exact base / Claude review: `1f440546a076c9359afaf5e832882e588d71dfa6`
 - Branch: `bc-018-c1-closure-prep`
-- Substantive correction commit: recorded by the metadata-only follow-up
+- Substantive correction commit:
+  `90e30c6d685eaa35c9bdf1a666179c9882877d85`

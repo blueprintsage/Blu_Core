@@ -1,8 +1,8 @@
 # BC-017 Implementation Handoff
 
-status: review
+status: done
 owner: Codex
-last_reviewed: 2026-08-07
+last_reviewed: 2026-08-08
 assignment: BC-017
 
 ## Result
@@ -58,3 +58,22 @@ integration. Do not begin successor design, BC-018, BC-020, or BC-030.
 - Substantive work commit: `dcad56f7d50252ab70e993aef7a763ed2bd3617b`
 - Metadata commit: reported externally because a commit cannot contain its own
   final SHA.
+
+## Closure receipt
+
+- Closure authority: Dad, Project Owner, and Blu, Project Lead.
+- Original Claude review: `c323cff06c9f111408f4a416817d78fc0f3e2d2b`;
+  disposition `return-for-correction` with B-01, B-02, and B-03.
+- Correction assignment: BC-017-C1; substantive correction
+  `87c4e49333d30a471a00483fc1384e1918626ee1`; metadata
+  `fd7f1707e242aa0e9621ab9f7293364860cab21d`.
+- Final Claude re-review:
+  `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb`; disposition
+  `approve-with-notes`; zero blocking findings.
+- Main integration merge and closure base:
+  `b88902d997685057ee0e76709df7117f8a83f295`.
+- Final status: `done`.
+- Substantive closure commit:
+  `b0182581c16bbb4dbeced715ae6e35bcee8bf097`.
+- The closure preserves all non-blocking notes, changes no archaeology
+  finding, and authorizes no successor design or runtime implementation.

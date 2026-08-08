@@ -1,8 +1,8 @@
 # BC-017-C1 Implementation Handoff
 
-status: review
+status: done
 owner: Codex
-last_reviewed: 2026-08-07
+last_reviewed: 2026-08-08
 assignment: BC-017-C1
 parent_assignment: BC-017
 
@@ -41,3 +41,18 @@ mark BC-017 done.
 - Substantive correction commit: `87c4e49333d30a471a00483fc1384e1918626ee1`
 - Metadata commit: reported externally because a commit cannot contain its own
   final SHA.
+
+## Closure receipt
+
+- Final Claude re-review:
+  `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb`.
+- Final semantic disposition: `approve-with-notes`.
+- B-01, B-02, and B-03: resolved.
+- Blocking findings at closure: none.
+- Main integration merge and closure base:
+  `b88902d997685057ee0e76709df7117f8a83f295`.
+- Closure authority: Dad, Project Owner, and Blu, Project Lead.
+- Final status: `done`.
+- Substantive closure commit:
+  `b0182581c16bbb4dbeced715ae6e35bcee8bf097`.
+- No C2 assignment was created because no new blocker appeared.

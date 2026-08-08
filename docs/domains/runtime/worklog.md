@@ -423,3 +423,41 @@ last_reviewed: 2026-08-06
   BC-017 or convert green validation into semantic proof.
 - Claude may perform a separately authorized read-only re-review of BC-017-C1.
   Dad and Blu decide integration and closure.
+
+## 2026-08-08 — BC-017 and BC-017-C1 closed
+
+### What changed
+
+- Dad and Blu authorized final closure of BC-017 and BC-017-C1.
+- The global assignment index and both assignment records moved to `done`.
+- Claude's original `return-for-correction` review remains intact as audit
+  history; C1 resolved B-01, B-02, and B-03.
+- Claude's final C1 re-review at
+  `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb` remains
+  `approve-with-notes` with zero blocking findings.
+- The manifest was regenerated after the final review record and closure
+  metadata changed.
+
+### What was tested or reviewed
+
+- Re-ran all four repository validator and unit-test suites.
+- Verified canonical manifest bytes, all eight golden CTS checksums, protected
+  paths, archive exclusion, publication safety, and PASS/SkillForge isolation.
+- Exact commands and results are recorded in the BC-017 and BC-017-C1
+  validation records.
+
+### Known risks and next safe step
+
+- All non-blocking archaeology-quality notes remain preserved; none is a
+  closure blocker or an approved successor requirement.
+- No assignment is currently eligible to start. BC-020 and BC-030 remain
+  `spec-needed` and were not started.
+- No archaeology, successor design, Python runtime, protected-source change, or
+  modern PASS/SkillForge work occurred during closure.
+
+### Commit identity
+
+- Closure base: `b88902d997685057ee0e76709df7117f8a83f295`.
+- Branch: `bc-017-closure`.
+- Substantive closure commit:
+  `b0182581c16bbb4dbeced715ae6e35bcee8bf097`.

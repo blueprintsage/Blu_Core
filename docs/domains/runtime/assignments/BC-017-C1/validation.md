@@ -1,8 +1,8 @@
 # BC-017-C1 Validation
 
-status: review
+status: done
 owner: Codex
-last_reviewed: 2026-08-07
+last_reviewed: 2026-08-08
 assignment: BC-017-C1
 
 ## Scope
@@ -61,3 +61,31 @@ Manual acceptance checks:
 The canonical staged-index manifest contains 167 entries, excludes itself, and
 verified against staged canonical bytes with zero missing entries and zero hash
 mismatches.
+
+## Closure validation — 2026-08-08
+
+The complete closure validation matrix was re-run after the final Claude review
+was integrated. Exact commands are recorded in the parent BC-017 validation
+record. Results were:
+
+```text
+runtime contract validator: passed
+contract tests: Ran 21, OK
+viability audit validator: passed
+viability tests: Ran 9, OK
+historical inventory validator: passed
+historical inventory tests: Ran 12, OK
+historical archaeology validator: passed
+historical archaeology tests: Ran 18, OK
+canonical manifest: 167/167 verified; 0 missing; 0 mismatches
+golden CTS SHA-256: 8/8 passed
+protected paths: unchanged
+archive path hits: 0
+Python/runtime implementation path hits: 0
+modern PASS/SkillForge path hits: 0
+protected source-surface hits: 0
+private or protected-text leak hits: 0
+git diff --check: passed
+```
+
+No BC-017-C2 was required. No successor work was started.

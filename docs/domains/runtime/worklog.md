@@ -544,7 +544,7 @@ last_reviewed: 2026-08-08
 ### Commit identity
 
 - Correction base: `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`
-- Substantive correction commit: recorded by the metadata-only follow-up
+- Substantive correction commit: `311c572f3a28fe4e1cca04b75856faae3cfd6c60`
 
 ## 2026-08-08 — BC-018 pre-review contract correction
 

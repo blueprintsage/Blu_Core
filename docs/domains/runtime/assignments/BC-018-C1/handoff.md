@@ -107,7 +107,7 @@ tools/validate_successor_kernel_spec.py
 ### Identity
 
 - Correction base: `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`
-- Substantive correction commit: recorded by the metadata-only follow-up
+- Substantive correction commit: `311c572f3a28fe4e1cca04b75856faae3cfd6c60`
 - Metadata/head commit: reported externally after creation
 - Branch: `bc-018-c1-security-state-correction`
 - Push status: pending at substantive handoff; final push reported externally

@@ -1,0 +1,33 @@
+{
+  "spec_version": "1.0.0",
+  "implementation_state": "generic_contracts_only",
+  "interfaces": [
+    {
+      "interface_id": "IF-MODEL-EXECUTION", "name": "Model Execution", "provider_domain": "model_facing", "consumer": "turn_controller and validation_egress", "purpose": "Generate candidates and structured requests under CTS, ScopeLock, capability, source, and authorization context.", "request_packets": ["TurnRequest", "ControlDecision", "ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["accept only allowed context", "label service requests as candidates", "never self-certify host side effects"], "failure_behavior": "ERROR or ASK", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-HOST-CAPABILITY", "name": "Host Capability Provider", "provider_domain": "host_adapter", "consumer": "turn_controller", "purpose": "Report verified availability separately from declaration and translate generic service requests.", "request_packets": ["ServiceExchange"], "response_packets": ["CapabilityReport", "ServiceExchange"], "required_behavior": ["include verification method", "include scope and limitations", "include receipt or failure reason", "scope reports to turn or timestamp"], "failure_behavior": "UNAVAILABLE or ERROR", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-TIME-PROVIDER", "name": "Time Provider", "provider_domain": "host_service", "consumer": "host_adapter_boundary", "purpose": "Supply verified current time and timezone evidence; never perform scheduling by implication.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return timestamp", "return timezone or offset", "return verification receipt"], "failure_behavior": "UNAVAILABLE", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-SCHEDULING-PROVIDER", "name": "Scheduling Provider", "provider_domain": "host_service", "consumer": "host_adapter_boundary", "purpose": "Create, update, cancel, and identify future schedules with explicit recurrence semantics.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return provider schedule id", "return normalized schedule", "return action receipt", "distinguish recurrence from one-time execution"], "failure_behavior": "UNAVAILABLE or ERROR", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-AUTHORIZATION-PROVIDER", "name": "Authorization Evidence Provider", "provider_domain": "host_service", "consumer": "authorization_evaluator", "purpose": "Supply identity, credential, role, consent, or policy evidence when the host can establish it.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["name evidence type", "name assurance and scope", "avoid exposing protected secrets", "return unavailable when identity is not established"], "failure_behavior": "UNAVAILABLE; never infer identity from conversational tone", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-CONTINUITY-PROVIDER", "name": "Continuity Provider", "provider_domain": "continuity_provider", "consumer": "turn_controller", "purpose": "Read and write namespaced, versioned continuity with provenance, conflict handling, and durability receipts.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["support read and write", "declare lifetime", "enforce namespace and scope", "return version and provenance", "return conflict and receipt"], "failure_behavior": "UNAVAILABLE or conflict without fabricated state", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-SOURCE-CONTEXT", "name": "Source and Context Provider", "provider_domain": "host_service", "consumer": "turn_controller and model_execution_boundary", "purpose": "Retrieve allowed source context with source identity, scope, provenance, and verification state.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["preserve source identity", "declare covered scope", "label incomplete or unverifiable retrieval", "return provenance"], "failure_behavior": "UNAVAILABLE or partial result with limitations", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-SKILL-CONTEXT", "name": "Skill and Curriculum Context Provider", "provider_domain": "host_service", "consumer": "model_execution_boundary", "purpose": "Provide optional authorized skill or curriculum context without becoming kernel authority.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return version", "return provenance", "declare authorization and scope", "remain optional"], "failure_behavior": "UNAVAILABLE without core failure", "host_specific": false, "provider_binding": null
+    },
+    {
+      "interface_id": "IF-ARTIFACT-PROVIDER", "name": "Artifact Provider and Validator", "provider_domain": "host_service", "consumer": "validation_egress", "purpose": "Create or inspect artifacts and return evidence sufficient to validate existence, identity, and requested shape.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return artifact identity", "return operation and timestamp or turn scope", "return receipt", "state limitations"], "failure_behavior": "UNAVAILABLE or ERROR; no success without receipt", "host_specific": false, "provider_binding": null
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/worklogs
-last_reviewed: 2026-08-06
+last_reviewed: 2026-08-08
 canonical_base: 7aed76e
 
 ## Rules
@@ -36,6 +36,7 @@ canonical_base: 7aed76e
 | ID | Assignment | Owner | Status | Notes |
 |---|---|---|---|---|
 | BC-001 | Establish bootstrap authority and golden source | Blu | done | Verified on clean `main` at `7aed76e`; live history has two commits rather than the four-commit bootstrap plan, but all protected artifacts and checksums passed |
+| BC-018 | Successor Kernel Boundary Specification | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018/assignment.md`; exact base `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`; branch `bc-018-successor-kernel-boundary-spec`; specification only, no successor runtime implementation; work commit recorded by metadata follow-up |
 
 ## Completed
 

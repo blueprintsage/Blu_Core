@@ -461,3 +461,59 @@ last_reviewed: 2026-08-06
 - Branch: `bc-017-closure`.
 - Substantive closure commit:
   `b0182581c16bbb4dbeced715ae6e35bcee8bf097`.
+
+## 2026-08-08 — BC-018 successor kernel boundary specification
+
+### What changed
+
+- Specified one seven-node successor graph: four deterministic core components,
+  plus model-execution, generic host-adapter, and generic continuity-provider
+  boundaries.
+- Classified 37 required behaviors, decomposed Exec, defined eight packets,
+  nine generic interfaces, six statuses, state lifetimes, source-grounding
+  modes, and a dependency-ordered migration plan.
+- Preserved OPSEC before ingress, bounded Auth to explicit evidence, and kept
+  Persona, teaching, host services, and persistence in their proper authority
+  domains.
+- Rejected mega-Exec, School Engine, legacy PASS, dedicated Mood/MMU services,
+  and the historical Faithfulness object model.
+- Added machine-readable traceability and unresolved registers plus a
+  standard-library design validator and negative tests.
+- Created the BC-018 assignment quartet and marked the assignment `review`.
+
+### What was tested or reviewed
+
+- Exact command and result receipts are recorded in
+  `assignments/BC-018/validation.md`.
+- Validation covers all prior repository validators/tests, the BC-018 validator
+  and negative suite, canonical manifest, golden checksums, and protected paths.
+
+### What worked
+
+- Every deterministic responsibility has one exclusive owner.
+- Capability, time, scheduling, artifacts, and persistence require provider
+  evidence rather than declaration.
+- BC-020 and BC-030 both receive generic plug-in contracts and are
+  `ready_for_spec` without being started.
+
+### What failed or remains unavailable
+
+- No runtime behavior, host adapter, scheduling, persistence, Auth, or OPSEC
+  implementation exists.
+- Protected Auth/OPSEC policy details, initial route catalog, semantic source
+  verification, host receipt capabilities, and Local Mirror lifecycle remain
+  explicit future questions.
+
+### Known risks and next safe step
+
+- Structured contracts can still be mistaken for execution; the design labels
+  all components as specifiable, not implemented.
+- Claude performs independent semantic review of the substantive work commit.
+  Dad and Blu decide integration. Do not begin BC-020, BC-030, or runtime
+  implementation.
+
+### Commit identity
+
+- Exact base: `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`
+- Branch: `bc-018-successor-kernel-boundary-spec`
+- Substantive work commit: recorded by the metadata-only follow-up

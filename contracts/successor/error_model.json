@@ -1,0 +1,24 @@
+{
+  "spec_version": "1.0.0",
+  "statuses": [
+    {"status": "PASS", "meaning": "The requested control step completed and required proof is present.", "terminal": false, "default_action": "continue"},
+    {"status": "BLOCK", "meaning": "Policy or required evidence forbids continuation.", "terminal": true, "default_action": "fail_closed"},
+    {"status": "ASK", "meaning": "One user decision or clarification can safely resolve the turn.", "terminal": true, "default_action": "ask_user"},
+    {"status": "UNAVAILABLE", "meaning": "A provider or capability is not verified or cannot serve the request.", "terminal": true, "default_action": "degrade_safely_or_report_unavailable"},
+    {"status": "INVALID", "meaning": "A packet, transition, receipt, or candidate violates its contract.", "terminal": true, "default_action": "fail_closed_in_deterministic_lane"},
+    {"status": "ERROR", "meaning": "An unexpected provider or internal failure occurred without a valid domain result.", "terminal": true, "default_action": "report_error_without_completion_claim"}
+  ],
+  "failure_policies": {
+    "fail_closed": "Required for security-sensitive, authorization-required, source_only, owner-locked, and proof-required paths when required evidence is absent or invalid.",
+    "ask_user": "Used only when one bounded user choice or clarification can safely continue.",
+    "degrade_safely": "Allowed for ordinary conversation when a nonessential host capability is unavailable and no unsupported claim is made.",
+    "unavailable": "Used when a real host or continuity service is required but not verified. Prompt text never substitutes for the service."
+  },
+  "invariants": [
+    "PASS never proves a host side effect without its provider receipt.",
+    "BLOCK and INVALID do not permit fallback success prose.",
+    "ASK does not execute the candidate action.",
+    "UNAVAILABLE does not become ERROR merely because a capability is absent.",
+    "Ordinary conversation does not fail closed for an unused optional capability."
+  ]
+}

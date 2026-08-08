@@ -15,13 +15,17 @@ Python runtime.
 
 ## Next safe step
 
-BC-017 and BC-017-C1 are closed after Claude's independent C1 re-review at
-`bea9463f0dbbae1c3944c5f44a7843c757d7f0bb` returned
-`approve-with-notes` with zero blocking findings.
+BC-018 has produced a successor-kernel specification on exact base
+`a5e68b3189c60e2d5b8acbe8a212d69b720dec58` and is in `review`.
 
-Next eligible assignment: none. BC-020 and BC-030 remain `spec-needed`; neither
-has an approved packet, owner, or closure-authorized base for implementation.
-Started: no.
+Claude performs the separately authorized independent semantic review of the
+corrected BC-018 head after the pre-review ownership/Auth contract correction.
+Dad and Blu decide integration and closure.
+
+BC-018 concludes that BC-020 and BC-030 are both `ready_for_spec` against the
+generic adapter and continuity boundaries. Their global rows remain
+`spec-needed`; neither has an approved packet, owner, or named base and neither
+has started. No successor runtime implementation is eligible to begin.
 
 The following non-blocking archaeology-quality notes remain preserved for
 separately authorized hardening work:

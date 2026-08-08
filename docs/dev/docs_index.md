@@ -85,6 +85,27 @@ docs/domains/runtime/viability/audit_report.md
 BC-015 classifies current evidence separately from successor disposition. It is
 an audit and inventory layer, not runtime implementation or behavioral proof.
 
+## Successor kernel specification
+
+```text
+docs/architecture/successor_kernel.md
+docs/architecture/successor_component_graph.md
+docs/architecture/successor_boundaries.md
+docs/architecture/successor_migration_sequence.md
+contracts/successor/README.md
+contracts/successor/component_registry.json
+contracts/successor/behavior_placement.json
+contracts/successor/interface_registry.json
+contracts/successor/packet_registry.json
+contracts/successor/error_model.json
+contracts/successor/unresolved_register.json
+contracts/successor/traceability.json
+```
+
+BC-018 specifies deterministic, model-facing, host, adapter, and continuity
+boundaries. These records are design artifacts, not a Python runtime and not a
+replacement for the current CTS.
+
 ## Historical archive source map
 
 ```text

@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-06
+last_reviewed: 2026-08-08
 
 - Bootstrap authority is defined by `AGENTS.md` and
   `docs/sources/authority_map.md`.
@@ -24,3 +24,43 @@ golden CTS source:
   formally declare its lane or pre-ingress restraint contract.
 - Generated BC-010 contracts must preserve that source gap rather than
   pretending the successor decision already exists in the golden kernel.
+
+## 2026-08-08 — BC-018 successor kernel boundary
+
+Approved specification decisions, pending independent semantic review:
+
+- The proposed successor graph has four deterministic-core components:
+  Pre-ingress Security Restraint, Authorization Evaluator, Turn Controller, and
+  Validation and Egress.
+- Model execution, host adaptation, and durable continuity remain separate
+  boundaries; host services do not become kernel components.
+- Persona, ordinary conversation, teaching judgment, and expressive adaptation
+  remain model-facing. Operations Law remains primarily model-facing, with only
+  independently provable invariants supported deterministically.
+- OPSEC is mandatory before ordinary ingress. Auth is a separate bounded
+  authorization contract over action, resource, policy, and explicit evidence.
+- Exec is decomposed rather than restored. There is no Exec successor
+  component, mega-Exec, School Engine, Mood service, MMU service, legacy PASS,
+  or historical Faithfulness library.
+- `source_only` factual output requires positive source support, while semantic
+  claim/source matching remains model-dependent until real verification tooling
+  proves otherwise.
+- Future scheduling, current time, tools, artifacts, credentials, and durable
+  storage require verified host/provider capabilities and receipts.
+- BC-020 is `ready_for_spec` against the generic host-adapter boundary. BC-030
+  is `ready_for_spec` against the generic continuity-provider boundary. Neither
+  assignment is activated or implemented by BC-018.
+
+### Pre-review ownership and authorization clarification
+
+- The Host Adapter translates `raw_host_event` to `raw_host_input` only.
+- The Security Restraint converts `raw_host_input` into `SecurityDecision` and
+  owns minimization of `allowed_input`.
+- The Turn Controller is the sole producer of normalized `TurnRequest`, and it
+  may begin only after `SecurityDecision PASS`.
+- When pre-ingress authorization is required but absent, the Security Restraint
+  returns a safe `ASK`; Validation and Egress / Host obtains explicit evidence;
+  the separate Authorization Evaluator returns `AuthorizationResult`; and that
+  result re-enters the Security Restraint for a new decision.
+- Pre-ingress Auth does not use ordinary routing. Auth does not merge into
+  OPSEC, and OPSEC remains before the Turn Controller.

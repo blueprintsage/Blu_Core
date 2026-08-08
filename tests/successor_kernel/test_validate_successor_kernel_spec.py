@@ -1,0 +1,217 @@
+import json
+import shutil
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "tools"))
+
+from validate_successor_kernel_spec import validate  # noqa: E402
+
+
+class SuccessorKernelSpecValidationTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        for source in (
+            "AGENTS.md",
+            "contracts/runtime",
+            "contracts/successor",
+            "docs/architecture",
+            "docs/domains/runtime/assignments/BC-018",
+            "docs/domains/runtime/decisions.md",
+            "docs/domains/runtime/viability",
+            "docs/sources/historical_archives/behavioral_archaeology",
+            "docs/worklogs/assignments.md",
+            "kernel/golden/v0.22.0",
+        ):
+            src = REPO_ROOT / source
+            dst = self.root / source
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            if src.is_dir():
+                shutil.copytree(src, dst)
+            else:
+                shutil.copy2(src, dst)
+        self.components = self.root / "contracts/successor/component_registry.json"
+        self.behaviors = self.root / "contracts/successor/behavior_placement.json"
+        self.interfaces = self.root / "contracts/successor/interface_registry.json"
+        self.packets = self.root / "contracts/successor/packet_registry.json"
+        self.trace = self.root / "contracts/successor/traceability.json"
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    @staticmethod
+    def load(path):
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def save(path, data):
+        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+    def assert_error(self, expected):
+        errors = validate(self.root)
+        self.assertTrue(any(expected in error for error in errors), errors)
+
+    def test_canonical_records_pass(self):
+        self.assertEqual([], validate(REPO_ROOT))
+
+    def test_missing_required_file_fails(self):
+        (self.root / "contracts/successor/error_model.json").unlink()
+        self.assert_error("missing required file")
+
+    def test_malformed_json_fails(self):
+        self.components.write_text("{not json", encoding="utf-8")
+        self.assert_error("invalid JSON")
+
+    def test_duplicate_component_id_fails(self):
+        data = self.load(self.components)
+        data["components"][1]["component_id"] = data["components"][0]["component_id"]
+        self.save(self.components, data)
+        self.assert_error("duplicate component ID")
+
+    def test_unknown_component_evidence_fails(self):
+        data = self.load(self.components)
+        data["components"][0]["evidence_refs"].append("EVID-NOT-REAL")
+        self.save(self.components, data)
+        self.assert_error("component evidence ref is unknown")
+
+    def test_unresolved_evidence_locator_fails(self):
+        data = self.load(self.trace)
+        data["evidence_catalog"][0]["source_locator"] = "not present anywhere"
+        self.save(self.trace, data)
+        self.assert_error("evidence locator does not resolve")
+
+    def test_component_must_own_and_disown(self):
+        data = self.load(self.components)
+        data["components"][0]["owns"] = []
+        data["components"][1]["does_not_own"] = []
+        self.save(self.components, data)
+        self.assert_error("component lacks owns")
+        self.assert_error("component lacks does_not_own")
+
+    def test_duplicate_exclusive_owner_fails(self):
+        data = self.load(self.components)
+        data["components"][1]["owns"].append(data["components"][0]["owns"][0])
+        self.save(self.components, data)
+        self.assert_error("duplicate exclusive deterministic owner")
+
+    def test_state_lifetime_required(self):
+        data = self.load(self.components)
+        data["components"][2]["state_lifetime"] = []
+        self.save(self.components, data)
+        self.assert_error("lacks valid lifetime")
+
+    def test_host_dependencies_must_be_explicit(self):
+        data = self.load(self.components)
+        data["components"][2].pop("host_dependencies")
+        self.save(self.components, data)
+        self.assert_error("host capability dependencies are not explicit")
+
+    def test_durable_claim_requires_continuity_provider(self):
+        data = self.load(self.behaviors)
+        item = next(x for x in data["behaviors"] if x["behavior"] == "durable persistence")
+        item["continuity_dependency"] = "none"
+        self.save(self.behaviors, data)
+        self.assert_error("durable-persistence claim lacks continuity-provider dependency")
+
+    def test_future_schedule_requires_provider(self):
+        data = self.load(self.behaviors)
+        item = next(x for x in data["behaviors"] if x["behavior"] == "future scheduling")
+        item["host_dependency"] = "prompt text"
+        self.save(self.behaviors, data)
+        self.assert_error("future scheduling claim lacks scheduling-provider dependency")
+
+    def test_opsec_must_be_pre_ingress(self):
+        data = self.load(self.components)
+        data["components"][0]["boundary_position"] = "after_turn_controller"
+        self.save(self.components, data)
+        self.assert_error("OPSEC is moved behind turn_controller")
+
+    def test_turn_request_producer_must_be_turn_controller(self):
+        data = self.load(self.packets)
+        next(x for x in data["packets"] if x["packet_id"] == "TurnRequest")["producer"] = "host_adapter_boundary"
+        self.save(self.packets, data)
+        self.assert_error("TurnRequest producer is not solely turn_controller")
+
+    def test_ordinary_routing_requires_security_pass(self):
+        data = self.load(self.packets)
+        data["ingress_ownership"]["ordinary_routing_precondition"] = "raw_host_input present"
+        self.save(self.packets, data)
+        self.assert_error("ordinary host routing may begin before SecurityDecision PASS")
+
+    def test_opsec_authorization_requires_auth_reentry(self):
+        data = self.load(self.packets)
+        data["pre_ingress_authorization_loop"]["reentry_target"] = None
+        data["pre_ingress_authorization_loop"]["ordinary_routing_bypassed"] = False
+        self.save(self.packets, data)
+        self.assert_error("lacks Auth/re-entry mechanism")
+
+    def test_auth_cannot_merge_into_opsec(self):
+        data = self.load(self.packets)
+        data["pre_ingress_authorization_loop"]["authorization_owner"] = "security_restraint"
+        self.save(self.packets, data)
+        self.assert_error("Auth is merged into OPSEC")
+
+    def test_persona_cannot_own_routing(self):
+        data = self.load(self.components)
+        model = next(x for x in data["components"] if x["component_id"] == "model_execution_boundary")
+        model["owns"].append("route_selection")
+        self.save(self.components, data)
+        self.assert_error("Persona/model boundary is assigned route ownership")
+
+    def test_historical_containers_cannot_return(self):
+        data = self.load(self.components)
+        clone = dict(data["components"][0])
+        clone["component_id"] = "school_engine"
+        clone["name"] = "School Engine"
+        data["components"].append(clone)
+        self.save(self.components, data)
+        self.assert_error("forbidden historical successor component")
+
+    def test_legacy_pass_and_school_must_be_rejected(self):
+        data = self.load(self.behaviors)
+        next(x for x in data["behaviors"] if x["behavior"] == "legacy PASS")["primary_domain"] = "deterministic_core"
+        next(x for x in data["behaviors"] if x["behavior"] == "School Engine")["primary_domain"] = "deferred"
+        self.save(self.behaviors, data)
+        self.assert_error("legacy PASS is not rejected")
+        self.assert_error("School Engine is restored")
+
+    def test_skillforge_cannot_be_embedded(self):
+        data = self.load(self.behaviors)
+        item = next(x for x in data["behaviors"] if x["behavior"] == "modern PASS/SkillForge integration boundary")
+        item["primary_domain"] = "deterministic_core"
+        self.save(self.behaviors, data)
+        self.assert_error("modern PASS/SkillForge is embedded")
+
+    def test_host_specific_adapter_implementation_fails(self):
+        data = self.load(self.interfaces)
+        data["interfaces"][0]["host_specific"] = True
+        data["interfaces"][0]["provider_binding"] = "CodexSDK"
+        self.save(self.interfaces, data)
+        self.assert_error("host-specific implementation")
+
+    def test_local_mirror_binding_fails(self):
+        data = self.load(self.components)
+        continuity = next(x for x in data["components"] if x["component_id"] == "continuity_provider_boundary")
+        continuity["provider_binding"] = "Local Mirror"
+        self.save(self.components, data)
+        self.assert_error("Local Mirror implementation")
+
+    def test_runtime_package_fails(self):
+        target = self.root / "src/blu_core/successor"
+        target.mkdir(parents=True)
+        (target / "runtime.py").write_text("pass\n", encoding="utf-8")
+        self.assert_error("Python runtime package added")
+
+    def test_golden_change_fails(self):
+        target = self.root / "kernel/golden/v0.22.0/03_Exec.md"
+        target.write_text(target.read_text(encoding="utf-8") + "\nchanged", encoding="utf-8")
+        self.assert_error("golden checksum mismatch")
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -4,6 +4,7 @@ status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-08
 assignment: BC-018
+correction: BC-018-C1
 
 ## Status and authority
 
@@ -50,31 +51,40 @@ storage are services behind interfaces, not kernel components.
    policy-permitted information, and emits `SecurityDecision` with `PASS`,
    `BLOCK`, or `ASK`. A `PASS` contains minimized `allowed_input`.
 3. If authorization is not required, the restraint may return `PASS` or
-   `BLOCK`. If adequate valid authorization state/evidence already exists, the
-   restraint may consume the bounded `AuthorizationResult` and return `PASS` or
-   `BLOCK` under OPSEC policy.
-4. If authorization is required but evidence/result is absent, the restraint
-   emits `ASK` with a safe `authorization_request_ref`. Validation and Egress
-   authorizes only that safe pre-ingress request; the host adapter obtains
-   explicit evidence; the Authorization Evaluator returns an
-   `AuthorizationResult` bound to the request; and that result re-enters the
-   Security Restraint for a new pre-ingress decision. The Turn Controller and
-   ordinary routing are not used by this loop.
-5. Only `SecurityDecision PASS` plus its minimized `allowed_input` reaches the
+   `BLOCK`. It may consume an existing `AuthorizationResult` only while the
+   action, resource, request binding, evidenced lifetime, freshness, and
+   revocation/reset state remain valid.
+4. The authorization continuation is explicitly cross-turn. In Turn N, when
+   authorization is required and an adequate current result is absent, the
+   restraint creates a safe `authorization_request_ref` and a policy-bounded
+   `PendingAuthorizationState`. The Host Adapter must bind that record to an
+   evidenced `host_session` before later correlation is possible. Validation
+   and Egress emits exactly one safe `ASK` `TerminalPacket`; Turn N ends and no
+   ordinary routing occurs.
+5. In Turn N+1, the Host Adapter receives a new `raw_host_event`. It may enter
+   the authorization-evidence exchange only when provider evidence binds that
+   event to the still-valid pending request in the current evidenced
+   `host_session`. The Security Restraint first decides whether another attempt
+   is permitted; the Authorization Evaluator then evaluates only the bound
+   action, resource, and evidence scope. Its `AuthorizationResult` plus the
+   pending context returns to the Security Restraint for a new
+   `SecurityDecision`. `BLOCK`, `ASK`, or `UNAVAILABLE` ends Turn N+1 with one
+   terminal packet. There is never a two-terminal host turn.
+6. Only `SecurityDecision PASS` plus its minimized `allowed_input` reaches the
    Turn Controller. The Turn Controller is the sole owner of ingress/task
    normalization and constructs the normalized `TurnRequest`.
-6. The Turn Controller validates `CapabilityReport` records. Declared and
+7. The Turn Controller validates `CapabilityReport` records. Declared and
    verified availability remain distinct.
-7. The Turn Controller resolves one route and one owner, constructs ScopeLock,
+8. The Turn Controller resolves one route and one owner, constructs ScopeLock,
    authorizes dependencies, and emits `ControlDecision`.
-8. The locked owner is either model execution or a declared service path. The
+9. The locked owner is either model execution or a declared service path. The
    host adapter translates service calls; it does not create capability truth.
-9. Source-bound work carries a source policy, allowed source scope, provenance,
+10. Source-bound work carries a source policy, allowed source scope, provenance,
    and evidence references.
-10. Validation and Egress checks authorization, capability and service receipts,
+11. Validation and Egress checks authorization, capability and service receipts,
    source policy, artifact proof, completion claims, owner identity, and
    ScopeLock containment.
-11. It emits exactly one `TerminalPacket`, including the current-turn receipt.
+12. It emits exactly one `TerminalPacket`, including the current-turn receipt.
     The host adapter delivers only that authorized output.
 
 OPSEC never moves behind route selection. No deterministic-lane public output
@@ -96,6 +106,11 @@ by their absence.
 - Host adapters translate. They do not own kernel policy.
 - Host adapters translate `raw_host_event` to `raw_host_input`; only the Turn
   Controller may normalize a passed input into `TurnRequest`.
+- The Security Restraint owns initiation, re-entry, retry, expiry, exhaustion,
+  cancellation, and replay policy for protected authorization interactions.
+  Authorization evaluates evidence/results. The Host Adapter provides storage
+  and correlation evidence when the host supports it; none may assume another's
+  authority.
 
 ## Source-grounding modes
 
@@ -118,17 +133,29 @@ unless later tooling proves it can verify the relation.
 
 ## State lifetime classes
 
+- `none`: no retained state.
 - `turn`: discarded after the terminal receipt unless explicitly exported.
-- `session`: kernel-managed logical state scoped to the active conversation and
-  never presumed across sessions.
-- `host_session`: host-owned state with host-declared scope and invalidation.
+- `host_session`: host-owned state accepted only with provider, binding method,
+  scope, freshness, record identity, expiry/lifetime boundary, and receipt or
+  evidence reference.
 - `durable_external`: external state proven only by a continuity-provider
   version and receipt.
-- `none`: stateless component or interface.
 
 Every state-bearing component and packet declares its lifetime. Moving state to
 a longer lifetime is a state transition requiring the destination provider and
-receipt; a Markdown declaration or model statement cannot perform the move.
+receipt; a Markdown declaration or model statement cannot perform the move. A
+bare `session` label is not a lifetime and cannot satisfy a cross-turn
+requirement. The deterministic core retains only turn state. Optional profile,
+workflow, or other cross-turn context must arrive as evidenced current-turn
+input from `host_session` or `durable_external`; the Turn Controller does not
+hold it invisibly.
+
+If the host cannot provide evidenced `host_session` state, ordinary cross-turn
+authorization continuation is `UNAVAILABLE` and security-sensitive work fails
+closed. Conversation history and model memory are never security state stores.
+Continuity is not required for ordinary authorization when a verified
+`host_session` substrate exists, and host-session state is never silently
+promoted to `durable_external`.
 
 ## Minimality result
 

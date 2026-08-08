@@ -15,15 +15,17 @@ Python runtime.
 
 ## Next safe step
 
-BC-018 has produced a successor-kernel specification on exact base
-`a5e68b3189c60e2d5b8acbe8a212d69b720dec58` and is in `review`.
+BC-018-C1 corrects the three blocking cross-turn security-state findings on
+exact review base `7796c7e738e0ff66b677c79314b80cf2bbb09a63` and is in
+`review` after Codex handoff.
 
-Claude performs the separately authorized independent semantic review of the
-corrected BC-018 head after the pre-review ownership/Auth contract correction.
-Dad and Blu decide integration and closure.
+Claude performs the separately authorized independent semantic re-review of
+the C1 substantive commit. Dad and Blu decide integration and closure. The
+original BC-018 review remains historical evidence and must not be rewritten.
 
-BC-018 concludes that BC-020 and BC-030 are both `ready_for_spec` against the
-generic adapter and continuity boundaries. Their global rows remain
+BC-018-C1 confirms that BC-020 and BC-030 are both `ready_for_spec` against the
+corrected generic adapter/security-state target and unchanged generic
+continuity boundary. Their global rows remain
 `spec-needed`; neither has an approved packet, owner, or named base and neither
 has started. No successor runtime implementation is eligible to begin.
 

@@ -4,6 +4,7 @@ status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-08
 assignment: BC-018
+correction: BC-018-C1
 
 ## One-page graph
 
@@ -12,10 +13,14 @@ flowchart LR
     Host["raw_host_event"] -->|"translate only"| Adapter["Generic Host Adapter"]
     Adapter -->|"raw_host_input"| OPSEC["Pre-ingress Security Restraint"]
     OPSEC -->|"PASS + minimized allowed_input"| Controller["Turn Controller constructs TurnRequest"]
-    OPSEC -->|"BLOCK / ASK"| Egress["Validation and Egress"]
-    Egress -->|"safe authorization request"| Adapter
-    Adapter -->|"explicit evidence bound to request ref"| Auth["Authorization Evaluator"]
-    Auth -->|"AuthorizationResult: re-enter pre-ingress"| OPSEC
+    OPSEC -->|"Turn N: BLOCK / ASK"| Egress["Validation and Egress"]
+    Egress -->|"Turn N: one safe TerminalPacket"| Adapter
+    OPSEC -->|"bind pending request"| Pending[("PendingAuthorizationState\nstate record, not component")]
+    Adapter -->|"evidenced host_session substrate"| Pending
+    NextHost["Turn N+1 raw_host_event"] --> Adapter
+    Pending -->|"still-valid request binding"| Adapter
+    Adapter -->|"bounded authorization evidence only"| Auth["Authorization Evaluator"]
+    Auth -->|"AuthorizationResult + pending context"| OPSEC
     Controller <-->|"candidate / structured request"| Model["Model Execution Boundary"]
     Controller <-->|"generic service exchange"| Adapter
     Adapter <-->|"time, schedule, tools, source, skill, artifact"| Services["Host Services"]
@@ -31,19 +36,24 @@ The arrows describe contracts, not live calls. Host services and continuity are
 not implied available. Every used path requires a verified capability record;
 side effects and durable writes require provider receipts.
 
-The Host Adapter never constructs `TurnRequest`. The authorization loop does
-not enter the Turn Controller: a safe pre-ingress `ASK` obtains explicit
-evidence, Auth evaluates it, and `AuthorizationResult` returns to the Security
-Restraint. Only `SecurityDecision PASS` permits Turn Controller normalization
-and ordinary routing.
+The Host Adapter never constructs `TurnRequest`. The authorization path is
+cross-turn and does not enter the Turn Controller while pending: Turn N binds
+`PendingAuthorizationState` to evidenced host-session state, emits one safe
+`ASK` terminal packet, and ends. A new host event in Turn N+1 must be correlated
+through provider evidence to the still-valid request before the bounded Auth
+exchange. `AuthorizationResult` returns to the Security Restraint, and only a
+new `SecurityDecision PASS` permits normalization and ordinary routing. Each
+host turn has exactly one terminal packet. The state-record node is not an
+eighth component or a ninth packet.
 
 ## Exclusive deterministic responsibilities
 
 | Responsibility | Owner |
 |---|---|
-| OPSEC pre-ingress decision and input minimization | Pre-ingress Security Restraint |
-| Authorization policy evaluation and session transition validation | Authorization Evaluator |
-| `SecurityDecision PASS` + `allowed_input` normalization into `TurnRequest`; capability validation, route, owner, ScopeLock, service dispatch authorization | Turn Controller |
+| OPSEC pre-ingress decision, input minimization, and whether an authorization interaction may start, retry, re-enter, expire, exhaust, cancel, or reject replay | Pre-ingress Security Restraint |
+| Authorization evidence sufficiency, assurance, action/resource result, and revocation/reset semantics | Authorization Evaluator |
+| Host-session substrate and returned-event/request correlation evidence | Generic Host Adapter Boundary (storage/evidence, not policy authority) |
+| `SecurityDecision PASS` + `allowed_input` normalization into `TurnRequest`; supplied-time arithmetic, capability validation, route, owner, ScopeLock, service dispatch authorization | Turn Controller |
 | Source policy, artifact/completion proof, terminal status, egress, receipt-backed diagnostics | Validation and Egress |
 
 No responsibility appears twice. Construction and validation are distinct:
@@ -55,7 +65,7 @@ candidate against it. That is not duplicate ownership.
 | Historical/current Exec responsibility | Successor owner | Disposition |
 |---|---|---|
 | pre-ingress security scheduling | Security Restraint is placed directly at the boundary | deterministic; recovered without scheduler ownership |
-| pre-ingress Auth evaluation/state | Authorization Evaluator plus evidence-provider interface; result re-enters Security Restraint | hybrid; bounded contract; no ordinary routing |
+| pre-ingress Auth evaluation/state | Security Restraint owns attempt policy; Authorization Evaluator owns evidence/result semantics; Host Adapter carries evidenced `host_session` state; result re-enters Security Restraint in a new host turn | hybrid; bounded cross-turn contract; no ordinary routing |
 | routing and arbitration | Turn Controller | deterministic |
 | one-owner enforcement | Turn Controller | deterministic |
 | ScopeLock construction | Turn Controller | deterministic |

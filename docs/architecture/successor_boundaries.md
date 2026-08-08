@@ -4,6 +4,7 @@ status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-08
 assignment: BC-018
+correction: BC-018-C1
 
 ## Pre-ingress security boundary
 
@@ -26,27 +27,49 @@ that leaves a safe, meaningful task. It may not redact merely to force an
 otherwise blocked request into ordinary routing. Protected-source handling is
 represented by policy and reason references, never embedded challenge content.
 
-The bounded pre-ingress authorization loop is normative:
+The bounded pre-ingress authorization loop is normatively cross-turn.
+
+**Turn N — authorization requested**
 
 1. The Security Restraint evaluates `raw_host_input`.
-2. If authorization is not required, it may return `PASS` or `BLOCK`.
-3. If adequate valid authorization state/evidence already exists, it may
-   consume the bounded `AuthorizationResult` and return `PASS` or `BLOCK` under
-   OPSEC policy.
-4. If authorization is required but evidence/result is absent, it returns
-   `ASK` with a safe `authorization_request_ref`.
-5. Validation and Egress authorizes only that safe pre-ingress request; the
-   Host Adapter obtains explicit evidence bound to the reference.
-6. The Authorization Evaluator evaluates the bounded request/evidence and
-   returns `AuthorizationResult`.
-7. The result is supplied back to the Security Restraint for a new pre-ingress
-   decision. Only `SecurityDecision PASS` may reach the Turn Controller.
+2. If authorization is not required, or an existing `AuthorizationResult` is
+   valid for the action, resource, binding, evidenced lifetime, freshness, and
+   revocation/reset state, it may return `PASS` or `BLOCK`.
+3. Otherwise it creates a safe `authorization_request_ref` and
+   `PendingAuthorizationState`. The record includes the protected
+   action/resource scope, binding, freshness, expiry, finite attempt policy,
+   replay policy, status, and provenance.
+4. Before the request can be correlated later, the Host Adapter binds the
+   record to evidenced `host_session` state. If it cannot, continuation is
+   `UNAVAILABLE` and fails closed for the protected interaction.
+5. Validation and Egress emits exactly one safe `ASK` `TerminalPacket`. Turn N
+   ends. No Turn Controller routing occurs.
+
+**Turn N+1 — authorization evidence returned**
+
+1. The Host Adapter receives a new `raw_host_event` and accepts it for the
+   bounded authorization exchange only when provider evidence correlates it to
+   the still-valid pending request in the current evidenced `host_session`.
+   Matching a request-ref string is insufficient.
+2. Security Restraint is the sole authority deciding whether re-entry and
+   another attempt are permitted under retry, expiry, exhaustion, cancellation,
+   lockout, action/resource binding, and replay policy.
+3. The Authorization Evaluator evaluates only the authorized action, resource,
+   and evidence scope and returns an `AuthorizationResult` with an evidenced
+   validity lifetime.
+4. The result and still-bound pending context return to the Security Restraint,
+   which emits a new `SecurityDecision`.
+5. Only `PASS` may reach the Turn Controller. `BLOCK`, `ASK`, or `UNAVAILABLE`
+   ends Turn N+1 with exactly one terminal packet. There is no two-terminal
+   host turn.
 
 OPSEC consumes the result but does not authenticate. Auth evaluates evidence
-but does not rewrite OPSEC policy. Neither component owns the other, and the
-loop never enters ordinary routing. OPSEC remains outside ordinary route
-ownership. Missing, ambiguous, invalid, or unavailable required evidence fails
-closed. Conversational identity inference is not authentication.
+but does not rewrite OPSEC or attempt policy. The Host Adapter stores/carries
+provider-evidenced host-session state and correlation receipts but owns neither
+policy. The loop never enters ordinary routing before `PASS`. Missing,
+ambiguous, invalid, expired, exhausted, replayed, unbound, or unavailable
+required evidence fails closed. Conversational identity inference is not
+authentication.
 
 ## Authorization boundary
 
@@ -57,16 +80,28 @@ user, credential, role, consent, or policy receipt accepted by that policy.
 
 The host supplies evidence or an honest unavailable result. The kernel receives
 no magical identity truth from the model. The Authorization Evaluator returns
-`PASS`, `BLOCK`, `ASK`, or `UNAVAILABLE`, evidence references, assurance,
-session effect, and a reason code. For a pre-ingress request, its `request_ref`
-must match the safe `authorization_request_ref`, and its result returns to the
-Security Restraint rather than entering the Turn Controller.
+`PASS`, `BLOCK`, `ASK`, or `UNAVAILABLE` plus result identity, action/resource
+scope, assurance, issue and expiry evidence, validity lifetime, provider and
+evidence references, revocation/reset state, and a safe reason code. For a
+pre-ingress request, its `request_ref` must match the safe
+`authorization_request_ref` through the provider-evidenced request binding,
+and its result returns to the Security Restraint rather than entering the Turn
+Controller.
 
-Session-scoped authorization may exist only when a successful result explicitly
-creates it and names its scope and expiry/reset behavior. It must never be
-assumed from prior tone, names, memory, or an earlier unrelated authorization.
-Logout, reset, expiry, host-session loss, policy change, or explicit revocation
-clears state; clearing that affects a provider-backed state requires a receipt.
+Authorization validity may be `turn`, evidenced `host_session`, or receipted
+`durable_external`; bare `session` validity is forbidden. The Security
+Restraint consumes an existing result only while its scope, binding, lifetime,
+freshness, and status remain valid. Logout, reset, expiry, host-session loss,
+policy change, or explicit revocation invalidates scoped state as defined;
+changing provider-backed state requires a receipt.
+
+Every `PendingAuthorizationState` has a policy-supplied finite positive attempt
+bound, expiry, request binding, replay rule, exhaustion behavior, and
+cancellation/reset behavior. Exact counts, thresholds, evidence classes, and
+lockout/backoff values remain protected future policy inputs. Exhaustion fails
+closed and does not automatically issue a new request that defeats the bound.
+A new request after exhaustion requires an explicitly permitted new
+authorization interaction under Security Restraint policy.
 Protected actions include protected-source access, privileged configuration or
 mutation, and any later policy-named action. Exact policy and evidence values
 remain unresolved under a security-authorized assignment.
@@ -89,8 +124,10 @@ evidence.
 
 ## Time and reminders
 
-Time reasoning is arithmetic over supplied timestamps, timezones, durations,
-and recurrence rules. Verified current time is a host service. A statement such
+The Turn Controller may perform deterministic arithmetic over supplied
+timestamps, timezones, durations, and recurrence rules as a current-turn
+utility, while the model may discuss the supplied values. Verified current time
+is still a host service. A statement such
 as “the current time is X” requires a time-provider result containing the
 timestamp, timezone/offset, verification method, turn or timestamp scope, and
 receipt.
@@ -109,23 +146,28 @@ The successor separates:
 
 - memory organization: categories, provenance, state, and transition rules;
 - retrieval: provider/source request and result;
-- context staging: turn or session material offered to the model;
-- session state: explicitly scoped non-durable control state;
+- context staging: current-turn material offered to the model, optionally from
+  an evidenced `host_session` or continuity result;
+- host-session state: host-owned cross-turn state with binding, freshness,
+  expiry, identity, provider, and receipt evidence;
 - durable persistence: external write proven by receipt;
 - continuity provider: the generic read/write/version/conflict boundary.
 
 There is no MMU component. The Turn Controller validates state classes and
 transitions; the model interprets relevance; the continuity provider proves
-external reads and writes. `turn`, `session`, `host_session`, and
-`durable_external` are distinct. Promotion to `durable_external` requires a
-continuity request, version/conflict result, and receipt. BC-030 owns Local
-Mirror schema, lifecycle, retention, and storage decisions.
+external reads and writes. `none`, `turn`, evidenced `host_session`, and
+receipted `durable_external` are the lifetime classes. A bare `session` label is
+not a substrate. Promotion to `durable_external` requires an explicit
+continuity request, version/conflict result, and receipt. The Turn Controller is
+turn-local and receives any optional cross-turn context as evidenced input for
+the current turn. BC-030 owns Local Mirror schema, lifecycle, retention, and
+storage decisions.
 
 ## Teaching and classroom behavior
 
 Pedagogical judgment, scaffolding, checks for understanding, explanation, and
 lesson sequencing remain model-facing. Curriculum assets may arrive through an
-optional source or skill/context provider. Class/session state, schedules, and
+optional source or skill/context provider. Classroom context/state, schedules, and
 durable student records are separate service and continuity concerns.
 
 There is no School Engine. Any future classroom state must earn a separate
@@ -135,11 +177,13 @@ later supply external skill or curriculum context; it is not kernel-owned.
 
 ## Mood disposition
 
-Natural affect and expressive adaptation remain Persona guidance. The only
-deterministic representation that may later be useful is explicit lightweight
-public/session profile metadata, and it must not control cognition, routing, or
-identity. No current evidence earns a Mood component or durable mood state.
-Absent optional metadata, Persona guidance is sufficient.
+Natural affect and expressive adaptation remain Persona/model behavior. If
+lightweight public profile metadata is retained, it is optional context supplied
+for the current turn from an evidenced host-session/context source. The Turn
+Controller is neither its semantic owner nor its storage owner, and the metadata
+must not control cognition, routing, identity, or Persona. No current evidence
+earns a Mood component or durable mood state. Absent optional metadata, Persona
+guidance is sufficient.
 
 ## Source grounding and Faithfulness
 
@@ -196,6 +240,21 @@ Distinct historical packet names were collapsed when they did not have
 distinct control semantics. Exact fields and invariants are normative in
 `contracts/successor/packet_registry.json`.
 
+`PendingAuthorizationState` is a normative state record, not a ninth packet or
+an eighth component. Security Restraint owns its attempt-policy semantics; the
+Host Adapter supplies the evidenced `host_session` substrate and correlation
+receipts when available. An explicitly requested continuity operation may store
+it as `durable_external`, but ordinary host-session authorization does not
+require continuity and is never silently promoted to it.
+
+`ServiceExchange.authority_class` is either `ordinary_control` or
+`pre_ingress_authorization`. Ordinary control requires a `ControlDecision`.
+Pre-ingress authorization requires the authorization request and host-session
+binding references, may use only `IF-AUTHORIZATION-PROVIDER` with service ID
+`authorization_evidence`, and carries no authority for tools, source lookup,
+scheduling, unrelated continuity writes, model execution, or ordinary service
+dispatch.
+
 Packet ownership is also normative: the Host Adapter produces `raw_host_input`,
 the Security Restraint produces `SecurityDecision` with minimized
 `allowed_input`, and only the Turn Controller produces `TurnRequest` after
@@ -214,12 +273,20 @@ degrade safely when an unused optional host capability is absent.
 ## Host adapter boundary
 
 The generic adapter discovers capabilities, translates `raw_host_event` into
-`raw_host_input`, translates service invocation, delivers authorized output, returns artifact and side-
-effect receipts, exposes time/scheduling where supported, translates
-host-specific errors, and passes identity/authorization evidence where the host
-can establish it. It does not construct `TurnRequest`, normalize ingress/task
-semantics, or decide kernel policy. BC-020 maps Chat and Codex
-to this contract and must document differences rather than simulate parity.
+`raw_host_input`, translates service invocation, delivers authorized output,
+returns artifact and side-effect receipts, exposes time/scheduling where
+supported, translates host-specific errors, and passes identity/authorization
+evidence where the host can establish it. When genuinely supported, its
+host-session state result supplies an opaque session binding, provider,
+verification/binding method, scope, freshness, state record identity, expiry or
+lifetime boundary, receipt/evidence reference, and unavailable/failure result.
+It correlates a new host event to an outstanding request through that evidence.
+
+The adapter does not construct `TurnRequest`, normalize ingress/task semantics,
+decide OPSEC/Auth/attempt policy, infer authorization, or treat conversation
+history/model memory as security state. If it cannot evidence cross-turn state,
+the continuation is unavailable. BC-020 maps Chat and Codex to this contract
+and must document differences rather than simulate parity.
 
 ## Continuity provider boundary
 

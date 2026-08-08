@@ -64,3 +64,29 @@ Approved specification decisions, pending independent semantic review:
   result re-enters the Security Restraint for a new decision.
 - Pre-ingress Auth does not use ordinary routing. Auth does not merge into
   OPSEC, and OPSEC remains before the Turn Controller.
+
+### BC-018-C1 cross-turn security-state correction
+
+- Pre-ingress authorization is explicitly cross-turn. Turn N ends with one
+  safe `ASK` terminal packet; any evidence response arrives as a new host event
+  in Turn N+1. Each host turn has exactly one `TerminalPacket`.
+- The deterministic core retains only turn state. The lifetime set is `none`,
+  `turn`, evidenced `host_session`, and receipted `durable_external`; bare
+  `session` is not a persistence lifetime or security-state substrate.
+- `PendingAuthorizationState` is a state record, not a component or packet.
+  Security Restraint owns attempt permission and retry/expiry/replay policy;
+  Authorization Evaluator owns evidence and result semantics; Host Adapter
+  provides evidenced host-session storage and correlation when supported.
+- Every pending authorization interaction has a policy-supplied finite positive
+  attempt bound, expiry, request binding, replay rejection, and fail-closed
+  exhaustion. Protected values remain unpublished and unresolved for a later
+  security-authorized policy packet.
+- `AuthorizationResult` validity is turn-bound, evidenced host-session-bound,
+  or explicitly continuity-receipted; it is never merely session-valid.
+- `ServiceExchange` distinguishes `ordinary_control` from
+  `pre_ingress_authorization`; pre-ingress authority can reach only the bounded
+  authorization-evidence interface and grants no ordinary service authority.
+- Turn Controller remains turn-local. Supplied-time arithmetic is its
+  deterministic current-turn utility; verified current time still requires a
+  provider. Optional profile metadata is current-turn evidenced context owned
+  behaviorally by Persona/model, not by Turn Controller.

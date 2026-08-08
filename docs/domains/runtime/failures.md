@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-06
+last_reviewed: 2026-08-08
 
 ## 2026-08-05 — BC-010 safe extraction limits
 
@@ -92,3 +92,18 @@ last_reviewed: 2026-08-06
 - Numeric filename suffixes are not automatically dates. Two task-file suffixes
   were initially parsed as short dates by the external discovery and were
   corrected during integration to explicit filesystem-timestamp fallbacks.
+
+## 2026-08-08 — BC-018-C1 cross-turn security-state limits
+
+- A semantic `session` label is not a storage substrate. Cross-turn security
+  state requires evidenced `host_session` storage or an explicit receipted
+  continuity operation; conversation history and model memory are never proof.
+- Matching an `authorization_request_ref` string does not establish request
+  binding. Require provider evidence for the current host session, record
+  identity, freshness, expiry, action/resource scope, and replay status.
+- A loop described as bounded in scope may still be unbounded in repetition.
+  Require a finite positive policy-supplied attempt bound and fail closed on
+  exhaustion without automatically issuing a fresh request.
+- Keep policy authority, evidence evaluation, and state storage distinct.
+  Duplicating attempt permission across OPSEC/Auth or giving it to the adapter
+  creates an authority ambiguity even when all fields are present.

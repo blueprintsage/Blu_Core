@@ -1,5 +1,6 @@
 {
-  "spec_version": "1.0.0",
+  "spec_version": "1.1.0",
+  "corrected_by": "BC-018-C1",
   "statuses": [
     {"status": "PASS", "meaning": "The requested control step completed and required proof is present.", "terminal": false, "default_action": "continue"},
     {"status": "BLOCK", "meaning": "Policy or required evidence forbids continuation.", "terminal": true, "default_action": "fail_closed"},
@@ -19,6 +20,8 @@
     "BLOCK and INVALID do not permit fallback success prose.",
     "ASK does not execute the candidate action.",
     "UNAVAILABLE does not become ERROR merely because a capability is absent.",
-    "Ordinary conversation does not fail closed for an unused optional capability."
+    "Ordinary conversation does not fail closed for an unused optional capability.",
+    "A pre-ingress authorization ASK ends the current host turn with exactly one TerminalPacket; any evidenced response is a new host turn.",
+    "Expired, exhausted, cancelled, replayed, or unbound authorization requests fail closed and do not silently create a fresh request."
   ]
 }

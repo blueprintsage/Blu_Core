@@ -9,7 +9,7 @@ last_reviewed: 2026-08-08
 - Assignment: BC-018 — Successor Kernel Boundary Specification
 - Base commit: `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`
 - Work branch: `bc-018-successor-kernel-boundary-spec`
-- Substantive work commit: pending metadata record
+- Substantive work commit: `413574097f8426d10ce5cf284282ddab87f4bc93`
 - Metadata commit: reported externally because a commit cannot contain its own SHA
 - Push status: pending
 - Working-tree status: pending final verification
@@ -43,7 +43,32 @@ explicit unresolved items.
 
 ## Files changed
 
-Recorded exactly by commit after the substantive commit is created.
+```text
+MANIFEST.sha256
+contracts/successor/README.md
+contracts/successor/behavior_placement.json
+contracts/successor/component_registry.json
+contracts/successor/error_model.json
+contracts/successor/interface_registry.json
+contracts/successor/packet_registry.json
+contracts/successor/traceability.json
+contracts/successor/unresolved_register.json
+docs/architecture/successor_boundaries.md
+docs/architecture/successor_component_graph.md
+docs/architecture/successor_kernel.md
+docs/architecture/successor_migration_sequence.md
+docs/dev/docs_index.md
+docs/domains/runtime/assignments/BC-018/assignment.md
+docs/domains/runtime/assignments/BC-018/handoff.md
+docs/domains/runtime/assignments/BC-018/review.md
+docs/domains/runtime/assignments/BC-018/validation.md
+docs/domains/runtime/decisions.md
+docs/domains/runtime/next_steps.md
+docs/domains/runtime/worklog.md
+docs/worklogs/assignments.md
+tests/successor_kernel/test_validate_successor_kernel_spec.py
+tools/validate_successor_kernel_spec.py
+```
 
 ## Unresolved items
 

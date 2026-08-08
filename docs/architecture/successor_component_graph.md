@@ -21,7 +21,8 @@ flowchart LR
     Egress -->|"one safe TerminalPacket\nSecurityDecision authority pre-ingress"| Adapter
     NextHost["Turn N+1 raw_host_event"] --> Adapter
     Pending -->|"still-valid request binding"| Adapter
-    Adapter -->|"bounded authorization evidence only"| Auth["Authorization Evaluator"]
+    Adapter -->|"correlated event evidence + pending context"| OPSEC
+    OPSEC -->|"attempt permitted + bounded authorization evidence"| Auth["Authorization Evaluator"]
     Auth -->|"AuthorizationResult + pending context"| OPSEC
     Controller <-->|"candidate / structured request"| Model["Model Execution Boundary"]
     Controller <-->|"generic service exchange"| Adapter
@@ -46,11 +47,12 @@ Unavailable binding leaves the proposal inactive and non-resumable and emits
 one safe `UNAVAILABLE` terminal packet instead. Both use the originating
 `SecurityDecision` authority and owner `security_restraint`; no
 `ControlDecision` exists. A new host event in Turn N+1 must be correlated
-through provider evidence to the still-valid request before the bounded Auth
-exchange. `AuthorizationResult` returns to the Security Restraint, and only a
-new `SecurityDecision PASS` permits normalization and ordinary routing. Each
-host turn has exactly one terminal packet. The state-record node is not an
-eighth component or a ninth packet.
+through provider evidence to the still-valid request, then the Security
+Restraint determines whether another attempt is permitted before the bounded
+Auth exchange. `AuthorizationResult` returns to the Security Restraint, and
+only a new `SecurityDecision PASS` permits normalization and ordinary routing.
+Each host turn has exactly one terminal packet. The state-record node is not
+an eighth component or a ninth packet.
 
 ## Exclusive deterministic responsibilities
 

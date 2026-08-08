@@ -652,3 +652,31 @@ last_reviewed: 2026-08-08
 - Exact base: `7796c7e738e0ff66b677c79314b80cf2bbb09a63`
 - Branch: `bc-018-c1-security-state-correction`
 - Substantive work commit: recorded by the metadata-only follow-up
+
+## 2026-08-08 — BC-018-C1 closure-prep correction
+
+### What changed
+
+- Restored complete canonical manifest coverage, including `.gitattributes`,
+  and added a narrow tracked-path completeness check to the successor validator.
+- Corrected the Turn N+1 component graph so Host Adapter correlation returns to
+  Security Restraint for attempt permission before Authorization Evaluator.
+- Set SUR-012 `blocking_for_BC020` to `true` without changing SUR-002.
+- Carried NN-4 to SUR-011 security-policy work and NN-5 to the BC-020/SUR-012
+  host-evidence matrix without resolving either future policy question.
+- Preserved Claude's review, the approved authority model, and all scope
+  exclusions.
+
+### Validation and next safe step
+
+- Exact command, test-count, manifest, golden, count, and protected-path
+  receipts are recorded in `assignments/BC-018-C1/validation.md`.
+- BC-018 and BC-018-C1 remain in `review`. Dad and Blu decide closure; BC-020,
+  BC-030, and runtime implementation remain unstarted.
+
+### Commit identity
+
+- Exact base / Claude review: `1f440546a076c9359afaf5e832882e588d71dfa6`
+- Branch: `bc-018-c1-closure-prep`
+- Substantive correction commit:
+  `90e30c6d685eaa35c9bdf1a666179c9882877d85`

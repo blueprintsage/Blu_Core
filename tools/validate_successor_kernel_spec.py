@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -15,6 +16,7 @@ SPEC_DIR = Path("contracts/successor")
 ASSIGNMENT_DIR = Path("docs/domains/runtime/assignments/BC-018")
 CORRECTION_ASSIGNMENT_DIR = Path("docs/domains/runtime/assignments/BC-018-C1")
 REQUIRED = {
+    Path("MANIFEST.sha256"),
     SPEC_DIR / "README.md",
     SPEC_DIR / "component_registry.json",
     SPEC_DIR / "behavior_placement.json",
@@ -96,12 +98,61 @@ def _validate_unique(errors: list[str], records: list[dict[str, Any]], key: str,
         errors.append(f"duplicate {label} ID: {item}")
 
 
+def _validate_manifest_coverage(
+    root: Path, tracked_paths: set[str] | None = None
+) -> list[str]:
+    """Reject tracked-file omissions from the self-excluding canonical manifest."""
+    errors: list[str] = []
+    manifest_path = root / "MANIFEST.sha256"
+    if not manifest_path.is_file():
+        return ["missing required file: MANIFEST.sha256"]
+
+    manifest_paths: list[str] = []
+    for line_number, line in enumerate(
+        manifest_path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
+        if not line.strip():
+            continue
+        parts = line.split(None, 1)
+        if len(parts) != 2:
+            errors.append(f"invalid MANIFEST.sha256 entry at line {line_number}")
+            continue
+        manifest_paths.append(parts[1].strip())
+
+    if tracked_paths is None:
+        if not (root / ".git").exists():
+            return errors
+        result = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z"],
+            check=False,
+            capture_output=True,
+        )
+        if result.returncode != 0:
+            errors.append("unable to enumerate tracked files for manifest coverage")
+            return errors
+        tracked_paths = {
+            item.decode("utf-8") for item in result.stdout.split(b"\0") if item
+        }
+
+    expected_paths = set(tracked_paths) - {"MANIFEST.sha256"}
+    actual_paths = set(manifest_paths)
+    for path in sorted(expected_paths - actual_paths):
+        errors.append(f"tracked file missing from MANIFEST.sha256: {path}")
+    for path in sorted(actual_paths - expected_paths):
+        errors.append(f"untracked file present in MANIFEST.sha256: {path}")
+    for path in sorted(_duplicates(manifest_paths)):
+        errors.append(f"duplicate MANIFEST.sha256 path: {path}")
+    return errors
+
+
 def validate(root: Path) -> list[str]:
     errors: list[str] = []
     missing = [str(path) for path in sorted(REQUIRED) if not (root / path).is_file()]
     if missing:
         errors.extend(f"missing required file: {path}" for path in missing)
         return errors
+
+    errors.extend(_validate_manifest_coverage(root))
 
     data: dict[str, Any] = {}
     for path in sorted(JSON_FILES):

@@ -113,3 +113,18 @@ last_reviewed: 2026-08-08
   Validation/Egress; requiring a nonexistent `ControlDecision` creates an
   authority gap, while expanding `SecurityDecision` conflates policy with
   provider failure.
+
+## 2026-08-08 — BC-018-C1 closure-prep integrity limits
+
+- Verifying every listed manifest digest does not prove manifest completeness.
+  Canonical verification must compare the complete tracked-file set, excluding
+  only `MANIFEST.sha256`, with the manifest path set before accepting zero hash
+  mismatches. `.gitattributes` is part of that integrity boundary because it
+  governs the LF-normalized Git-blob convention.
+- A correlated host event must return through Security Restraint attempt-policy
+  permission before Authorization Evaluator evaluation; diagrams must preserve
+  that authority sequence even when machine-readable contracts are correct.
+- Correlation evidence does not by itself prove integrity of host-provided
+  `attempt_count`. BC-020/SUR-012 must evaluate tamper and rollback resistance,
+  while the disposition of an unrelated intervening turn remains a separate
+  security-policy input under SUR-011.

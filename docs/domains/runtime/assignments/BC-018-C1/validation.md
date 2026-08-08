@@ -165,3 +165,70 @@ Four focused negative cases reject:
 
 The previous 35 successor tests remain present and passing. Structural success
 does not prove host support or runtime enforcement.
+
+## Closure-prep correction validation — 2026-08-08
+
+Exact base / Claude review commit:
+`1f440546a076c9359afaf5e832882e588d71dfa6`.
+Substantive correction commit:
+`90e30c6d685eaa35c9bdf1a666179c9882877d85`.
+
+Commands:
+
+```text
+git diff --cached --check
+python tools/validate_runtime_contracts.py
+python -m unittest discover -s tests/contracts -p "test_*.py"
+python tools/validate_viability_audit.py
+python -m unittest discover -s tests/viability -p "test_*.py"
+python tools/validate_historical_archive_inventory.py
+python -m unittest discover -s tests/historical_archives -p "test_*.py"
+python tools/validate_historical_behavioral_archaeology.py
+python -m unittest discover -s tests/historical_archaeology -p "test_*.py"
+python tools/validate_successor_kernel_spec.py
+python -m unittest discover -s tests/successor_kernel -p "test_*.py"
+PowerShell/Python SHA-256 verification against
+  kernel/golden/v0.22.0/SHA256SUMS
+canonical LF/Git-blob MANIFEST regeneration and complete tracked-set
+  verification from the staged index
+protected-path, runtime-implementation, modern PASS/SkillForge, review-blob,
+  component, packet, interface, and SecurityDecision-status checks
+```
+
+Results:
+
+```text
+git diff --cached --check: passed
+runtime contract validator: passed
+contract tests: Ran 21, OK
+viability audit validator: passed
+viability tests: Ran 9, OK
+historical inventory validator: passed
+historical inventory tests: Ran 12, OK
+historical archaeology validator: passed
+historical archaeology tests: Ran 18, OK
+successor specification validator: passed
+successor specification tests: Ran 40, OK
+canonical manifest: 189 entries, self-excluded, 0 missing, 0 extra,
+  0 duplicate, 0 mismatch
+golden CTS SHA-256: 8/8 passed
+component count: 7, unchanged
+packet count: 8, unchanged
+interface count: 9, unchanged
+SecurityDecision statuses: PASS, BLOCK, ASK, unchanged
+protected/current-CTS diff: empty
+successor runtime implementation diff: empty
+modern PASS/SkillForge diff: empty
+Claude review blob: unchanged
+```
+
+The successor suite increased from 39 to 40 tests only to add
+`test_manifest_coverage_rejects_missing_tracked_file`, which proves the
+validator rejects a tracked file omitted from `MANIFEST.sha256`. Existing
+successor tests remain present and passing.
+
+NN-2 now has a diagram path through Security Restraint attempt permission before
+Authorization Evaluator. NN-3 sets only SUR-012 `blocking_for_BC020` to `true`;
+SUR-002 remains unchanged. NN-4 and NN-5 remain unresolved, explicit future
+inputs under SUR-011 and SUR-012/BC-020 respectively. Neither assignment was
+marked done, and BC-020/BC-030 were not started.

@@ -79,3 +79,41 @@ None.
 Passing checks prove only the published structural constraints and repository
 integrity. They do not prove the successor has been implemented or that a host
 can satisfy any interface.
+
+## Pre-review correction validation — 2026-08-08
+
+Correction base: `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`.
+
+Focused validation added four new negative cases for:
+
+- a non-Turn-Controller `TurnRequest` producer;
+- ordinary routing before `SecurityDecision PASS`;
+- missing Auth-to-OPSEC re-entry;
+- Auth merged into OPSEC.
+
+The existing OPSEC-order test now explicitly moves OPSEC behind Turn Controller
+and requires rejection.
+
+Complete-suite results before the correction commit:
+
+```text
+git diff --check: passed (line-ending warnings only)
+runtime contract validator: passed
+contract tests: Ran 21, OK
+viability audit validator: passed
+viability tests: Ran 9, OK
+historical inventory validator: passed
+historical inventory tests: Ran 12, OK
+historical archaeology validator: passed
+historical archaeology tests: Ran 18, OK
+successor specification validator: passed
+successor specification tests: Ran 25, OK
+golden CTS SHA-256: 8/8 passed
+protected-path diff from correction base: empty
+component count: 7, unchanged
+packet count: 8, unchanged
+```
+
+The corrected canonical manifest contains 185 entries, excludes itself, and
+verified against staged Git-blob bytes with zero missing entries and zero
+mismatches.

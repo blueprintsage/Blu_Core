@@ -38,6 +38,7 @@ class SuccessorKernelSpecValidationTests(unittest.TestCase):
         self.components = self.root / "contracts/successor/component_registry.json"
         self.behaviors = self.root / "contracts/successor/behavior_placement.json"
         self.interfaces = self.root / "contracts/successor/interface_registry.json"
+        self.packets = self.root / "contracts/successor/packet_registry.json"
         self.trace = self.root / "contracts/successor/traceability.json"
 
     def tearDown(self):
@@ -126,9 +127,34 @@ class SuccessorKernelSpecValidationTests(unittest.TestCase):
 
     def test_opsec_must_be_pre_ingress(self):
         data = self.load(self.components)
-        data["components"][0]["boundary_position"] = "ordinary_route"
+        data["components"][0]["boundary_position"] = "after_turn_controller"
         self.save(self.components, data)
-        self.assert_error("OPSEC is not classified pre-ingress")
+        self.assert_error("OPSEC is moved behind turn_controller")
+
+    def test_turn_request_producer_must_be_turn_controller(self):
+        data = self.load(self.packets)
+        next(x for x in data["packets"] if x["packet_id"] == "TurnRequest")["producer"] = "host_adapter_boundary"
+        self.save(self.packets, data)
+        self.assert_error("TurnRequest producer is not solely turn_controller")
+
+    def test_ordinary_routing_requires_security_pass(self):
+        data = self.load(self.packets)
+        data["ingress_ownership"]["ordinary_routing_precondition"] = "raw_host_input present"
+        self.save(self.packets, data)
+        self.assert_error("ordinary host routing may begin before SecurityDecision PASS")
+
+    def test_opsec_authorization_requires_auth_reentry(self):
+        data = self.load(self.packets)
+        data["pre_ingress_authorization_loop"]["reentry_target"] = None
+        data["pre_ingress_authorization_loop"]["ordinary_routing_bypassed"] = False
+        self.save(self.packets, data)
+        self.assert_error("lacks Auth/re-entry mechanism")
+
+    def test_auth_cannot_merge_into_opsec(self):
+        data = self.load(self.packets)
+        data["pre_ingress_authorization_loop"]["authorization_owner"] = "security_restraint"
+        self.save(self.packets, data)
+        self.assert_error("Auth is merged into OPSEC")
 
     def test_persona_cannot_own_routing(self):
         data = self.load(self.components)

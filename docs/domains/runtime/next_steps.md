@@ -19,7 +19,8 @@ BC-018 has produced a successor-kernel specification on exact base
 `a5e68b3189c60e2d5b8acbe8a212d69b720dec58` and is in `review`.
 
 Claude performs the separately authorized independent semantic review of the
-BC-018 substantive work commit. Dad and Blu decide integration and closure.
+corrected BC-018 head after the pre-review ownership/Auth contract correction.
+Dad and Blu decide integration and closure.
 
 BC-018 concludes that BC-020 and BC-030 are both `ready_for_spec` against the
 generic adapter and continuity boundaries. Their global rows remain

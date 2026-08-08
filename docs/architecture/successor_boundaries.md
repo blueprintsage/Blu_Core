@@ -7,8 +7,9 @@ assignment: BC-018
 
 ## Pre-ingress security boundary
 
-The Pre-ingress Security Restraint receives raw host input, an approved policy
-reference, and only the authorization summary the policy permits it to inspect.
+The Host Adapter translates `raw_host_event` to `raw_host_input` and stops. The
+Pre-ingress Security Restraint receives that `raw_host_input`, an approved policy
+reference, and only the bounded `AuthorizationResult` the policy permits it to inspect.
 It may inspect features necessary to identify protected-source, identity-
 challenge, clone/copy/recreation, disclosure, or related policy categories. It
 must minimize retained content.
@@ -17,18 +18,35 @@ It returns `SecurityDecision`:
 
 - `PASS`: provides minimized `allowed_input` and explicit redactions;
 - `BLOCK`: provides a safe reason code and no protected details;
-- `ASK`: provides one safe authorization or clarification request.
+- `ASK`: provides one safe authorization or clarification request and, when
+  authorization is required, a safe `authorization_request_ref`.
 
 Redaction is allowed only when policy explicitly authorizes a transformation
 that leaves a safe, meaningful task. It may not redact merely to force an
 otherwise blocked request into ordinary routing. Protected-source handling is
 represented by policy and reason references, never embedded challenge content.
 
-OPSEC may consume an `AuthorizationResult`, but it does not authenticate. Auth
-may be invoked when OPSEC says authorization is required, but it does not
-rewrite OPSEC policy. OPSEC remains outside ordinary route ownership. Missing,
-ambiguous, invalid, or unavailable required evidence fails closed. This design
-does not claim conversational identity inference is authentication.
+The bounded pre-ingress authorization loop is normative:
+
+1. The Security Restraint evaluates `raw_host_input`.
+2. If authorization is not required, it may return `PASS` or `BLOCK`.
+3. If adequate valid authorization state/evidence already exists, it may
+   consume the bounded `AuthorizationResult` and return `PASS` or `BLOCK` under
+   OPSEC policy.
+4. If authorization is required but evidence/result is absent, it returns
+   `ASK` with a safe `authorization_request_ref`.
+5. Validation and Egress authorizes only that safe pre-ingress request; the
+   Host Adapter obtains explicit evidence bound to the reference.
+6. The Authorization Evaluator evaluates the bounded request/evidence and
+   returns `AuthorizationResult`.
+7. The result is supplied back to the Security Restraint for a new pre-ingress
+   decision. Only `SecurityDecision PASS` may reach the Turn Controller.
+
+OPSEC consumes the result but does not authenticate. Auth evaluates evidence
+but does not rewrite OPSEC policy. Neither component owns the other, and the
+loop never enters ordinary routing. OPSEC remains outside ordinary route
+ownership. Missing, ambiguous, invalid, or unavailable required evidence fails
+closed. Conversational identity inference is not authentication.
 
 ## Authorization boundary
 
@@ -40,7 +58,9 @@ user, credential, role, consent, or policy receipt accepted by that policy.
 The host supplies evidence or an honest unavailable result. The kernel receives
 no magical identity truth from the model. The Authorization Evaluator returns
 `PASS`, `BLOCK`, `ASK`, or `UNAVAILABLE`, evidence references, assurance,
-session effect, and a reason code.
+session effect, and a reason code. For a pre-ingress request, its `request_ref`
+must match the safe `authorization_request_ref`, and its result returns to the
+Security Restraint rather than entering the Turn Controller.
 
 Session-scoped authorization may exist only when a successful result explicitly
 creates it and names its scope and expiry/reset behavior. It must never be
@@ -176,6 +196,13 @@ Distinct historical packet names were collapsed when they did not have
 distinct control semantics. Exact fields and invariants are normative in
 `contracts/successor/packet_registry.json`.
 
+Packet ownership is also normative: the Host Adapter produces `raw_host_input`,
+the Security Restraint produces `SecurityDecision` with minimized
+`allowed_input`, and only the Turn Controller produces `TurnRequest` after
+`SecurityDecision PASS`. Pre-ingress `BLOCK`/`ASK` terminal validation uses the
+`SecurityDecision` as `authority_ref`; routed terminal validation uses the
+`ControlDecision`.
+
 ## Error and terminal model
 
 The common statuses are `PASS`, `BLOCK`, `ASK`, `UNAVAILABLE`, `INVALID`, and
@@ -186,11 +213,12 @@ degrade safely when an unused optional host capability is absent.
 
 ## Host adapter boundary
 
-The generic adapter discovers capabilities, normalizes host input, translates
-service invocation, delivers authorized output, returns artifact and side-
+The generic adapter discovers capabilities, translates `raw_host_event` into
+`raw_host_input`, translates service invocation, delivers authorized output, returns artifact and side-
 effect receipts, exposes time/scheduling where supported, translates
 host-specific errors, and passes identity/authorization evidence where the host
-can establish it. It does not decide kernel policy. BC-020 maps Chat and Codex
+can establish it. It does not construct `TurnRequest`, normalize ingress/task
+semantics, or decide kernel policy. BC-020 maps Chat and Codex
 to this contract and must document differences rather than simulate parity.
 
 ## Continuity provider boundary

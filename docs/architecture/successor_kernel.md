@@ -44,24 +44,37 @@ storage are services behind interfaces, not kernel components.
 
 ## Normative control flow
 
-1. The host adapter supplies raw host input.
-2. The Pre-ingress Security Restraint inspects only policy-permitted information
-   and emits `SecurityDecision` with `PASS`, `BLOCK`, or `ASK`.
-3. Only a `PASS` decision yields minimized allowed input and a `TurnRequest`.
-4. The Turn Controller validates `CapabilityReport` records. Declared and
+1. The host adapter translates `raw_host_event` into `raw_host_input`. It does
+   not construct `TurnRequest` or perform ingress/task normalization.
+2. The Pre-ingress Security Restraint consumes `raw_host_input`, inspects only
+   policy-permitted information, and emits `SecurityDecision` with `PASS`,
+   `BLOCK`, or `ASK`. A `PASS` contains minimized `allowed_input`.
+3. If authorization is not required, the restraint may return `PASS` or
+   `BLOCK`. If adequate valid authorization state/evidence already exists, the
+   restraint may consume the bounded `AuthorizationResult` and return `PASS` or
+   `BLOCK` under OPSEC policy.
+4. If authorization is required but evidence/result is absent, the restraint
+   emits `ASK` with a safe `authorization_request_ref`. Validation and Egress
+   authorizes only that safe pre-ingress request; the host adapter obtains
+   explicit evidence; the Authorization Evaluator returns an
+   `AuthorizationResult` bound to the request; and that result re-enters the
+   Security Restraint for a new pre-ingress decision. The Turn Controller and
+   ordinary routing are not used by this loop.
+5. Only `SecurityDecision PASS` plus its minimized `allowed_input` reaches the
+   Turn Controller. The Turn Controller is the sole owner of ingress/task
+   normalization and constructs the normalized `TurnRequest`.
+6. The Turn Controller validates `CapabilityReport` records. Declared and
    verified availability remain distinct.
-5. When the requested action requires authorization, the Authorization
-   Evaluator consumes explicit evidence and returns `AuthorizationResult`.
-6. The Turn Controller resolves one route and one owner, constructs ScopeLock,
+7. The Turn Controller resolves one route and one owner, constructs ScopeLock,
    authorizes dependencies, and emits `ControlDecision`.
-7. The locked owner is either model execution or a declared service path. The
+8. The locked owner is either model execution or a declared service path. The
    host adapter translates service calls; it does not create capability truth.
-8. Source-bound work carries a source policy, allowed source scope, provenance,
+9. Source-bound work carries a source policy, allowed source scope, provenance,
    and evidence references.
-9. Validation and Egress checks authorization, capability and service receipts,
+10. Validation and Egress checks authorization, capability and service receipts,
    source policy, artifact proof, completion claims, owner identity, and
    ScopeLock containment.
-10. It emits exactly one `TerminalPacket`, including the current-turn receipt.
+11. It emits exactly one `TerminalPacket`, including the current-turn receipt.
     The host adapter delivers only that authorized output.
 
 OPSEC never moves behind route selection. No deterministic-lane public output
@@ -81,6 +94,8 @@ by their absence.
 - A continuity provider may prove external durability; it cannot decide what a
   memory means or what context the model should use.
 - Host adapters translate. They do not own kernel policy.
+- Host adapters translate `raw_host_event` to `raw_host_input`; only the Turn
+  Controller may normalize a passed input into `TurnRequest`.
 
 ## Source-grounding modes
 

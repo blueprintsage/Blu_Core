@@ -1,12 +1,27 @@
 {
   "spec_version": "1.0.0",
   "implementation_state": "generic_contracts_only",
+  "ingress_contract": {
+    "host_adapter_boundary": "raw_host_event -> raw_host_input only",
+    "security_restraint": "raw_host_input -> SecurityDecision containing minimized allowed_input",
+    "turn_controller": "SecurityDecision PASS plus allowed_input -> normalized TurnRequest",
+    "turn_request_producer": "turn_controller",
+    "ordinary_routing_precondition": "SecurityDecision status=PASS"
+  },
+  "pre_ingress_authorization_contract": {
+    "missing_evidence": "SecurityDecision ASK with safe authorization_request_ref",
+    "evidence_collection": "validation_egress and host_adapter_boundary obtain explicit evidence without ordinary routing",
+    "evaluation": "authorization_evaluator returns AuthorizationResult bound to authorization_request_ref",
+    "reentry": "AuthorizationResult -> security_restraint -> new SecurityDecision",
+    "route_gate": "only SecurityDecision PASS reaches turn_controller",
+    "owners_separate": true
+  },
   "interfaces": [
     {
       "interface_id": "IF-MODEL-EXECUTION", "name": "Model Execution", "provider_domain": "model_facing", "consumer": "turn_controller and validation_egress", "purpose": "Generate candidates and structured requests under CTS, ScopeLock, capability, source, and authorization context.", "request_packets": ["TurnRequest", "ControlDecision", "ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["accept only allowed context", "label service requests as candidates", "never self-certify host side effects"], "failure_behavior": "ERROR or ASK", "host_specific": false, "provider_binding": null
     },
     {
-      "interface_id": "IF-HOST-CAPABILITY", "name": "Host Capability Provider", "provider_domain": "host_adapter", "consumer": "turn_controller", "purpose": "Report verified availability separately from declaration and translate generic service requests.", "request_packets": ["ServiceExchange"], "response_packets": ["CapabilityReport", "ServiceExchange"], "required_behavior": ["include verification method", "include scope and limitations", "include receipt or failure reason", "scope reports to turn or timestamp"], "failure_behavior": "UNAVAILABLE or ERROR", "host_specific": false, "provider_binding": null
+      "interface_id": "IF-HOST-CAPABILITY", "name": "Host Capability Provider", "provider_domain": "host_adapter", "consumer": "turn_controller", "purpose": "Translate raw_host_event to raw_host_input, report verified availability separately from declaration, and translate generic service requests without constructing TurnRequest.", "request_packets": ["ServiceExchange"], "response_packets": ["CapabilityReport", "ServiceExchange"], "required_behavior": ["raw_host_event produces raw_host_input only", "never construct TurnRequest", "include verification method", "include scope and limitations", "include receipt or failure reason", "scope reports to turn or timestamp"], "failure_behavior": "UNAVAILABLE or ERROR", "host_specific": false, "provider_binding": null
     },
     {
       "interface_id": "IF-TIME-PROVIDER", "name": "Time Provider", "provider_domain": "host_service", "consumer": "host_adapter_boundary", "purpose": "Supply verified current time and timezone evidence; never perform scheduling by implication.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return timestamp", "return timezone or offset", "return verification receipt"], "failure_behavior": "UNAVAILABLE", "host_specific": false, "provider_binding": null
@@ -15,7 +30,7 @@
       "interface_id": "IF-SCHEDULING-PROVIDER", "name": "Scheduling Provider", "provider_domain": "host_service", "consumer": "host_adapter_boundary", "purpose": "Create, update, cancel, and identify future schedules with explicit recurrence semantics.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["return provider schedule id", "return normalized schedule", "return action receipt", "distinguish recurrence from one-time execution"], "failure_behavior": "UNAVAILABLE or ERROR", "host_specific": false, "provider_binding": null
     },
     {
-      "interface_id": "IF-AUTHORIZATION-PROVIDER", "name": "Authorization Evidence Provider", "provider_domain": "host_service", "consumer": "authorization_evaluator", "purpose": "Supply identity, credential, role, consent, or policy evidence when the host can establish it.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["name evidence type", "name assurance and scope", "avoid exposing protected secrets", "return unavailable when identity is not established"], "failure_behavior": "UNAVAILABLE; never infer identity from conversational tone", "host_specific": false, "provider_binding": null
+      "interface_id": "IF-AUTHORIZATION-PROVIDER", "name": "Authorization Evidence Provider", "provider_domain": "host_service", "consumer": "authorization_evaluator", "purpose": "Supply explicit identity, credential, role, consent, or policy evidence bound to a safe authorization_request_ref when the host can establish it.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange", "AuthorizationResult"], "required_behavior": ["accept the safe authorization_request_ref without ordinary routing", "name evidence type", "name assurance and scope", "avoid exposing protected secrets", "return unavailable when identity is not established", "return AuthorizationResult to security_restraint for pre-ingress re-entry"], "failure_behavior": "UNAVAILABLE; never infer identity from conversational tone and never bypass security_restraint", "host_specific": false, "provider_binding": null
     },
     {
       "interface_id": "IF-CONTINUITY-PROVIDER", "name": "Continuity Provider", "provider_domain": "continuity_provider", "consumer": "turn_controller", "purpose": "Read and write namespaced, versioned continuity with provenance, conflict handling, and durability receipts.", "request_packets": ["ServiceExchange"], "response_packets": ["ServiceExchange"], "required_behavior": ["support read and write", "declare lifetime", "enforce namespace and scope", "return version and provenance", "return conflict and receipt"], "failure_behavior": "UNAVAILABLE or conflict without fabricated state", "host_specific": false, "provider_binding": null

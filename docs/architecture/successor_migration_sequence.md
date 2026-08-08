@@ -26,13 +26,15 @@ collision domain, tests, review, and revertible commit.
 3. **Pre-ingress Security Restraint**
    - begin only after a security-authorized OPSEC policy packet resolves
      `SUR-001`;
-   - test ordering, content minimization, redaction authorization, and
-     fail-closed behavior without publishing protected details.
+   - test ordering, content minimization, redaction authorization, the bounded
+     Auth re-entry loop, and fail-closed behavior without publishing protected
+     details or entering ordinary routing.
 
 4. **Authorization Evaluator**
    - begin only after accepted evidence and assurance rules resolve `SUR-002`;
    - test action/resource scope, session creation/expiry/reset, unavailable
-     evidence, and OPSEC interaction.
+     evidence, safe request binding, and return to OPSEC for a new pre-ingress
+     decision.
 
 5. **Turn Controller**
    - normalize allowed turns;

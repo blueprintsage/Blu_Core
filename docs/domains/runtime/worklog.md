@@ -517,3 +517,45 @@ last_reviewed: 2026-08-06
 - Exact base: `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`
 - Branch: `bc-018-successor-kernel-boundary-spec`
 - Substantive work commit: recorded by the metadata-only follow-up
+
+## 2026-08-08 — BC-018 pre-review contract correction
+
+### What changed
+
+- Corrected `TurnRequest` ownership so only Turn Controller produces it after a
+  passing SecurityDecision; Host Adapter now owns only raw host-event
+  translation.
+- Defined one bounded pre-ingress Auth loop: safe ASK, explicit evidence,
+  separate Auth evaluation, result returned to OPSEC, and PASS required before
+  ordinary routing.
+- Aligned components, packets, interfaces, traceability, graph, normative flow,
+  boundary text, migration notes, and runtime decisions.
+- Added focused validator invariants and four negative tests without changing
+  the seven-component design or eight-packet set.
+
+### What was tested or reviewed
+
+- Exact final commands and results are recorded in
+  `assignments/BC-018/validation.md`.
+
+### What worked
+
+- The validator rejects non-controller TurnRequest production, routing before
+  SecurityDecision PASS, missing Auth re-entry, merged Auth/OPSEC ownership,
+  and OPSEC placement behind Turn Controller.
+
+### What failed or remains unavailable
+
+- No implementation was attempted. Protected Auth/OPSEC policy and evidence
+  details remain unresolved as designed.
+
+### Known risks and next safe step
+
+- This correction removes contract ambiguity only; it is not runtime proof.
+- After push, Claude performs the independently authorized semantic review of
+  the corrected BC-018 head. Do not begin BC-020, BC-030, or implementation.
+
+### Commit identity
+
+- Correction base: `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`
+- Correction substantive commit: recorded by the metadata-only follow-up

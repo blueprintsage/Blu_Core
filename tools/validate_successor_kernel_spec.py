@@ -97,6 +97,8 @@ def validate(root: Path) -> list[str]:
     unresolved = data["unresolved_register.json"].get("items", [])
     evidence_catalog = data["traceability.json"].get("evidence_catalog", [])
     requirements = data["traceability.json"].get("requirements", [])
+    packet_contract = data["packet_registry.json"]
+    interface_contract = data["interface_registry.json"]
 
     for records, key, label in (
         (components, "component_id", "component"),
@@ -155,6 +157,64 @@ def validate(root: Path) -> list[str]:
                 )
             deterministic_owners[responsibility] = component.get("component_id")
 
+    by_component = {item.get("component_id"): item for item in components}
+    by_packet = {item.get("packet_id"): item for item in packets}
+    security = by_component.get("security_restraint", {})
+    authorization = by_component.get("authorization_evaluator", {})
+    controller = by_component.get("turn_controller", {})
+    egress = by_component.get("validation_egress", {})
+    adapter = by_component.get("host_adapter_boundary", {})
+
+    turn_request = by_packet.get("TurnRequest", {})
+    if turn_request.get("producer") != "turn_controller":
+        errors.append("TurnRequest producer is not solely turn_controller")
+    if "TurnRequest" not in controller.get("outputs", []):
+        errors.append("turn_controller does not produce TurnRequest")
+    if "ingress_normalization" not in controller.get("owns", []):
+        errors.append("turn_controller does not solely own ingress/task normalization")
+    if "TurnRequest" in adapter.get("outputs", []) or "ingress_normalization" in adapter.get("owns", []):
+        errors.append("host_adapter_boundary improperly constructs TurnRequest")
+
+    ingress = packet_contract.get("ingress_ownership", {})
+    interface_ingress = interface_contract.get("ingress_contract", {})
+    expected_precondition = "SecurityDecision status=PASS"
+    if ingress.get("host_adapter_boundary", {}).get("output") != "raw_host_input":
+        errors.append("host adapter ingress output is not raw_host_input")
+    if ingress.get("host_adapter_boundary", {}).get("does_not_produce") != "TurnRequest":
+        errors.append("host adapter ingress contract does not exclude TurnRequest construction")
+    if ingress.get("security_restraint", {}).get("input") != "raw_host_input":
+        errors.append("security restraint does not consume raw_host_input before routing")
+    if ingress.get("turn_controller", {}).get("output") != "TurnRequest" or ingress.get("turn_controller", {}).get("sole_turn_request_producer") is not True:
+        errors.append("TurnRequest ingress ownership is not exclusive to turn_controller")
+    if ingress.get("ordinary_routing_precondition") != expected_precondition:
+        errors.append("ordinary host routing may begin before SecurityDecision PASS")
+    if interface_ingress.get("turn_request_producer") != "turn_controller":
+        errors.append("interface contract assigns TurnRequest to a non-controller producer")
+    if interface_ingress.get("ordinary_routing_precondition") != expected_precondition:
+        errors.append("interface contract permits ordinary routing before SecurityDecision PASS")
+    control_invariants = by_packet.get("ControlDecision", {}).get("invariants", [])
+    if "SecurityDecision PASS exists" not in control_invariants:
+        errors.append("ControlDecision does not require SecurityDecision PASS")
+
+    auth_loop = packet_contract.get("pre_ingress_authorization_loop", {})
+    interface_auth = interface_contract.get("pre_ingress_authorization_contract", {})
+    if not auth_loop or auth_loop.get("reentry_target") != "security_restraint" or auth_loop.get("ordinary_routing_bypassed") is not True or auth_loop.get("pass_required_for_turn_controller") is not True:
+        errors.append("OPSEC authorization-required path lacks Auth/re-entry mechanism")
+    if auth_loop.get("authorization_owner") != "authorization_evaluator" or auth_loop.get("security_owner") != "security_restraint" or auth_loop.get("authorization_owner") == auth_loop.get("security_owner"):
+        errors.append("Auth is merged into OPSEC instead of remaining a separate evaluator")
+    if auth_loop.get("safe_ask_egress_owner") != "validation_egress" or auth_loop.get("evidence_channel") != "host_adapter_boundary":
+        errors.append("pre-ingress authorization ASK lacks bounded egress/evidence owners")
+    if interface_auth.get("owners_separate") is not True or "security_restraint" not in str(interface_auth.get("reentry", "")) or "SecurityDecision PASS" not in str(interface_auth.get("route_gate", "")):
+        errors.append("interface contract lacks separate Auth-to-OPSEC re-entry")
+    if "authorization_evaluator" not in security.get("dependencies", []):
+        errors.append("security restraint lacks authorization evaluator dependency")
+    if "host_adapter_boundary" not in authorization.get("dependencies", []):
+        errors.append("authorization evaluator lacks explicit evidence channel")
+    if "security_restraint" not in egress.get("dependencies", []):
+        errors.append("validation egress lacks pre-ingress SecurityDecision dependency")
+    if "authorization_evaluator" in controller.get("dependencies", []) or "AuthorizationResult_when_required" in controller.get("inputs", []):
+        errors.append("pre-ingress Auth is incorrectly routed through turn_controller")
+
     component_text = " ".join(
         f"{item.get('component_id', '')} {item.get('name', '')}".lower() for item in components
     )
@@ -190,9 +250,8 @@ def validate(root: Path) -> list[str]:
         if "scheduling_provider" not in str(by_behavior.get(name, {}).get("host_dependency", "")):
             errors.append(f"future scheduling claim lacks scheduling-provider dependency: {name}")
 
-    security = next((item for item in components if item.get("component_id") == "security_restraint"), {})
     if security.get("boundary_position") != "pre_ingress":
-        errors.append("OPSEC is not classified pre-ingress")
+        errors.append("OPSEC is moved behind turn_controller instead of remaining pre-ingress")
     model = next((item for item in components if item.get("component_id") == "model_execution_boundary"), {})
     if any("route" in item.lower() for item in model.get("owns", [])):
         errors.append("Persona/model boundary is assigned route ownership")

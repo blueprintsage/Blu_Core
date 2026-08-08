@@ -9,12 +9,13 @@ assignment: BC-018
 
 ```mermaid
 flowchart LR
-    Host["Host input"] --> Adapter["Generic Host Adapter"]
-    Adapter --> OPSEC["Pre-ingress Security Restraint"]
-    OPSEC -->|"PASS: minimized allowed input"| Controller["Turn Controller"]
+    Host["raw_host_event"] -->|"translate only"| Adapter["Generic Host Adapter"]
+    Adapter -->|"raw_host_input"| OPSEC["Pre-ingress Security Restraint"]
+    OPSEC -->|"PASS + minimized allowed_input"| Controller["Turn Controller constructs TurnRequest"]
     OPSEC -->|"BLOCK / ASK"| Egress["Validation and Egress"]
-    Controller <-->|"authorization request / result"| Auth["Authorization Evaluator"]
-    Auth <-->|"explicit evidence only"| Adapter
+    Egress -->|"safe authorization request"| Adapter
+    Adapter -->|"explicit evidence bound to request ref"| Auth["Authorization Evaluator"]
+    Auth -->|"AuthorizationResult: re-enter pre-ingress"| OPSEC
     Controller <-->|"candidate / structured request"| Model["Model Execution Boundary"]
     Controller <-->|"generic service exchange"| Adapter
     Adapter <-->|"time, schedule, tools, source, skill, artifact"| Services["Host Services"]
@@ -30,13 +31,19 @@ The arrows describe contracts, not live calls. Host services and continuity are
 not implied available. Every used path requires a verified capability record;
 side effects and durable writes require provider receipts.
 
+The Host Adapter never constructs `TurnRequest`. The authorization loop does
+not enter the Turn Controller: a safe pre-ingress `ASK` obtains explicit
+evidence, Auth evaluates it, and `AuthorizationResult` returns to the Security
+Restraint. Only `SecurityDecision PASS` permits Turn Controller normalization
+and ordinary routing.
+
 ## Exclusive deterministic responsibilities
 
 | Responsibility | Owner |
 |---|---|
 | OPSEC pre-ingress decision and input minimization | Pre-ingress Security Restraint |
 | Authorization policy evaluation and session transition validation | Authorization Evaluator |
-| Ingress normalization, capability validation, route, owner, ScopeLock, service dispatch authorization | Turn Controller |
+| `SecurityDecision PASS` + `allowed_input` normalization into `TurnRequest`; capability validation, route, owner, ScopeLock, service dispatch authorization | Turn Controller |
 | Source policy, artifact/completion proof, terminal status, egress, receipt-backed diagnostics | Validation and Egress |
 
 No responsibility appears twice. Construction and validation are distinct:
@@ -48,7 +55,7 @@ candidate against it. That is not duplicate ownership.
 | Historical/current Exec responsibility | Successor owner | Disposition |
 |---|---|---|
 | pre-ingress security scheduling | Security Restraint is placed directly at the boundary | deterministic; recovered without scheduler ownership |
-| Auth dispatch/state | Authorization Evaluator plus evidence-provider interface | hybrid; bounded contract |
+| pre-ingress Auth evaluation/state | Authorization Evaluator plus evidence-provider interface; result re-enters Security Restraint | hybrid; bounded contract; no ordinary routing |
 | routing and arbitration | Turn Controller | deterministic |
 | one-owner enforcement | Turn Controller | deterministic |
 | ScopeLock construction | Turn Controller | deterministic |

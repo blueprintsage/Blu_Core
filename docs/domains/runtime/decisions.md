@@ -50,3 +50,17 @@ Approved specification decisions, pending independent semantic review:
 - BC-020 is `ready_for_spec` against the generic host-adapter boundary. BC-030
   is `ready_for_spec` against the generic continuity-provider boundary. Neither
   assignment is activated or implemented by BC-018.
+
+### Pre-review ownership and authorization clarification
+
+- The Host Adapter translates `raw_host_event` to `raw_host_input` only.
+- The Security Restraint converts `raw_host_input` into `SecurityDecision` and
+  owns minimization of `allowed_input`.
+- The Turn Controller is the sole producer of normalized `TurnRequest`, and it
+  may begin only after `SecurityDecision PASS`.
+- When pre-ingress authorization is required but absent, the Security Restraint
+  returns a safe `ASK`; Validation and Egress / Host obtains explicit evidence;
+  the separate Authorization Evaluator returns `AuthorizationResult`; and that
+  result re-enters the Security Restraint for a new decision.
+- Pre-ingress Auth does not use ordinary routing. Auth does not merge into
+  OPSEC, and OPSEC remains before the Turn Controller.

@@ -226,4 +226,26 @@ performs a separately authorized independent semantic review.
 
 ## Approved amendments
 
-No amendments.
+### 2026-08-08 — Pre-review contract correction
+
+Authorized on exact base `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`
+for the existing branch `bc-018-successor-kernel-boundary-spec`.
+
+The amendment is narrow and does not redesign BC-018:
+
+- Host Adapter owns only `raw_host_event -> raw_host_input` translation.
+- Pre-ingress Security Restraint owns
+  `raw_host_input -> SecurityDecision` with minimized `allowed_input`.
+- Turn Controller is the sole owner and producer of normalized `TurnRequest`,
+  and may act only after `SecurityDecision PASS`.
+- A missing pre-ingress authorization result produces a safe `ASK`; explicit
+  evidence is obtained through Egress/Host, Authorization Evaluator returns a
+  bounded `AuthorizationResult`, and the result re-enters the separate Security
+  Restraint before ordinary routing.
+- Auth does not merge into OPSEC, and OPSEC does not move behind routing.
+- Focused validator invariants and negative tests must enforce those rules.
+
+Use the existing BC-018 collision domain. Append one substantive correction
+commit and one metadata-only receipt commit, push the existing branch, and keep
+BC-018 at `review`. No CTS, runtime, BC-020/BC-030, PASS/SkillForge, or protected
+policy/challenge work is authorized.

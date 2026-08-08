@@ -100,3 +100,31 @@ Component minimality, evidence traceability, false determinism, duplicate
 ownership, source authority, OPSEC/Auth secrecy and ordering, host/persistence
 truth, Exec decomposition, model-facing preservation, packet collapse, and
 architecture creep.
+
+## Pre-review contract correction — 2026-08-08
+
+- Correction base: `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`
+- Correction substantive commit: pending metadata record
+- Correction metadata commit: reported externally because a commit cannot
+  contain its own SHA
+- Push status: pending correction push
+
+The correction makes Turn Controller the sole `TurnRequest` producer and
+defines the bounded pre-ingress authorization loop:
+
+```text
+raw_host_event
+-> Host Adapter raw_host_input
+-> Security Restraint SecurityDecision
+-> ASK / safe authorization_request_ref when evidence is absent
+-> Validation and Egress / Host evidence collection
+-> Authorization Evaluator AuthorizationResult
+-> Security Restraint re-entry
+-> only PASS reaches Turn Controller and TurnRequest normalization
+```
+
+Auth remains separate from OPSEC; OPSEC remains before ordinary routing. The
+component count, behavior placement, packet count, host/continuity boundaries,
+and migration architecture are otherwise unchanged.
+
+Exact correction files are recorded by the metadata-only follow-up.

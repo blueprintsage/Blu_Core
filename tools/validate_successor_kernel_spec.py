@@ -266,6 +266,31 @@ def validate(root: Path) -> list[str]:
     if auth_loop.get("turn_n", {}).get("ordinary_routing") is not False:
         errors.append("authorization ASK turn enters ordinary routing")
 
+    terminal_authority = packet_contract.get("pre_ingress_terminal_authority_contract", {})
+    security_decision = by_packet.get("SecurityDecision", {})
+    validation_result = by_packet.get("ValidationResult", {})
+    terminal_packet = by_packet.get("TerminalPacket", {})
+    security_invariants = " ".join(security_decision.get("invariants", [])).lower()
+    validation_invariants = " ".join(validation_result.get("invariants", [])).lower()
+    terminal_invariants = " ".join(terminal_packet.get("invariants", [])).lower()
+    if (set(terminal_authority.get("security_decision_statuses", [])) != {"PASS", "BLOCK", "ASK"} or
+            "status is pass, block, or ask" not in security_invariants):
+        errors.append("SecurityDecision status vocabulary is expanded beyond PASS, BLOCK, ASK")
+    if terminal_authority.get("control_decision_required") is not False:
+        errors.append("pre-ingress UNAVAILABLE improperly requires ControlDecision")
+    if (terminal_authority.get("authority_ref_type") != "SecurityDecision" or
+            "originating securitydecision" not in validation_invariants or
+            "originating securitydecision" not in terminal_invariants):
+        errors.append("pre-ingress UNAVAILABLE lacks SecurityDecision authority")
+    if (set(terminal_authority.get("pre_ingress_terminal_statuses", [])) != {"BLOCK", "ASK", "UNAVAILABLE"} or
+            terminal_authority.get("owner") != "security_restraint" or
+            terminal_authority.get("ordinary_routing") is not False):
+        errors.append("pre-ingress terminal authority contract is incomplete")
+    if (terminal_authority.get("binding_resolution_terminal_count") != 1 or
+            "mutually exclusive" not in str(auth_loop.get("turn_n", {}).get("terminal_selection_point", "")).lower() or
+            "instead of a second terminal packet" not in terminal_invariants):
+        errors.append("binding failure can emit ASK followed by UNAVAILABLE")
+
     pending = next((item for item in state_records if item.get("state_record_id") == "PendingAuthorizationState"), {})
     pending_fields = set(pending.get("required_fields", []))
     if not pending or pending.get("semantic_owner") != "security_restraint":
@@ -291,6 +316,11 @@ def validate(root: Path) -> list[str]:
         errors.append("pending authorization request lacks request and host-session binding")
     if "fail_closed" not in str(repetition.get("exhaustion_behavior", "")):
         errors.append("authorization exhaustion does not fail closed")
+    activation = pending.get("activation_contract", {})
+    if (activation.get("unbound_request_correlatable") is not False or
+            activation.get("unavailable_binding_becomes_active") is not False or
+            "never becomes active or resumable" not in str(activation.get("binding_unavailable", "")).lower()):
+        errors.append("unbound PendingAuthorizationState remains resumable after substrate failure")
 
     host_session_contract = interface_contract.get("host_session_state_contract", {})
     if not HOST_SESSION_EVIDENCE_FIELDS <= set(host_session_contract.get("required_evidence_fields", [])):

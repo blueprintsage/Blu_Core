@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.1.0",
+  "spec_version": "1.1.1",
   "corrected_by": "BC-018-C1",
   "implementation_state": "generic_contracts_only",
   "ingress_contract": {
@@ -12,19 +12,20 @@
   "pre_ingress_authorization_contract": {
     "turn_model": "cross_turn",
     "missing_evidence": "SecurityDecision ASK with safe authorization_request_ref",
-    "turn_n_terminal": "Validation and Egress emits exactly one ASK TerminalPacket after PendingAuthorizationState is bound to evidenced host_session state; the host turn then ends",
+    "turn_n_terminal": "after the host_session binding attempt, Validation and Egress emits exactly one TerminalPacket under the originating SecurityDecision: ASK on binding success or provider-caused UNAVAILABLE on binding failure; the host turn then ends",
     "evidence_collection": "on a new host turn, host_adapter_boundary correlates explicit provider evidence to the still-valid pending request and current evidenced host_session without ordinary routing",
     "evaluation": "authorization_evaluator returns AuthorizationResult bound to authorization_request_ref",
     "reentry": "in Turn N+1, AuthorizationResult plus PendingAuthorizationState -> security_restraint -> new SecurityDecision",
     "route_gate": "only SecurityDecision PASS reaches turn_controller",
     "owners_separate": true,
     "one_terminal_packet_per_host_turn": true,
-    "missing_host_session_substrate": "UNAVAILABLE and fail closed for the protected interaction"
+    "missing_host_session_substrate": "the proposed pending interaction remains inactive and non-resumable; Validation and Egress emits terminal UNAVAILABLE under the originating SecurityDecision with owner security_restraint, without ControlDecision or ordinary routing",
+    "security_decision_statuses_unchanged": ["PASS", "BLOCK", "ASK"]
   },
   "host_session_state_contract": {
     "provider": "host_adapter_boundary when the host genuinely supports evidenced cross-turn state",
     "required_evidence_fields": ["host_session_id_or_opaque_binding_ref", "provider", "verification_or_binding_method", "scope", "created_or_observed_at", "state_record_identity", "expires_at_or_lifetime_boundary", "receipt_or_evidence_ref", "availability_or_failure_result"],
-    "security_rules": ["the deterministic core never invents host_session state", "conversation history or model memory is not a security state store", "a returned authorization event is accepted only through provider-evidenced correlation to the outstanding request", "absence of evidenced host_session state makes ordinary cross-turn authorization continuation UNAVAILABLE", "host_session state is not promoted to durable_external without an explicit continuity operation and receipt"]
+    "security_rules": ["the deterministic core never invents host_session state", "conversation history or model memory is not a security state store", "a returned authorization event is accepted only through provider-evidenced correlation to the outstanding request", "absence of evidenced host_session state makes ordinary cross-turn authorization continuation UNAVAILABLE", "an unbound proposed PendingAuthorizationState never becomes active or resumable and no future event may correlate to its authorization_request_ref", "host_session state is not promoted to durable_external without an explicit continuity operation and receipt"]
   },
   "interfaces": [
     {

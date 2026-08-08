@@ -107,3 +107,9 @@ last_reviewed: 2026-08-08
 - Keep policy authority, evidence evaluation, and state storage distinct.
   Duplicating attempt permission across OPSEC/Auth or giving it to the adapter
   creates an authority ambiguity even when all fields are present.
+- A provider-caused terminal status does not need to become a policy-decision
+  status. When required pre-ingress substrate is unavailable, retain the
+  originating `SecurityDecision` authority and express `UNAVAILABLE` in
+  Validation/Egress; requiring a nonexistent `ControlDecision` creates an
+  authority gap, while expanding `SecurityDecision` conflates policy with
+  provider failure.

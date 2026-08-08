@@ -13,10 +13,12 @@ flowchart LR
     Host["raw_host_event"] -->|"translate only"| Adapter["Generic Host Adapter"]
     Adapter -->|"raw_host_input"| OPSEC["Pre-ingress Security Restraint"]
     OPSEC -->|"PASS + minimized allowed_input"| Controller["Turn Controller constructs TurnRequest"]
-    OPSEC -->|"Turn N: BLOCK / ASK"| Egress["Validation and Egress"]
-    Egress -->|"Turn N: one safe TerminalPacket"| Adapter
-    OPSEC -->|"bind pending request"| Pending[("PendingAuthorizationState\nstate record, not component")]
-    Adapter -->|"evidenced host_session substrate"| Pending
+    OPSEC -->|"Turn N: BLOCK or proposed ASK"| Egress["Validation and Egress"]
+    OPSEC -->|"proposed pending request"| Pending[("PendingAuthorizationState\nstate record, not component")]
+    Adapter -->|"attempt evidenced host_session binding"| Pending
+    Pending -->|"bound: activate + one ASK terminal"| Egress
+    Pending -->|"binding unavailable: inactive + one UNAVAILABLE terminal"| Egress
+    Egress -->|"one safe TerminalPacket\nSecurityDecision authority pre-ingress"| Adapter
     NextHost["Turn N+1 raw_host_event"] --> Adapter
     Pending -->|"still-valid request binding"| Adapter
     Adapter -->|"bounded authorization evidence only"| Auth["Authorization Evaluator"]
@@ -37,9 +39,13 @@ not implied available. Every used path requires a verified capability record;
 side effects and durable writes require provider receipts.
 
 The Host Adapter never constructs `TurnRequest`. The authorization path is
-cross-turn and does not enter the Turn Controller while pending: Turn N binds
-`PendingAuthorizationState` to evidenced host-session state, emits one safe
-`ASK` terminal packet, and ends. A new host event in Turn N+1 must be correlated
+cross-turn and does not enter the Turn Controller while pending. In Turn N, a
+proposed `PendingAuthorizationState` becomes active only if evidenced
+host-session binding succeeds; success emits one safe `ASK` terminal packet.
+Unavailable binding leaves the proposal inactive and non-resumable and emits
+one safe `UNAVAILABLE` terminal packet instead. Both use the originating
+`SecurityDecision` authority and owner `security_restraint`; no
+`ControlDecision` exists. A new host event in Turn N+1 must be correlated
 through provider evidence to the still-valid request before the bounded Auth
 exchange. `AuthorizationResult` returns to the Security Restraint, and only a
 new `SecurityDecision PASS` permits normalization and ordinary routing. Each

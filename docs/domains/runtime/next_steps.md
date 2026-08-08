@@ -15,9 +15,10 @@ Python runtime.
 
 ## Next safe step
 
-BC-018-C1 corrects the three blocking cross-turn security-state findings on
-exact review base `7796c7e738e0ff66b677c79314b80cf2bbb09a63` and is in
-`review` after Codex handoff.
+BC-018-C1 corrects the three blocking cross-turn security-state findings and
+the pre-review terminal-authority gap on the existing
+`bc-018-c1-security-state-correction` branch. It remains in `review` after
+Codex handoff.
 
 Claude performs the separately authorized independent semantic re-review of
 the C1 substantive commit. Dad and Blu decide integration and closure. The

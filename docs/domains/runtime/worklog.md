@@ -518,6 +518,34 @@ last_reviewed: 2026-08-08
 - Branch: `bc-018-successor-kernel-boundary-spec`
 - Substantive work commit: `a87e7d7ea57688212c7c8461b5630c6ddb55a00f`
 
+## 2026-08-08 — BC-018-C1 pre-review terminal-authority correction
+
+### What changed
+
+- Defined successful host-session binding and unavailable binding as mutually
+  exclusive Turn N terminal outcomes.
+- Kept `SecurityDecision` at `PASS`, `BLOCK`, and `ASK`; provider-caused
+  `UNAVAILABLE` is selected by Validation and Egress under the originating
+  `SecurityDecision` before any `ControlDecision` exists.
+- Made unbound proposed pending state inactive, non-resumable, and permanently
+  non-correlatable by future host events.
+- Updated packet, interface, error, architecture, validator, assignment, and
+  continuity surfaces without changing the seven-component/eight-packet design.
+- Added four focused negative tests while preserving the existing 35.
+
+### Validation and next step
+
+- Exact final suite, manifest, golden, and protected-path receipts are appended
+  to `assignments/BC-018-C1/validation.md`.
+- Claude may perform the separately authorized semantic re-review only after
+  this correction is committed and pushed. Do not begin BC-020, BC-030, or
+  runtime implementation.
+
+### Commit identity
+
+- Correction base: `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`
+- Substantive correction commit: recorded by the metadata-only follow-up
+
 ## 2026-08-08 — BC-018 pre-review contract correction
 
 ### What changed

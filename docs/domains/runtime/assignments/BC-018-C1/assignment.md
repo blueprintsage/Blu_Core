@@ -121,4 +121,26 @@ Claude re-review, BC-020, BC-030, or runtime implementation.
 
 ## Approved amendments
 
-No amendments.
+### 2026-08-08 — Pre-review terminal-authority correction
+
+Authorized by Dad through direct instruction on existing branch
+`bc-018-c1-security-state-correction` at exact head
+`b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`.
+
+This amendment corrects only the provider-caused pre-ingress `UNAVAILABLE`
+terminal path before any `ControlDecision` exists:
+
+- keep `SecurityDecision` status vocabulary exactly `PASS`, `BLOCK`, `ASK`;
+- attempt evidenced host-session binding before publicly emitting a resumable
+  authorization `ASK`;
+- on successful binding, activate the pending interaction and emit exactly one
+  `ASK` `TerminalPacket` under the originating `SecurityDecision`;
+- on unavailable binding, leave the proposed pending interaction inactive and
+  non-resumable, prohibit future correlation to its request reference, and emit
+  exactly one safe `UNAVAILABLE` `TerminalPacket` under the originating
+  `SecurityDecision` with owner `security_restraint`;
+- require no `ControlDecision`, ordinary routing, component, packet, runtime,
+  or protected status/policy expansion;
+- add four focused negative tests while preserving all existing tests;
+- append one narrow substantive commit and one metadata-only receipt commit,
+  then push without merging or starting re-review.

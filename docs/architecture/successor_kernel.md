@@ -57,10 +57,15 @@ storage are services behind interfaces, not kernel components.
 4. The authorization continuation is explicitly cross-turn. In Turn N, when
    authorization is required and an adequate current result is absent, the
    restraint creates a safe `authorization_request_ref` and a policy-bounded
-   `PendingAuthorizationState`. The Host Adapter must bind that record to an
-   evidenced `host_session` before later correlation is possible. Validation
-   and Egress emits exactly one safe `ASK` `TerminalPacket`; Turn N ends and no
-   ordinary routing occurs.
+   proposed `PendingAuthorizationState`. The Host Adapter attempts to bind that
+   record to an evidenced `host_session` before any resumable `ASK` is emitted.
+   On success, the interaction becomes active and Validation and Egress emits
+   exactly one safe `ASK` `TerminalPacket`. If binding is `UNAVAILABLE`, the
+   interaction never becomes active or resumable, no future event may correlate
+   to its request reference, and Validation and Egress instead emits exactly one
+   safe `UNAVAILABLE` `TerminalPacket`. Both terminal paths use the originating
+   `SecurityDecision` as authority and `security_restraint` as owner; no
+   `ControlDecision` exists. Turn N ends without ordinary routing.
 5. In Turn N+1, the Host Adapter receives a new `raw_host_event`. It may enter
    the authorization-evidence exchange only when provider evidence binds that
    event to the still-valid pending request in the current evidenced
@@ -152,7 +157,9 @@ hold it invisibly.
 
 If the host cannot provide evidenced `host_session` state, ordinary cross-turn
 authorization continuation is `UNAVAILABLE` and security-sensitive work fails
-closed. Conversation history and model memory are never security state stores.
+closed through one terminal `UNAVAILABLE` egress result under the originating
+`SecurityDecision`. This does not add `UNAVAILABLE` to the `SecurityDecision`
+status vocabulary. Conversation history and model memory are never security state stores.
 Continuity is not required for ordinary authorization when a verified
 `host_session` substrate exists, and host-session state is never silently
 promoted to `durable_external`.

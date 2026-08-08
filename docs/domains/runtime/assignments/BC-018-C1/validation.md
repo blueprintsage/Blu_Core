@@ -103,3 +103,63 @@ Passing checks prove the published structural constraints, internal references,
 required negative fixtures, repository manifest, protected paths, and golden
 checksums. They do not prove that any host implements the interface, that a
 security policy is correct, or that a successor runtime exists.
+
+## Pre-review terminal-authority correction validation — 2026-08-08
+
+Correction base: `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`.
+
+Commands:
+
+```text
+git diff --check
+python tools/validate_runtime_contracts.py
+python -m unittest discover -s tests/contracts -p "test_*.py"
+python tools/validate_viability_audit.py
+python -m unittest discover -s tests/viability -p "test_*.py"
+python tools/validate_historical_archive_inventory.py
+python -m unittest discover -s tests/historical_archives -p "test_*.py"
+python tools/validate_historical_behavioral_archaeology.py
+python -m unittest discover -s tests/historical_archaeology -p "test_*.py"
+python tools/validate_successor_kernel_spec.py
+python -m unittest discover -s tests/successor_kernel -p "test_*.py"
+PowerShell SHA-256 verification against kernel/golden/v0.22.0/SHA256SUMS
+git diff --name-only b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c --
+  kernel/golden/v0.22.0 contracts/runtime docs/sources/historical_archives
+canonical LF/git-blob MANIFEST regeneration and verification from the index
+```
+
+Results:
+
+```text
+git diff --check: passed (line-ending warnings only)
+runtime contract validator: passed
+contract tests: Ran 21, OK
+viability audit validator: passed
+viability tests: Ran 9, OK
+historical inventory validator: passed
+historical inventory tests: Ran 12, OK
+historical archaeology validator: passed
+historical archaeology tests: Ran 18, OK
+successor specification validator: passed
+successor specification tests: Ran 39, OK
+component count: 7, unchanged
+packet count: 8, unchanged
+SecurityDecision statuses: PASS, BLOCK, ASK, unchanged
+canonical manifest: 188 entries, self-excluded, 0 missing, 0 mismatch
+golden CTS SHA-256: 8/8 passed
+protected-path diff: empty
+modern PASS/SkillForge diff: empty
+successor runtime implementation diff: empty
+```
+
+Four focused negative cases reject:
+
+1. pre-ingress `UNAVAILABLE` requiring a `ControlDecision`;
+2. pre-ingress `UNAVAILABLE` without originating `SecurityDecision` authority;
+3. an unbound `PendingAuthorizationState` remaining resumable after substrate
+   failure; and
+4. an `ASK` terminal followed by a second `UNAVAILABLE` terminal for the same
+   binding attempt.
+
+The previous 35 successor tests remain present and passing. Structural success
+does not prove host support or runtime enforcement.

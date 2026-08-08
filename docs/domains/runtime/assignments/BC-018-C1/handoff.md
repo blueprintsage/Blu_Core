@@ -101,3 +101,56 @@ tools/validate_successor_kernel_spec.py
 - Verify no bare session lifetime, hidden controller state, replay-by-string,
   unbounded retries, or ordinary service authority remains.
 - Verify N1, N5, and N8 are resolved without broadening into other review notes.
+
+## Pre-review terminal-authority correction — 2026-08-08
+
+### Identity
+
+- Correction base: `b1e0f5c7ce3fddd7d71f6b2fa8050b0b55875b3c`
+- Substantive correction commit: recorded by the metadata-only follow-up
+- Metadata/head commit: reported externally after creation
+- Branch: `bc-018-c1-security-state-correction`
+- Push status: pending at substantive handoff; final push reported externally
+
+### Result
+
+- Preserved `SecurityDecision` statuses `PASS`, `BLOCK`, and `ASK` only.
+- Made the host-session binding attempt precede terminal selection.
+- Binding success activates the pending interaction and emits one terminal
+  `ASK` under the originating `SecurityDecision`.
+- Binding `UNAVAILABLE` leaves the proposal inactive, non-resumable, and
+  permanently non-correlatable, then emits one safe terminal `UNAVAILABLE`
+  under the originating `SecurityDecision` with owner `security_restraint`.
+- No `ControlDecision`, ordinary routing, new component, new packet, runtime,
+  CTS, BC-020/BC-030, or PASS/SkillForge work was introduced.
+
+### Exact substantive correction files
+
+```text
+MANIFEST.sha256
+contracts/successor/error_model.json
+contracts/successor/interface_registry.json
+contracts/successor/packet_registry.json
+docs/architecture/successor_boundaries.md
+docs/architecture/successor_component_graph.md
+docs/architecture/successor_kernel.md
+docs/domains/runtime/assignments/BC-018-C1/assignment.md
+docs/domains/runtime/assignments/BC-018-C1/handoff.md
+docs/domains/runtime/assignments/BC-018-C1/validation.md
+docs/domains/runtime/decisions.md
+docs/domains/runtime/failures.md
+docs/domains/runtime/next_steps.md
+docs/domains/runtime/worklog.md
+docs/worklogs/assignments.md
+tests/successor_kernel/test_validate_successor_kernel_spec.py
+tools/validate_successor_kernel_spec.py
+```
+
+### Reviewer focus
+
+- Confirm provider-caused terminal `UNAVAILABLE` is an egress result under the
+  originating `SecurityDecision`, not a fourth SecurityDecision status.
+- Confirm an unbound proposed pending interaction can never be resumed or
+  correlated.
+- Confirm binding success `ASK` and binding failure `UNAVAILABLE` are mutually
+  exclusive and still yield one terminal packet per host turn.

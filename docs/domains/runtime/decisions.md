@@ -90,3 +90,10 @@ Approved specification decisions, pending independent semantic review:
   deterministic current-turn utility; verified current time still requires a
   provider. Optional profile metadata is current-turn evidenced context owned
   behaviorally by Persona/model, not by Turn Controller.
+- A proposed pre-ingress authorization interaction becomes resumable only after
+  evidenced host-session binding succeeds. Success emits one terminal `ASK`;
+  unavailable binding emits one terminal `UNAVAILABLE` instead, leaves the
+  proposal inactive and non-correlatable, and requires no `ControlDecision`.
+  Both terminal paths use the originating `SecurityDecision` authority and
+  owner `security_restraint`; `SecurityDecision` remains limited to `PASS`,
+  `BLOCK`, and `ASK`.

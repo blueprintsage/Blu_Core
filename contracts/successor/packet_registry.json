@@ -1,5 +1,5 @@
 {
-  "spec_version": "1.1.0",
+  "spec_version": "1.1.1",
   "corrected_by": "BC-018-C1",
   "design_rule": "Eight packets are retained. IngressPacket and TaskPacket collapse into TurnRequest; ScopeLock and RouteDecision collapse into ControlDecision; ServiceRequest and ServiceResult share ServiceExchange; SourceScope is embedded where used; ExecutionReceipt is embedded in TerminalPacket.",
   "ingress_ownership": {
@@ -25,12 +25,14 @@
     "ordinary_routing_bypassed": true,
     "pass_required_for_turn_controller": true,
     "substrate_requirement": "evidenced host_session state; explicitly requested durable_external state may supplement storage only with a continuity receipt",
-    "unavailable_substrate_result": "UNAVAILABLE and fail closed for the protected interaction",
+    "unavailable_substrate_result": "Validation and Egress emits terminal UNAVAILABLE under the originating SecurityDecision; SecurityDecision itself remains ASK and the protected interaction fails closed",
     "turn_n": {
       "input": "new raw_host_event translated to raw_host_input",
       "control": "security_restraint emits ASK when adequate current AuthorizationResult is absent",
-      "state_requirement": "PendingAuthorizationState is bound to evidenced host_session state before the authorization_request_ref is usable for later correlation",
-      "terminal_result": "exactly one TerminalPacket for Turn N",
+      "state_requirement": "PendingAuthorizationState remains a non-resumable proposal until bound to evidenced host_session state; only successful binding makes authorization_request_ref usable for later correlation",
+      "binding_success_terminal": "exactly one TerminalPacket status=ASK under the originating SecurityDecision; the pending interaction becomes active",
+      "binding_unavailable_terminal": "exactly one TerminalPacket status=UNAVAILABLE under the originating SecurityDecision with owner security_restraint; the proposed pending interaction never becomes active or resumable",
+      "terminal_selection_point": "after the host_session binding attempt; ASK and UNAVAILABLE are mutually exclusive terminal outcomes",
       "ordinary_routing": false
     },
     "turn_n_plus_1": {
@@ -51,14 +53,26 @@
     "steps": [
       "Turn N: security_restraint evaluates raw_host_input and emits PASS or BLOCK when authorization continuation is not needed",
       "Turn N: if required authorization evidence or a valid bounded AuthorizationResult is absent, security_restraint creates a safe authorization_request_ref and policy-bounded PendingAuthorizationState",
-      "Turn N: host_adapter_boundary binds PendingAuthorizationState to evidenced host_session state before the ASK can be correlated later",
-      "Turn N: validation_egress emits exactly one safe ASK TerminalPacket and the host turn ends without ordinary routing",
+      "Turn N: host_adapter_boundary attempts to bind the proposed PendingAuthorizationState to evidenced host_session state before any resumable ASK is emitted",
+      "Turn N binding success: the state becomes active pending and validation_egress emits exactly one safe ASK TerminalPacket under the originating SecurityDecision",
+      "Turn N binding unavailable: the state never becomes active or resumable, its authorization_request_ref cannot be correlated later, and validation_egress emits exactly one safe UNAVAILABLE TerminalPacket under the originating SecurityDecision with owner security_restraint",
       "Turn N+1: host_adapter_boundary accepts a new raw_host_event only when provider evidence correlates it to the still-valid pending request in the current evidenced host_session",
       "Turn N+1: security_restraint confirms retry, expiry, exhaustion, replay, action, resource, and binding policy before permitting the bounded evidence exchange",
       "Turn N+1: authorization_evaluator evaluates only the authorized action, resource, and evidence scope and returns AuthorizationResult",
       "Turn N+1: AuthorizationResult and pending request context return to security_restraint for a new SecurityDecision",
       "Turn N+1: only SecurityDecision PASS permits turn_controller normalization and ordinary routing; any other result ends the turn with exactly one TerminalPacket"
     ]
+  },
+  "pre_ingress_terminal_authority_contract": {
+    "security_decision_statuses": ["PASS", "BLOCK", "ASK"],
+    "pre_ingress_terminal_statuses": ["BLOCK", "ASK", "UNAVAILABLE"],
+    "authority_ref_type": "SecurityDecision",
+    "owner": "security_restraint",
+    "control_decision_required": false,
+    "ordinary_routing": false,
+    "binding_resolution_terminal_count": 1,
+    "binding_success": "terminal ASK after PendingAuthorizationState becomes active and resumable",
+    "binding_unavailable": "provider-caused terminal UNAVAILABLE; originating SecurityDecision remains ASK; proposed state stays inactive and non-resumable; public output is safe and contains no protected detail"
   },
   "state_records": [
     {
@@ -69,6 +83,13 @@
       "allowed_storage_lifetimes": ["host_session", "durable_external"],
       "required_fields": ["state_record_ref", "authorization_request_ref", "protected_action_scope", "protected_resource_scope", "request_binding", "issued_at", "expires_at", "attempt_count", "maximum_attempts", "retry_allowed", "lockout_or_block_state", "host_session_binding", "last_authorization_result_ref", "status", "storage_lifetime", "provenance_receipt_ref"],
       "status_values": ["pending", "satisfied", "blocked", "expired", "cancelled"],
+      "activation_contract": {
+        "before_binding": "proposed only; not active, pending, resumable, or correlatable",
+        "binding_success": "becomes status=pending and resumable within the evidenced host_session binding",
+        "binding_unavailable": "never becomes active or resumable and cannot be correlated by any future host event",
+        "unbound_request_correlatable": false,
+        "unavailable_binding_becomes_active": false
+      },
       "invariants": ["maximum_attempts is a policy-defined finite positive integer", "attempt_count cannot exceed maximum_attempts", "expires_at is finite and enforced", "host_session storage requires evidenced provider binding and receipt", "durable_external storage requires an explicit continuity operation and receipt and does not silently promote host_session state", "returned evidence must match the request binding, host session, protected action, and protected resource", "expired, exhausted, cancelled, blocked, or forbidden one-shot replay is rejected", "Security Restraint alone decides whether another attempt is permitted", "a fresh request after exhaustion requires an explicitly permitted new authorization interaction"],
       "failure_representation": "UNAVAILABLE when substrate evidence is absent; otherwise BLOCK or ASK according to Security Restraint policy"
     }
@@ -100,7 +121,7 @@
       "packet_id": "TurnRequest", "purpose": "Represent one normalized, security-allowed user turn and requested deliverable.", "producer": "turn_controller", "consumer": "model_execution_boundary and validation_egress", "required_fields": ["turn_id", "allowed_input", "task_intent", "requested_deliverable", "explicit_constraints", "source_policy", "created_at_scope", "security_decision_ref"], "optional_fields": ["user_supplied_time", "session_context_ref", "artifact_refs"], "invariants": ["turn_controller is the sole producer", "SecurityDecision status=PASS is present", "allowed_input equals the minimized SecurityDecision allowed_input", "contains no blocked raw material beyond approved minimization", "one active task", "source_policy is one allowed mode"], "failure_representation": "INVALID", "lifetime": "turn"
     },
     {
-      "packet_id": "SecurityDecision", "purpose": "Record the mandatory pre-ingress OPSEC result for one host turn.", "producer": "security_restraint", "consumer": "turn_controller only for PASS; validation_egress for BLOCK or ASK; authorization_evaluator through authorization_request_ref", "required_fields": ["decision_id", "turn_id", "status", "policy_ref", "reason_code", "allowed_input_or_null", "redactions", "authorization_required"], "optional_fields": ["safe_user_prompt", "authorization_request_ref", "pending_authorization_state_ref", "authorization_result_ref"], "invariants": ["status is PASS, BLOCK, or ASK", "only PASS may be consumed by turn_controller", "BLOCK contains no protected detail", "redaction is explicit and policy-authorized", "authorization-required with absent adequate result returns ASK and a safe authorization_request_ref", "a cross-turn authorization ASK is usable for later correlation only after PendingAuthorizationState is bound to evidenced host_session state", "a re-entered decision in a new host turn references the bounded AuthorizationResult and still-valid pending state", "precedes TurnRequest and ordinary routing"], "failure_representation": "BLOCK", "lifetime": "turn"
+      "packet_id": "SecurityDecision", "purpose": "Record the mandatory pre-ingress OPSEC result for one host turn.", "producer": "security_restraint", "consumer": "turn_controller only for PASS; validation_egress for every pre-ingress terminal path; authorization_evaluator through an active authorization_request_ref", "required_fields": ["decision_id", "turn_id", "status", "policy_ref", "reason_code", "allowed_input_or_null", "redactions", "authorization_required"], "optional_fields": ["safe_user_prompt", "authorization_request_ref", "pending_authorization_state_ref", "authorization_result_ref"], "invariants": ["status is PASS, BLOCK, or ASK", "only PASS may be consumed by turn_controller", "BLOCK contains no protected detail", "redaction is explicit and policy-authorized", "authorization-required with absent adequate result returns ASK and a safe authorization_request_ref", "a cross-turn authorization ASK is usable for later correlation only after PendingAuthorizationState is bound to evidenced host_session state", "provider-caused terminal UNAVAILABLE does not change the originating SecurityDecision ASK into a fourth SecurityDecision status", "a re-entered decision in a new host turn references the bounded AuthorizationResult and still-valid pending state", "precedes TurnRequest and ordinary routing"], "failure_representation": "BLOCK", "lifetime": "turn"
     },
     {
       "packet_id": "CapabilityReport", "purpose": "Separate declared capabilities from verified provider availability.", "producer": "host_adapter_boundary", "consumer": "turn_controller", "required_fields": ["report_id", "capability_id", "provider", "declared", "availability", "verification_method", "scope", "limitations", "timestamp_or_turn_scope", "receipt", "failure_reason"], "optional_fields": ["expires_at", "assurance"], "invariants": ["availability verified requires receipt", "unavailable requires failure_reason", "scope is explicit", "declaration alone never means available"], "failure_representation": "UNAVAILABLE or INVALID", "lifetime": "turn_or_host_session_as_declared"
@@ -115,10 +136,10 @@
       "packet_id": "ServiceExchange", "purpose": "Carry a typed request or result across model, host, source, skill, artifact, time, scheduling, authorization-evidence, and continuity interfaces.", "producer": "turn_controller, model_execution_boundary, host_adapter_boundary, or declared provider", "consumer": "declared interface peer", "required_fields": ["exchange_id", "direction", "service_id", "operation", "authority_class", "authority_ref", "status", "payload", "limitations", "receipt", "failure_reason"], "optional_fields": ["provider_request_id", "source_scope", "expected_version", "schedule_id", "artifact_id", "authorization_request_ref", "host_session_binding_ref"], "invariants": ["direction is request or result", "authority_class is ordinary_control or pre_ingress_authorization", "ordinary_control requires a ControlDecision and only its allowlisted services", "pre_ingress_authorization requires authorization_request_ref, host_session_binding_ref, IF-AUTHORIZATION-PROVIDER, and service_id authorization_evidence", "pre_ingress_authorization carries no ordinary ControlDecision authority and cannot invoke arbitrary tools, sources, schedules, unrelated continuity writes, model execution, or ordinary services", "PASS side effects require receipt", "durable writes require continuity provider", "future schedules require scheduling provider"], "failure_representation": "UNAVAILABLE, INVALID, BLOCK, or ERROR", "lifetime": "turn; provider identity may outlive turn only by receipt"
     },
     {
-      "packet_id": "ValidationResult", "purpose": "Record pre-ingress safe-terminal or routed source, scope, authorization, capability, artifact, and completion checks before output.", "producer": "validation_egress", "consumer": "validation_egress terminal assembly", "required_fields": ["validation_id", "authority_ref", "status", "checks", "source_policy_result", "scope_result", "artifact_result", "unsupported_claims", "contradictions", "failure_reason"], "optional_fields": ["reduced_candidate", "ask_prompt"], "invariants": ["authority_ref is SecurityDecision for pre-ingress BLOCK or ASK, otherwise ControlDecision", "pre-ingress ASK exposes only the safe authorization request", "source_only factual claims require positive support", "security-sensitive missing evidence blocks", "unsupported and contradiction results remain distinct", "PASS does not exceed provider receipts"], "failure_representation": "BLOCK, ASK, UNAVAILABLE, INVALID, or ERROR", "lifetime": "turn"
+      "packet_id": "ValidationResult", "purpose": "Record pre-ingress safe-terminal or routed source, scope, authorization, capability, artifact, and completion checks before output.", "producer": "validation_egress", "consumer": "validation_egress terminal assembly", "required_fields": ["validation_id", "authority_ref", "status", "checks", "source_policy_result", "scope_result", "artifact_result", "unsupported_claims", "contradictions", "failure_reason"], "optional_fields": ["reduced_candidate", "ask_prompt"], "invariants": ["authority_ref is the originating SecurityDecision for every pre-ingress terminal path: BLOCK, ASK, or provider-caused UNAVAILABLE before ControlDecision exists; routed output uses ControlDecision", "pre-ingress ASK exposes only the safe authorization request", "pre-ingress host-session binding UNAVAILABLE is an egress result and does not imply SecurityDecision status UNAVAILABLE", "source_only factual claims require positive support", "security-sensitive missing evidence blocks", "unsupported and contradiction results remain distinct", "PASS does not exceed provider receipts"], "failure_representation": "BLOCK, ASK, UNAVAILABLE, INVALID, or ERROR", "lifetime": "turn"
     },
     {
-      "packet_id": "TerminalPacket", "purpose": "Authorize exactly one public result and embed the current-turn execution receipt.", "producer": "validation_egress", "consumer": "host_adapter_boundary", "required_fields": ["terminal_id", "turn_id", "authority_ref", "owner_id", "status", "public_output", "artifact_refs", "validation_ref", "receipt"], "optional_fields": ["safe_error_code", "delivery_constraints"], "invariants": ["one terminal packet per host turn", "authority_ref is SecurityDecision for pre-ingress BLOCK or ASK, otherwise ControlDecision", "owner matches security_restraint for pre-ingress terminal output or ControlDecision for routed output", "public output is empty or safe for BLOCK and INVALID", "receipt lists executed actions and provider proofs", "terminal authorization precedes host delivery"], "failure_representation": "terminal BLOCK, ASK, UNAVAILABLE, INVALID, or ERROR", "lifetime": "turn; durable retention requires continuity receipt"
+      "packet_id": "TerminalPacket", "purpose": "Authorize exactly one public result and embed the current-turn execution receipt.", "producer": "validation_egress", "consumer": "host_adapter_boundary", "required_fields": ["terminal_id", "turn_id", "authority_ref", "owner_id", "status", "public_output", "artifact_refs", "validation_ref", "receipt"], "optional_fields": ["safe_error_code", "delivery_constraints"], "invariants": ["one terminal packet per host turn", "every pre-ingress terminal output uses the originating SecurityDecision authority; routed output uses ControlDecision authority", "failed required host-session binding produces terminal UNAVAILABLE under the originating SecurityDecision without requiring ControlDecision", "owner is security_restraint for every pre-ingress terminal output and otherwise matches ControlDecision", "public output is empty or safe and reveals no protected detail for BLOCK, INVALID, and pre-ingress UNAVAILABLE", "ASK is emitted only after binding succeeds; binding failure emits UNAVAILABLE instead of a second terminal packet", "receipt lists executed actions and provider proofs", "terminal authorization precedes host delivery"], "failure_representation": "terminal BLOCK, ASK, UNAVAILABLE, INVALID, or ERROR", "lifetime": "turn; durable retention requires continuity receipt"
     }
   ]
 }

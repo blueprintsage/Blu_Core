@@ -178,6 +178,33 @@ class SuccessorKernelSpecValidationTests(unittest.TestCase):
         self.save(self.packets, data)
         self.assert_error("two TerminalPackets for one host turn")
 
+    def test_pre_ingress_unavailable_cannot_require_control_decision(self):
+        data = self.load(self.packets)
+        data["pre_ingress_terminal_authority_contract"]["control_decision_required"] = True
+        self.save(self.packets, data)
+        self.assert_error("pre-ingress UNAVAILABLE improperly requires ControlDecision")
+
+    def test_pre_ingress_unavailable_requires_security_decision_authority(self):
+        data = self.load(self.packets)
+        data["pre_ingress_terminal_authority_contract"]["authority_ref_type"] = None
+        self.save(self.packets, data)
+        self.assert_error("pre-ingress UNAVAILABLE lacks SecurityDecision authority")
+
+    def test_unbound_pending_authorization_cannot_remain_resumable(self):
+        data = self.load(self.packets)
+        pending = next(x for x in data["state_records"] if x["state_record_id"] == "PendingAuthorizationState")
+        pending["activation_contract"]["unbound_request_correlatable"] = True
+        pending["activation_contract"]["unavailable_binding_becomes_active"] = True
+        pending["activation_contract"]["binding_unavailable"] = "status=pending and resumable"
+        self.save(self.packets, data)
+        self.assert_error("unbound PendingAuthorizationState remains resumable")
+
+    def test_binding_failure_cannot_emit_ask_then_unavailable(self):
+        data = self.load(self.packets)
+        data["pre_ingress_terminal_authority_contract"]["binding_resolution_terminal_count"] = 2
+        self.save(self.packets, data)
+        self.assert_error("binding failure can emit ASK followed by UNAVAILABLE")
+
     def test_pending_authorization_requires_expiry(self):
         data = self.load(self.packets)
         pending = next(x for x in data["state_records"] if x["state_record_id"] == "PendingAuthorizationState")

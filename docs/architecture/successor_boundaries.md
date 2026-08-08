@@ -36,14 +36,23 @@ The bounded pre-ingress authorization loop is normatively cross-turn.
    valid for the action, resource, binding, evidenced lifetime, freshness, and
    revocation/reset state, it may return `PASS` or `BLOCK`.
 3. Otherwise it creates a safe `authorization_request_ref` and
-   `PendingAuthorizationState`. The record includes the protected
+   proposed `PendingAuthorizationState`. The record includes the protected
    action/resource scope, binding, freshness, expiry, finite attempt policy,
-   replay policy, status, and provenance.
-4. Before the request can be correlated later, the Host Adapter binds the
-   record to evidenced `host_session` state. If it cannot, continuation is
-   `UNAVAILABLE` and fails closed for the protected interaction.
-5. Validation and Egress emits exactly one safe `ASK` `TerminalPacket`. Turn N
-   ends. No Turn Controller routing occurs.
+   replay policy, status, and provenance, but is not yet active or resumable.
+4. Before any resumable request is emitted publicly, the Host Adapter attempts
+   to bind the proposed record to evidenced `host_session` state.
+5. If binding succeeds, the record becomes active with status `pending` and
+   Validation and Egress emits exactly one safe `ASK` `TerminalPacket` under
+   the originating `SecurityDecision` with owner `security_restraint`.
+6. If binding is `UNAVAILABLE`, the proposed record never becomes active or
+   resumable and no future event may correlate to its
+   `authorization_request_ref`. Validation and Egress emits exactly one safe
+   `UNAVAILABLE` `TerminalPacket` under the originating `SecurityDecision` with
+   owner `security_restraint`. The originating decision remains `ASK`—the
+   unavailable result is caused by the required provider substrate, not a
+   fourth `SecurityDecision` status.
+7. In either binding outcome, Turn N ends with one terminal packet. No
+   `ControlDecision` exists and no ordinary routing occurs.
 
 **Turn N+1 — authorization evidence returned**
 
@@ -245,7 +254,10 @@ an eighth component. Security Restraint owns its attempt-policy semantics; the
 Host Adapter supplies the evidenced `host_session` substrate and correlation
 receipts when available. An explicitly requested continuity operation may store
 it as `durable_external`, but ordinary host-session authorization does not
-require continuity and is never silently promoted to it.
+require continuity and is never silently promoted to it. Before binding, the
+record is only a proposal: it is not pending, active, resumable, or correlatable.
+Unavailable binding terminates the turn and permanently denies correlation to
+that unbound request reference.
 
 `ServiceExchange.authority_class` is either `ordinary_control` or
 `pre_ingress_authorization`. Ordinary control requires a `ControlDecision`.
@@ -258,9 +270,11 @@ dispatch.
 Packet ownership is also normative: the Host Adapter produces `raw_host_input`,
 the Security Restraint produces `SecurityDecision` with minimized
 `allowed_input`, and only the Turn Controller produces `TurnRequest` after
-`SecurityDecision PASS`. Pre-ingress `BLOCK`/`ASK` terminal validation uses the
-`SecurityDecision` as `authority_ref`; routed terminal validation uses the
-`ControlDecision`.
+`SecurityDecision PASS`. Every pre-ingress terminal path uses the originating
+`SecurityDecision` as `authority_ref`: policy `BLOCK`, successfully bound
+`ASK`, or provider-caused host-session `UNAVAILABLE` before a
+`ControlDecision` exists. The pre-ingress owner remains `security_restraint`.
+Routed terminal validation uses `ControlDecision` authority.
 
 ## Error and terminal model
 
@@ -268,7 +282,9 @@ The common statuses are `PASS`, `BLOCK`, `ASK`, `UNAVAILABLE`, `INVALID`, and
 `ERROR`. They remain distinct because each changes control flow. Security,
 authorization-required, `source_only`, owner-locked, and proof-required lanes
 fail closed when evidence is absent or invalid. Ordinary conversation may
-degrade safely when an unused optional host capability is absent.
+degrade safely when an unused optional host capability is absent. A required
+host-session binding failure produces terminal `UNAVAILABLE` in Validation and
+Egress; it does not expand `SecurityDecision` beyond `PASS`, `BLOCK`, and `ASK`.
 
 ## Host adapter boundary
 
@@ -285,7 +301,9 @@ It correlates a new host event to an outstanding request through that evidence.
 The adapter does not construct `TurnRequest`, normalize ingress/task semantics,
 decide OPSEC/Auth/attempt policy, infer authorization, or treat conversation
 history/model memory as security state. If it cannot evidence cross-turn state,
-the continuation is unavailable. BC-020 maps Chat and Codex to this contract
+the proposed interaction remains non-resumable and Validation and Egress emits
+one safe `UNAVAILABLE` terminal result under the originating SecurityDecision.
+BC-020 maps Chat and Codex to this contract
 and must document differences rather than simulate parity.
 
 ## Continuity provider boundary

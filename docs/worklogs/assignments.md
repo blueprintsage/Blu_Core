@@ -36,7 +36,7 @@ canonical_base: 7aed76e
 | ID | Assignment | Owner | Status | Notes |
 |---|---|---|---|---|
 | BC-001 | Establish bootstrap authority and golden source | Blu | done | Verified on clean `main` at `7aed76e`; live history has two commits rather than the four-commit bootstrap plan, but all protected artifacts and checksums passed |
-| BC-018 | Successor Kernel Boundary Specification | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018/assignment.md`; exact base `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`; branch `bc-018-successor-kernel-boundary-spec`; substantive work `413574097f8426d10ce5cf284282ddab87f4bc93`; pre-review correction base `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`, correction work recorded by metadata follow-up; specification only, no successor runtime implementation |
+| BC-018 | Successor Kernel Boundary Specification | Codex | review | Packet: `docs/domains/runtime/assignments/BC-018/assignment.md`; exact base `a5e68b3189c60e2d5b8acbe8a212d69b720dec58`; branch `bc-018-successor-kernel-boundary-spec`; substantive work `413574097f8426d10ce5cf284282ddab87f4bc93`; pre-review correction base `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`, correction work `3384db41996d975d079d2d7f83a8e8fea9f4fce5`; specification only, no successor runtime implementation |
 
 ## Completed
 

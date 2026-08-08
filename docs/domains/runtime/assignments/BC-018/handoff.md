@@ -104,7 +104,7 @@ architecture creep.
 ## Pre-review contract correction — 2026-08-08
 
 - Correction base: `ec4a3c14e6aedb7164fc500b0c9a31486bcd11e8`
-- Correction substantive commit: pending metadata record
+- Correction substantive commit: `3384db41996d975d079d2d7f83a8e8fea9f4fce5`
 - Correction metadata commit: reported externally because a commit cannot
   contain its own SHA
 - Push status: pending correction push
@@ -127,4 +127,26 @@ Auth remains separate from OPSEC; OPSEC remains before ordinary routing. The
 component count, behavior placement, packet count, host/continuity boundaries,
 and migration architecture are otherwise unchanged.
 
-Exact correction files are recorded by the metadata-only follow-up.
+Exact correction files:
+
+```text
+MANIFEST.sha256
+contracts/successor/behavior_placement.json
+contracts/successor/component_registry.json
+contracts/successor/interface_registry.json
+contracts/successor/packet_registry.json
+contracts/successor/traceability.json
+docs/architecture/successor_boundaries.md
+docs/architecture/successor_component_graph.md
+docs/architecture/successor_kernel.md
+docs/architecture/successor_migration_sequence.md
+docs/domains/runtime/assignments/BC-018/assignment.md
+docs/domains/runtime/assignments/BC-018/handoff.md
+docs/domains/runtime/assignments/BC-018/validation.md
+docs/domains/runtime/decisions.md
+docs/domains/runtime/next_steps.md
+docs/domains/runtime/worklog.md
+docs/worklogs/assignments.md
+tests/successor_kernel/test_validate_successor_kernel_spec.py
+tools/validate_successor_kernel_spec.py
+```

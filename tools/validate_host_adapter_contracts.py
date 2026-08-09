@@ -58,6 +58,59 @@ EVIDENCE_CLASSES = {
     "unverified",
 }
 STRONG_CURRENT_EVIDENCE = {"local_probe", "host_receipt"}
+VERIFIED_CAPABILITY_SUPPORTS = {
+    ("input.text", "verified_available"): {"text_input"},
+    ("input.host_attachment", "verified_available"): {"host_attachment_input"},
+    ("input.structured_tool_result", "verified_available"): {"structured_tool_result_input"},
+    ("input.workspace_repository_context", "verified_available"): {"repo_detected"},
+    ("retrieval.attached_file", "verified_available"): {"attached_file_retrieval"},
+    ("retrieval.web_search", "verified_available"): {"web_search", "web_page_retrieval"},
+    ("retrieval.filesystem_read", "verified_available"): {"filesystem_scope", "working_directory"},
+    ("action.filesystem_write", "verified_available"): {"filesystem_write"},
+    ("action.filesystem_create", "verified_available"): {"filesystem_create"},
+    ("action.shell_execute", "verified_available"): {"shell_execution"},
+    ("action.raw_network", "verified_available"): {"raw_network"},
+    ("action.git.repo_detected", "verified_available"): {"repo_detected"},
+    ("action.git.read", "verified_available"): {"git_read"},
+    ("action.git.branch_create", "verified_available"): {"branch_create"},
+    ("action.git.push", "verified_available"): {"push"},
+    ("action.git.remote_access", "verified_available"): {"remote_access_operation_scoped"},
+    ("action.artifact_create", "verified_available"): {"artifact_creation_filesystem"},
+    ("action.external_tool_invoke", "verified_available"): {"web_search", "verified_current_time"},
+    ("time.current_date", "verified_available"): {"verified_current_time"},
+    ("time.current_time", "verified_available"): {"verified_current_time"},
+    ("time.timezone_offset", "verified_available"): {"timezone_offset"},
+    ("schedule.create", "verified_available"): {"schedule_create_available"},
+    ("schedule.recurring", "verified_available"): {"schedule_recurring_available"},
+    ("schedule.update_cancel", "verified_available"): {"schedule_update_cancel_available"},
+    ("session.host_session_binding", "verified_unavailable"): {"host_session_security_unavailable"},
+    ("session.cross_turn_security_correlation", "verified_unavailable"): {"host_session_security_unavailable"},
+    ("security.host_action_confirmation", "verified_available"): {"host_action_confirmation"},
+    ("security.identity_role_credential_evidence", "verified_unavailable"): {"authorization_identity_evidence_unavailable"},
+    ("security.pending_request_correlation", "verified_unavailable"): {"host_session_security_unavailable"},
+    ("security.replay_evidence", "verified_unavailable"): {"replay_evidence_unavailable"},
+    ("security.attempt_count_integrity", "verified_available"): {"attempt_count_integrity"},
+    ("security.attempt_count_integrity", "verified_unavailable"): {"attempt_integrity_unavailable"},
+    ("output.natural_language", "verified_available"): {"natural_language_delivery"},
+    ("output.structured_result", "verified_available"): {"structured_tool_result_input"},
+    ("output.file_artifact", "verified_available"): {"artifact_creation_filesystem"},
+    ("output.external_side_effect_receipt", "verified_available"): {
+        "exit_code_receipt", "remote_access_operation_scoped", "web_search", "verified_current_time"
+    },
+}
+VERIFIED_CAPABILITY_DISCLAIMS = {
+    ("action.raw_network", "verified_available"): {"raw_network", "arbitrary_network"},
+    ("action.git.push", "verified_available"): {"push", "remote_push", "push_capability"},
+    ("schedule.create", "verified_available"): {
+        "external_account_connection", "write_authorization", "schedule_operation_success"
+    },
+    ("schedule.recurring", "verified_available"): {
+        "external_account_connection", "write_authorization", "schedule_operation_success"
+    },
+    ("schedule.update_cancel", "verified_available"): {
+        "external_account_connection", "write_authorization", "schedule_operation_success"
+    },
+}
 REQUIRED_CAPABILITIES = {
     "input.text", "input.host_attachment", "input.image",
     "input.structured_tool_result", "input.workspace_repository_context",
@@ -200,14 +253,41 @@ def _validate_matrix(
         classes = {evidence[ref].get("evidence_class") for ref in refs if ref in evidence}
         if status in {"verified_available", "verified_unavailable"} and not classes & STRONG_CURRENT_EVIDENCE:
             errors.append(f"{family} {status} lacks current runtime evidence: {capability_id}")
+        if status in {"verified_available", "verified_unavailable"}:
+            expected = VERIFIED_CAPABILITY_SUPPORTS.get((capability_id, status))
+            if expected is None:
+                errors.append(
+                    f"{family} {status} lacks a semantic evidence profile: {capability_id}"
+                )
+            else:
+                disclaimers = VERIFIED_CAPABILITY_DISCLAIMS.get(
+                    (capability_id, status), expected
+                )
+                relevant = [
+                    entry
+                    for ref in refs
+                    if (entry := evidence.get(ref)) is not None
+                    and entry.get("evidence_class") in STRONG_CURRENT_EVIDENCE
+                    and set(entry.get("supports", [])) & expected
+                    and not set(entry.get("does_not_prove", [])) & disclaimers
+                ]
+                if not relevant:
+                    errors.append(
+                        f"{family} {status} lacks semantically relevant current evidence: {capability_id}"
+                    )
         if status == "documented_possible" and "official_documentation" not in classes:
             errors.append(f"{family} documented_possible lacks official documentation: {capability_id}")
         if capability_id in {"time.current_date", "time.current_time", "time.timezone_offset"} and status == "verified_available":
             if "host_receipt" not in classes:
                 errors.append(f"verified current time lacks provider receipt: {family} {capability_id}")
         if capability_id.startswith("schedule.") and status == "verified_available":
-            if not classes & STRONG_CURRENT_EVIDENCE:
-                errors.append(f"verified scheduling lacks current provider/tool evidence: {family} {capability_id}")
+            scheduling_support = VERIFIED_CAPABILITY_SUPPORTS.get((capability_id, status), set())
+            if not any(
+                evidence.get(ref, {}).get("evidence_class") in STRONG_CURRENT_EVIDENCE
+                and set(evidence.get(ref, {}).get("supports", [])) & scheduling_support
+                for ref in refs
+            ):
+                errors.append(f"verified scheduling lacks operational evidence: {family} {capability_id}")
         if family == "chatgpt" and status == "verified_available" and classes == {"official_documentation"}:
             errors.append(f"Chat documentary claim promoted to verified availability: {capability_id}")
     return id_set
@@ -288,8 +368,11 @@ def validate(root: Path) -> list[str]:
     grade = str(capability.get("security_evidence_grade_values", {}).get("security_grade", ""))
     if not _contains_all(grade, {"binding", "integrity", "freshness", "replay", "rollback"}):
         errors.append("security_grade lacks explicit minimum evidence properties")
-    if "official_documentation alone is insufficient" not in capability.get("capability_record", {}).get("verified_available_rule", ""):
+    verified_rule = capability.get("capability_record", {}).get("verified_available_rule", "")
+    if "official_documentation alone is insufficient" not in verified_rule:
         errors.append("official documentation can create verified_available")
+    if not _contains_all(verified_rule, {"supports[]", "does_not_prove[]", "semantically"}):
+        errors.append("verified capability rule lacks semantic evidence relevance")
     if "unknown" not in capability.get("support_status_values", {}):
         errors.append("unknown capabilities are not permitted")
 

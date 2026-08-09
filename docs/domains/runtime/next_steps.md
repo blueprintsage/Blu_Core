@@ -33,6 +33,15 @@ is unavailable for protected cross-turn authorization continuation because the
 adapter-visible interface lacks replay/consumption and rollback-resistant
 attempt-state evidence.
 
+BC-020-C1 corrects the review blocker without changing the generic architecture.
+The observed Codex scheduling interface remains recorded, while
+`schedule.create`, `schedule.recurring`, and `schedule.update_cancel` are
+`unknown` pending operationally relevant provider evidence. Corrected Codex
+totals are 52 capabilities: 24 verified available, 6 verified unavailable, 4
+documented possible, 17 unknown, and 1 not applicable. The next safe action is
+Claude's independent re-review of the C1 metadata head; Dad or Blu then decides
+integration and closure.
+
 SUR-011 remains a future security-authorized policy input for protected attempt
 values, retry/lockout/backoff, cancellation/reset, new-request-after-exhaustion,
 and unrelated intervening turns. BC-030 remains `spec-needed` globally and

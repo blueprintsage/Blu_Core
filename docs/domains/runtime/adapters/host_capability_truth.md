@@ -18,10 +18,13 @@ assignment: BC-020
   boundary.
 
 A documentation page alone cannot produce `verified_available`. A past success
-does not prove present availability. Each current claim records `surface_id`,
-provider, evidence class/ref, observation time, freshness, scope, limitations,
-approval/side-effect/security classes, receipt requirement, and failure
-behavior through `CapabilityRecord`.
+does not prove present availability, and a strong evidence class alone does not
+prove an unrelated capability. At least one current evidence entry must bear on
+the capability through `supports[]`; evidence whose `does_not_prove[]` boundary
+disclaims the claimed property cannot independently establish it. Each current
+claim records `surface_id`, provider, evidence class/ref, observation time,
+freshness, scope, limitations, approval/side-effect/security classes, receipt
+requirement, and failure behavior through `CapabilityRecord`.
 
 ## Evidence vocabulary
 

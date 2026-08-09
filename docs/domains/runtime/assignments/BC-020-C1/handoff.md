@@ -10,7 +10,7 @@ parent_assignment: BC-020
 
 - Base commit: `370278cd91fd9ecca2c64cd0953cae7ed63c4d16`
 - Work branch: `bc-020-c1-scheduling-evidence-correction`
-- Substantive correction commit: pending metadata-only receipt
+- Substantive correction commit: `b770be849d625e924f7e65cae4efb8894a7e4c23`
 - Metadata commit: reported externally because a commit cannot contain its own
   final SHA
 - Push status: pending

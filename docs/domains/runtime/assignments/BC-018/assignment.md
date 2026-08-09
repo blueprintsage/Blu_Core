@@ -1,6 +1,6 @@
 # BC-018 — Successor Kernel Boundary Specification
 
-status: review
+status: done
 owner: Codex
 reviewer: Claude
 project_lead: Blu
@@ -249,3 +249,22 @@ Use the existing BC-018 collision domain. Append one substantive correction
 commit and one metadata-only receipt commit, push the existing branch, and keep
 BC-018 at `review`. No CTS, runtime, BC-020/BC-030, PASS/SkillForge, or protected
 policy/challenge work is authorized.
+
+### 2026-08-08 — Final closure authorization
+
+Dad and Blu authorized administrative closure from exact integrated main base
+`ce1cc235057a5de3d71fefbcee32e5617197cbb0` on branch
+`bc-018-closure`.
+
+- Final status: `done`.
+- Final semantic disposition: `approve-with-notes`.
+- Final blocking findings: zero; BF-1, BF-2, and BF-3 were resolved by
+  BC-018-C1.
+- Original Claude review commit:
+  `7796c7e738e0ff66b677c79314b80cf2bbb09a63`; its
+  `return-for-correction` disposition remains immutable history.
+- Claude BC-018-C1 re-review commit:
+  `1f440546a076c9359afaf5e832882e588d71dfa6`.
+- Closure records final lineage and repository integrity only. It does not
+  change the approved successor architecture, authorize runtime
+  implementation, or start BC-020 or BC-030.

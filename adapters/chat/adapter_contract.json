@@ -1,0 +1,55 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-020",
+  "host_family": "chatgpt",
+  "surface_model": {
+    "surface_id_required": true,
+    "known_documentary_surface_examples": [
+      "chat",
+      "chatgpt_work_web",
+      "chatgpt_desktop_chat",
+      "chatgpt_desktop_work"
+    ],
+    "current_runtime_surface": "unknown",
+    "rule": "Examples are documentary labels, not an exhaustive product enum. A binding self-identifies its actual supported surface and current tool exposure."
+  },
+  "event_normalization": {
+    "input": "raw_host_event",
+    "output": "raw_host_input",
+    "does_not_produce": "TurnRequest",
+    "preserves": ["event_identity_if_exposed", "host_attachment_identity", "source_provenance", "tool_result_provenance", "limitations"]
+  },
+  "capability_discovery": {
+    "mode": "dynamic_self_report",
+    "refresh_points": ["adapter_startup", "new_chat_or_binding", "tool_exposure_change", "permission_change", "before_sensitive_or_side_effecting_use"],
+    "unexposed_capability_result": "unknown_or_verified_unavailable_according_to_current_evidence",
+    "forbidden_assumption": "No product-wide tool, plugin, MCP, web, file, scheduling, image, application-action, or external-service list is treated as permanently available."
+  },
+  "input_object_mapping": {
+    "uploaded_or_attached_file": "host_attachment",
+    "project_source": "host_attachment_or_external_source_object_as_reported",
+    "connected_source": "external_source_object",
+    "local_filesystem_path": "filesystem_object_only_when_the_surface_explicitly_supplies_one"
+  },
+  "integrations": {
+    "normalized_kind": "external_tool_capability",
+    "required_metadata": ["provider_identity", "operation_type", "read_write_classification", "approval_requirement", "authorization_requirements", "input_scope", "output_scope", "receipt_semantics", "current_availability"],
+    "kernel_embedding_of_vendor_integrations": false
+  },
+  "approvals": "Transport HostApprovalEvidence separately from Blu AuthorizationResult.",
+  "host_session_evidence": "Emit only supported provider evidence. Chat/conversation/project identity alone yields correlation_only at most and cannot qualify protected cross-turn continuation.",
+  "authorization_transport": "If verified identity/role/credential evidence is not exposed through a supported interface, return unavailable or insufficient; product sign-in is not promoted.",
+  "time_mapping": "Map an exposed current-time provider to a receipted time result; otherwise exact current time is unknown/unavailable even when deployment date context exists.",
+  "scheduling_mapping": "Map an exposed Scheduled provider to create/update/cancel/recurrence operations and provider schedule receipts. Documentary availability on some surfaces does not prove the current chat exposes it.",
+  "artifact_mapping": "Distinguish requested, attempted, created, and verified states using host object references or provider evidence; do not invent filesystem paths.",
+  "failure_mapping": "adapters/common/error_mapping.json",
+  "generic_boundary_constraints": [
+    "no_route_selection",
+    "no_ScopeLock_construction",
+    "no_OPSEC_or_Auth_policy",
+    "no_Persona_behavior",
+    "no_durable_persistence_claim",
+    "no_capability_invention"
+  ],
+  "implementation_status": "specification_only"
+}

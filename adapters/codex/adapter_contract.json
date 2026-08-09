@@ -1,0 +1,47 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-020",
+  "host_family": "codex",
+  "surface_model": {
+    "surface_id_required": true,
+    "documented_surface_examples": ["codex_desktop_local", "codex_desktop_worktree", "codex_cloud", "codex_cli", "codex_ide_extension"],
+    "observed_binding": {
+      "surface_id": "codex_desktop_local_windows",
+      "surface_version": "unknown",
+      "client_version": "unknown",
+      "operating_system": "Microsoft Windows 10.0.19045 x64",
+      "execution_environment": "local_checkout",
+      "sandbox_mode": "workspace-write",
+      "approval_mode": "auto_review",
+      "network_policy": "restricted; specific web-search and approved Git remote operations observed",
+      "workspace_roots": ["D:/Repos/Blu_Core"],
+      "observed_at": "2026-08-08T23:05:40-05:00",
+      "evidence_refs": ["CODEX-EVID-PROBE-SURFACE", "CODEX-EVID-PROBE-SHELL", "CODEX-EVID-RECEIPT-WEB", "CODEX-EVID-RECEIPT-TIME"]
+    },
+    "snapshot_rule": "The observed binding does not generalize to Codex as a product or to another local, worktree, cloud, CLI, or IDE configuration."
+  },
+  "event_normalization": {"input": "raw_host_event", "output": "raw_host_input", "does_not_produce": "TurnRequest"},
+  "workspace_filesystem": {
+    "operations_reported_separately": ["read", "write", "create", "delete", "rename", "execute"],
+    "scope_and_sandbox_reported_separately": true,
+    "approval_reported_separately": true
+  },
+  "shell_process": {
+    "required_report_fields": ["execution_available", "working_directory_scope", "sandbox_scope", "approval_requirement", "environment_visibility", "network_policy", "timeout_behavior", "exit_code_receipt", "stdout_stderr_availability", "side_effect_limitations"],
+    "success_rule": "A proposed command is not execution. A completed operation requires host receipt including exit-code evidence where exposed."
+  },
+  "network": {
+    "classes": ["web_search", "raw_network", "integration_call"],
+    "rule": "Observed web search or a successful approved Git operation never implies arbitrary outbound network access."
+  },
+  "git": {
+    "capabilities_reported_separately": ["repo_detected", "git_read", "git_write", "branch_create", "commit", "push", "remote_access", "pr_operation"],
+    "rule": "Each operation has its own scope, approval, network, and receipt status."
+  },
+  "integrations": "Discover current MCP/plugin/tool exposure and normalize provider identity, operation/read-write class, approval/Auth needs, scope, availability, and receipt semantics without embedding vendor tools in the kernel.",
+  "approvals": "Transport HostApprovalEvidence separately from Blu AuthorizationResult.",
+  "host_session_evidence": "The observed thread/chat identity and tool metadata do not expose the integrity, replay, or rollback-resistant attempt state required for security-grade protected cross-turn continuation.",
+  "authorization_transport": "No verified identity/role/credential evidence suitable for Blu authorization was exposed by the observed binding; return unavailable or insufficient.",
+  "failure_mapping": "adapters/common/error_mapping.json",
+  "implementation_status": "specification_only"
+}

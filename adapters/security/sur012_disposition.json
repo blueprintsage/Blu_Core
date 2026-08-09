@@ -1,0 +1,70 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-020",
+  "unresolved_item": "SUR-012",
+  "disposition": "resolved_at_generic_host_evidence_contract_level",
+  "resolution_statement": "The normalized contracts now define the evidence required for host-session identity, protected request and AuthorizationResult binding, freshness, finite lifetime, replay state, correlation, attempt_count integrity, and rollback resistance. A surface that cannot supply every required property returns insufficient or unavailable, making protected cross-turn authorization continuation unavailable on that surface. Availability is not forced.",
+  "required_evidence_properties": [
+    "provider_bound_host_session_identity",
+    "provider_bound_state_record_identity",
+    "pending_request_binding",
+    "authorization_result_binding",
+    "protected_action_and_resource_scope",
+    "observed_or_issued_freshness_evidence",
+    "finite_expiry_or_lifetime_boundary",
+    "prior_consumption_and_replay_status",
+    "integrity_evidence",
+    "monotonic_or_rollback_resistant_attempt_state",
+    "provider_receipt_or_evidence_reference"
+  ],
+  "security_relevant_failures": [
+    "missing",
+    "unknown",
+    "ambiguous",
+    "stale",
+    "expired",
+    "replayed",
+    "unbound",
+    "client_local_mutable",
+    "integrity_not_evidenced",
+    "rollback_resistance_not_evidenced"
+  ],
+  "normalized_failure_result": "insufficient_or_unavailable",
+  "correlation_classes": [
+    "pending_request_match",
+    "same_host_session_uncorrelated",
+    "different_host_session",
+    "expired_request",
+    "replayed_request",
+    "ambiguous",
+    "unavailable"
+  ],
+  "surface_dispositions": {
+    "chatgpt_current_binding": {
+      "availability": "unknown",
+      "protected_cross_turn_continuation": "unavailable_until_a_future_binding_self_report_supplies_security_grade_evidence",
+      "reason": "BC-020 had no supported runtime probe of Dad's separate live Chat binding; official documentation and project/chat identity do not qualify."
+    },
+    "codex_desktop_local_windows_observed": {
+      "availability": "verified_unavailable",
+      "protected_cross_turn_continuation": "unavailable",
+      "reason": "The adapter-visible interface exposes no provider-bound session integrity, replay/consumption state, or monotonic/rollback-resistant attempt state."
+    }
+  },
+  "attempt_count_answer": "Yes, an attacker or client could reset a mutable client-local attempt_count unless the host supplies provider-bound integrity plus monotonic or rollback-resistant state. Such mutable state is therefore disqualified and cannot resume a protected cross-turn authorization interaction.",
+  "forbidden_substitutes": [
+    "model_memory",
+    "conversation_history",
+    "opaque_thread_or_conversation_id_alone",
+    "request_ref_string_equality_alone",
+    "timestamp_alone",
+    "client_local_mutable_attempt_count",
+    "product_sign_in",
+    "host_action_approval"
+  ],
+  "security_restraint_consumption_rule": "Security Restraint consumes normalized availability, correlation class, binding/scope, freshness/expiry, replay, integrity, and rollback evidence without knowing host-specific internals. It owns policy and attempt permission; the adapter supplies evidence only.",
+  "sur011_state": "unresolved_security_policy_input",
+  "sur011_boundary": "BC-020 does not decide the effect of an unrelated intervening turn or publish protected maximum-attempt, retry, lockout/backoff, cancellation/reset, or new-request-after-exhaustion policy values.",
+  "bc030_readiness": "ready_for_spec",
+  "bc030_reason": "host_session remains host-local cross-turn evidence and durable_external remains an explicit continuity-provider operation with a receipt; BC-020 neither defines nor implements Local Mirror."
+}

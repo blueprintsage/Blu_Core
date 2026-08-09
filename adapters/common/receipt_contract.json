@@ -1,0 +1,56 @@
+{
+  "spec_version": "1.0.0",
+  "host_action_receipt": {
+    "record_name": "HostActionReceipt",
+    "required_fields": [
+      "receipt_id",
+      "host_family",
+      "surface_id",
+      "provider",
+      "capability_id",
+      "operation",
+      "status",
+      "started_at_or_turn_ref",
+      "completed_at_or_turn_ref",
+      "scope",
+      "limitations",
+      "evidence_ref"
+    ],
+    "optional_fields": ["result_identity", "artifact_identity", "provider_operation_id"],
+    "status_values": ["completed", "failed", "partial", "unavailable", "denied"],
+    "policy_separation": "Receipt status reports host outcome only and never means kernel PASS/BLOCK or Blu authorization."
+  },
+  "artifact_receipt": {
+    "record_name": "ArtifactReceipt",
+    "required_fields": [
+      "artifact_id",
+      "provider",
+      "operation",
+      "state",
+      "path_or_host_reference",
+      "receipt_or_evidence_ref",
+      "limitations"
+    ],
+    "optional_fields": ["size", "hash", "mime_type", "created_or_modified_at"],
+    "state_values": ["requested", "attempted", "created", "verified", "failed", "unavailable"],
+    "verification_rule": "created requires provider evidence; verified requires a bounded read/stat/hash/provider-object check suitable for the surface. A model-emitted filename is not evidence."
+  },
+  "delivery_receipt": {
+    "record_name": "HostDeliveryReceipt",
+    "states": ["adapter_accepted", "host_displayed", "human_read", "unknown"],
+    "rule": "Do not promote host acceptance/rendering to human_read unless the provider supplies explicit read evidence."
+  },
+  "side_effect_rule": "An external side effect is not completed merely because it was requested, attempted, approved, or generated. Completion requires an appropriate host/provider receipt; when no receipt exists the adapter reports the evidentiary limitation.",
+  "shell_process_receipt_properties": [
+    "working_directory_scope",
+    "sandbox_scope",
+    "approval_requirement",
+    "environment_visibility",
+    "network_policy",
+    "timeout_behavior",
+    "exit_code",
+    "stdout_availability",
+    "stderr_availability",
+    "side_effect_limitations"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "spec_version": "1.0.0",
+  "producer": "host_adapter_boundary",
+  "normalized_host_errors": [
+    {"error_id": "capability_unavailable", "meaning": "The current surface does not expose the requested capability.", "kernel_status_candidates": ["UNAVAILABLE"]},
+    {"error_id": "permission_denied", "meaning": "Host permission prevents the operation.", "kernel_status_candidates": ["BLOCK", "UNAVAILABLE"]},
+    {"error_id": "approval_required", "meaning": "Host approval is required before transport may continue.", "kernel_status_candidates": ["ASK", "UNAVAILABLE"]},
+    {"error_id": "approval_denied", "meaning": "Required host approval was denied.", "kernel_status_candidates": ["BLOCK", "UNAVAILABLE"]},
+    {"error_id": "sandbox_denied", "meaning": "Sandbox boundary rejected the operation.", "kernel_status_candidates": ["UNAVAILABLE", "BLOCK"]},
+    {"error_id": "network_denied", "meaning": "Network policy rejected the operation.", "kernel_status_candidates": ["UNAVAILABLE"]},
+    {"error_id": "timeout", "meaning": "The provider did not complete within the bounded timeout.", "kernel_status_candidates": ["ERROR", "UNAVAILABLE"]},
+    {"error_id": "provider_error", "meaning": "The host/provider returned an operation error.", "kernel_status_candidates": ["ERROR"]},
+    {"error_id": "partial_result", "meaning": "Only a labeled subset of the requested result was produced.", "kernel_status_candidates": ["ERROR", "UNAVAILABLE"]},
+    {"error_id": "stale_evidence", "meaning": "Capability or security evidence is outside its freshness boundary.", "kernel_status_candidates": ["UNAVAILABLE", "BLOCK"]},
+    {"error_id": "correlation_failed", "meaning": "The host event cannot be bound to the pending request with required evidence.", "kernel_status_candidates": ["BLOCK", "UNAVAILABLE"]},
+    {"error_id": "replay_detected", "meaning": "Provider evidence indicates prior consumption or prohibited replay.", "kernel_status_candidates": ["BLOCK"]},
+    {"error_id": "receipt_missing", "meaning": "The host cannot prove completion of a receipt-required operation.", "kernel_status_candidates": ["UNAVAILABLE", "ERROR"]},
+    {"error_id": "unsupported_surface", "meaning": "The operation is not defined for this host surface.", "kernel_status_candidates": ["UNAVAILABLE"]},
+    {"error_id": "unknown_host_failure", "meaning": "The host failed without a more specific safe mapping.", "kernel_status_candidates": ["ERROR"]}
+  ],
+  "policy_boundary": "The adapter reports host condition and evidence. Higher-level kernel policy chooses ASK, BLOCK, UNAVAILABLE, or ERROR. approval_required never becomes Blu authorization, and same-session correlation never decides pending-request policy."
+}

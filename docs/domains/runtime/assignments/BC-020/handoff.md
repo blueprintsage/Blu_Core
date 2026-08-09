@@ -9,10 +9,10 @@ last_reviewed: 2026-08-08
 - Assignment: BC-020 — Chat and Codex Capability Adapter Contracts
 - Base commit: `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f`
 - Work branch: `bc-020-chat-codex-adapter-contracts`
-- Substantive work commit: recorded by the metadata-only follow-up
+- Substantive work commit: `09c484418e51365cf9b156cf304eebae7fecde5d`
 - Metadata commit: pending
 - Push status: pending
-- Working-tree status: staged substantive specification; final clean check pending commits
+- Working-tree status: substantive commit created; metadata commit and final clean check pending
 
 ## Result
 

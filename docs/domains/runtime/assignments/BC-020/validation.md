@@ -162,3 +162,11 @@ future adapter implementation or provider guarantee.
 
 The final clean-tree, exact commit, and push receipts are recorded after Git
 operations and are not inferred from this pre-commit validation.
+
+## Substantive commit identity
+
+- Work commit: `09c484418e51365cf9b156cf304eebae7fecde5d`
+- Commit subject: `docs(BC-020): define Chat and Codex adapter contracts`
+- Commit result: 32 files changed, 2,881 insertions, 17 deletions
+- Metadata method: one follow-up metadata-only commit records this work SHA;
+  the substantive commit does not attempt to contain its own identity.

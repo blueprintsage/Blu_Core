@@ -781,3 +781,11 @@ last_reviewed: 2026-08-08
   client/surface version remains unknown rather than inferred from a path.
 - After substantive and metadata commits are pushed, Claude performs the
   independent semantic review. Do not begin BC-030 or runtime implementation.
+
+### Commit identity
+
+- Exact base: `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f`
+- Substantive specification commit:
+  `09c484418e51365cf9b156cf304eebae7fecde5d`
+- Metadata receipt commit: reported externally because a commit cannot contain
+  its own final SHA

@@ -110,6 +110,28 @@ BC-018-C1 adds the evidenced cross-turn authorization state correction under
 `docs/domains/runtime/assignments/BC-018-C1/`. It preserves the seven-component,
 eight-packet design and adds no runtime implementation.
 
+## Chat and Codex host adapter contracts
+
+```text
+docs/domains/runtime/adapters/README.md
+docs/domains/runtime/adapters/host_capability_truth.md
+docs/domains/runtime/adapters/chat_adapter.md
+docs/domains/runtime/adapters/codex_adapter.md
+docs/domains/runtime/adapters/security_evidence.md
+docs/domains/runtime/adapters/receipts_and_failures.md
+adapters/README.md
+adapters/common/
+adapters/chat/
+adapters/codex/
+adapters/security/
+```
+
+BC-020 specializes only the Generic Host Adapter Boundary. These records
+separate documentary possibility from current-surface availability, define
+normalized capability/evidence/receipt/session/Auth-transport contracts, and
+resolve SUR-012 at the generic host-evidence level. They are specifications,
+not Chat/Codex adapters, provider implementations, or a successor runtime.
+
 ## Historical archive source map
 
 ```text

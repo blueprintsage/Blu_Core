@@ -1,0 +1,65 @@
+{
+  "spec_version": "1.0.0",
+  "host_family_ids": ["chatgpt", "codex"],
+  "host_surface_record": {
+    "required_fields": [
+      "host_family",
+      "surface_id",
+      "observed_at",
+      "evidence_refs"
+    ],
+    "optional_fields": [
+      "surface_version",
+      "client_version",
+      "vendor_product_metadata",
+      "operating_system",
+      "execution_environment",
+      "sandbox_mode",
+      "approval_mode",
+      "network_policy",
+      "workspace_roots"
+    ],
+    "truth_rule": "Populate only provider-supplied or safely observed fields. Omit or label unknown values; do not infer versions from marketing names, opaque identifiers, or installation paths."
+  },
+  "surface_identity_rule": "host_family is stable normalization; surface_id identifies an actual binding. Generic kernel packets consume normalized records and do not depend on vendor marketing names.",
+  "variability_causes": [
+    "surface",
+    "surface_or_client_version",
+    "sandbox_mode",
+    "approval_configuration",
+    "network_configuration",
+    "workspace_policy",
+    "connected_integrations",
+    "user_permissions",
+    "plan_or_workspace_policy",
+    "current_tool_exposure",
+    "conversation_context",
+    "provider_outage_or_degradation"
+  ],
+  "object_kinds": {
+    "host_attachment": "Host-supplied attachment identity; no filesystem path is invented.",
+    "filesystem_object": "Object addressable through a host-exposed filesystem scope.",
+    "external_source_object": "Object retrieved through a connected provider, plugin, app, MCP server, or source service."
+  },
+  "source_context_mapping": {
+    "generic_interface": "IF-SOURCE-CONTEXT",
+    "required_result_properties": [
+      "source_identity",
+      "provenance",
+      "covered_scope",
+      "retrieval_completeness",
+      "verification_state",
+      "limitations"
+    ],
+    "partial_rule": "Partial retrieval remains labeled partial; search-result metadata is not full source content."
+  },
+  "filesystem_operations": ["read", "write", "create", "delete", "rename", "execute"],
+  "filesystem_scope_values": ["workspace_only", "additional_roots", "host_defined", "unrestricted", "unknown"],
+  "network_classes": ["web_search", "raw_network", "integration_call"],
+  "network_rule": "Web/search, arbitrary outbound networking, and MCP/app/plugin calls are distinct capabilities and must carry separate scope, approval, sandbox, provider, and receipt evidence.",
+  "git_capabilities": ["repo_detected", "git_read", "git_write", "branch_create", "commit", "push", "remote_access", "pr_operation"],
+  "git_rule": "Local repository or commit capability never implies remote, push, or PR capability. Git is not a generic kernel requirement.",
+  "time_rule": "Deployment date context is not exact current time. Exact time requires a provider result with timestamp, timezone/offset, provider, observed_at, and receipt.",
+  "scheduling_rule": "Natural-language intent or a background-process assumption is not scheduling. Create/update/cancel/recurrence success requires IF-SCHEDULING-PROVIDER capability and a provider schedule receipt.",
+  "continuity_rule": "Conversation/thread identity may assist correlation but is not security-grade host_session binding. host_session is not durable_external continuity."
+}

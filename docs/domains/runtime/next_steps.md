@@ -20,18 +20,28 @@ BC-018-C1 cross-turn security-state correction. Claude's original BC-018
 `return-for-correction` review and the C1 `approve-with-notes` re-review remain
 immutable history. Final closure has zero blocking findings.
 
-Two non-blocking security inputs remain explicit and unresolved: the policy for
-an uncorrelated intervening turn travels with SUR-011 to security-authorized
-OPSEC/Auth policy work, and integrity/rollback resistance for host-provided
-authorization attempt state travels with SUR-012 to the BC-020 host-evidence
-matrix.
+BC-020 is in `review` on its authorized exact base after producing the Chat/Codex
+host-adapter specification. SUR-012 is resolved at the
+generic host-evidence contract level: protected cross-turn continuation requires
+provider-bound identity/state/request/result scope, freshness/expiry, replay/
+consumption state, integrity, and monotonic rollback-resistant attempt state.
+Insufficient evidence returns unavailable rather than inventing safety.
 
-The next specification-ready assignments are BC-020 and BC-030. Both remain
-`spec-needed` and unstarted; neither has an approved packet, owner, or named
-base. BC-020 targets Chat and Codex capability adapter contracts against the
-corrected host-session/security-evidence boundary. BC-030 targets Local Mirror
-continuity schema and lifecycle against the generic continuity-provider
-boundary. No successor Python runtime implementation is authorized.
+This resolution does not claim current surface availability. Dad's live Chat
+binding was not probed and remains unknown. The observed Codex desktop binding
+is unavailable for protected cross-turn authorization continuation because the
+adapter-visible interface lacks replay/consumption and rollback-resistant
+attempt-state evidence.
+
+SUR-011 remains a future security-authorized policy input for protected attempt
+values, retry/lockout/backoff, cancellation/reset, new-request-after-exhaustion,
+and unrelated intervening turns. BC-030 remains `spec-needed` globally and
+`ready_for_spec` architecturally: `host_session` remains host-local and
+`durable_external` still requires an explicit continuity-provider receipt.
+
+The next safe action after the substantive/metadata commits and branch push is
+Claude's independent semantic review. Do not begin BC-030 or successor runtime
+implementation.
 
 The following non-blocking archaeology-quality notes remain preserved for
 separately authorized hardening work:

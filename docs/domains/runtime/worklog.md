@@ -726,3 +726,66 @@ last_reviewed: 2026-08-08
 - Branch: `bc-018-closure`.
 - Substantive closure commit:
   `373092e98fef4d291365462baaa7f1ea2a8f065b`.
+
+## 2026-08-08 — BC-020 Chat and Codex host adapter contracts
+
+### What changed
+
+- Activated the Dad/Blu-authorized BC-020 specification from exact base
+  `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f` on branch
+  `bc-020-chat-codex-adapter-contracts`.
+- Added common capability, host-surface, receipt, error, host-session, replay,
+  approval, and authorization-transport contracts under `adapters/`.
+- Added independent Chat and Codex family/surface contracts, evidence registers,
+  and normalized capability matrices covering input, retrieval, actions,
+  filesystem/shell/network/Git, time, scheduling, continuity/session, security,
+  and output.
+- Added the cross-host security evidence matrix and resolved SUR-012 at the
+  generic host-evidence contract level without claiming that current surfaces
+  can satisfy it.
+- Added focused adapter documentation, an offline structural validator, and 25
+  negative/positive tests.
+
+### Evidence and dispositions
+
+- Used current first-party OpenAI documentation only for moving product claims;
+  every such claim remains `documented_possible` rather than current runtime
+  truth.
+- Safely observed only the current Codex desktop local Windows binding. The
+  snapshot proved bounded workspace/shell/Git/web/time/tool-interface operations
+  and recorded their scope, freshness, receipts, and limitations.
+- Dad's separate live Chat binding was not probed; its runtime statuses remain
+  unknown unless a future adapter self-report supplies evidence.
+- Product sign-in remains distinct from usable Blu Auth evidence; host approval
+  remains distinct from Blu authorization.
+- The current Chat binding is unknown for security-grade host-session evidence.
+  The observed Codex binding is verified unavailable for protected cross-turn
+  authorization continuation because it exposes no provider-backed replay/
+  consumption state or monotonic rollback-resistant attempt state.
+- SUR-011 remains unresolved security-policy input. BC-030 remains
+  `ready_for_spec` because host-session and durable-external continuity remain
+  separate.
+
+### What was tested
+
+- Focused BC-020 validator and 25-test suite passed before the complete
+  repository validation run.
+- Exact complete-suite, manifest, golden, protected-path, and publication-safety
+  results are recorded in `assignments/BC-020/validation.md`.
+
+### Limitations and next safe step
+
+- Static validation proves contract coherence and guardrails, not a live
+  provider guarantee, runtime implementation, or behavioral parity.
+- The safe client-version probe could not execute the packaged Codex binary;
+  client/surface version remains unknown rather than inferred from a path.
+- After substantive and metadata commits are pushed, Claude performs the
+  independent semantic review. Do not begin BC-030 or runtime implementation.
+
+### Commit identity
+
+- Exact base: `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f`
+- Substantive specification commit:
+  `09c484418e51365cf9b156cf304eebae7fecde5d`
+- Metadata receipt commit: reported externally because a commit cannot contain
+  its own final SHA

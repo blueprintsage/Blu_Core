@@ -1,0 +1,72 @@
+{
+  "spec_version": "1.0.0",
+  "host_session_evidence": {
+    "record_name": "HostSessionEvidence",
+    "required_fields": [
+      "host_session_binding_ref",
+      "host_family",
+      "surface_id",
+      "provider",
+      "binding_method",
+      "state_record_identity",
+      "observed_at",
+      "expires_at_or_lifetime_boundary",
+      "scope",
+      "integrity_evidence",
+      "freshness_evidence",
+      "replay_evidence",
+      "rollback_resistance",
+      "receipt_or_evidence_ref",
+      "availability",
+      "limitations"
+    ],
+    "availability_values": ["verified_available", "verified_unavailable", "unknown", "insufficient"],
+    "rollback_resistance_values": ["none", "untrusted", "integrity_evidenced", "monotonic_or_rollback_resistant"],
+    "truth_rule": "Never construct HostSessionEvidence from conversation continuity, model memory, writing style, account-name claims, private-fact knowledge, or an opaque thread/conversation identifier alone."
+  },
+  "replay_evidence": {
+    "required_fields": [
+      "request_binding_ref",
+      "event_freshness",
+      "prior_consumption_state",
+      "one_shot_or_reusable",
+      "replay_detection_capability",
+      "replay_status",
+      "provider_evidence_ref"
+    ],
+    "optional_fields": ["event_identity"],
+    "replay_status_values": ["fresh_unconsumed", "consumed", "replayed", "unknown", "insufficient"],
+    "rule": "A timestamp or request-ref string alone does not prove replay prevention or prior-consumption state."
+  },
+  "correlation_classes": [
+    "pending_request_match",
+    "same_host_session_uncorrelated",
+    "different_host_session",
+    "expired_request",
+    "replayed_request",
+    "ambiguous",
+    "unavailable"
+  ],
+  "correlation_rule": "Classification supplies evidence only. It does not decide OPSEC/Auth retry, cancellation, lockout, or the effect of unrelated intervening turns.",
+  "attempt_count_integrity": {
+    "required_properties_for_protected_cross_turn_use": [
+      "provider_bound_state_record_identity",
+      "request_action_resource_binding",
+      "integrity_evidence",
+      "freshness_and_expiry_evidence",
+      "prior_consumption_or_replay_state",
+      "monotonic_or_rollback_resistant_attempt_state"
+    ],
+    "rollback_rule": "A host-session record whose security-relevant fields can be rewritten or rolled back without detection is insufficient to carry attempt_count, request status, expiry, or consumed/replay state.",
+    "failure_result": "insufficient",
+    "model_memory_fallback_allowed": false,
+    "client_local_mutable_state_qualifies": false
+  },
+  "protected_cross_turn_resume_gate": {
+    "required_grade": "security_grade",
+    "required_bindings": ["host_session", "pending_request", "authorization_result", "action", "resource"],
+    "required_properties": ["integrity", "freshness", "expiry", "replay_state", "rollback_resistance"],
+    "failure_behavior": "Protected cross-turn continuation is unavailable when any required evidence is absent, unknown, ambiguous, stale, replayed, mutable without integrity, or rollback-prone."
+  },
+  "durability_boundary": "host_session is host-local cross-turn scope. It is never durable_external continuity without an explicit continuity-provider operation and receipt."
+}

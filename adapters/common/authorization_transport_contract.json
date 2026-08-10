@@ -1,0 +1,55 @@
+{
+  "spec_version": "1.0.0",
+  "host_approval_evidence": {
+    "record_name": "HostApprovalEvidence",
+    "required_fields": [
+      "approval_ref",
+      "host_family",
+      "surface_id",
+      "operation_scope",
+      "approval_status",
+      "provider",
+      "observed_at",
+      "expires_or_scope",
+      "evidence_ref"
+    ],
+    "status_values": ["not_required", "required", "granted", "denied", "unknown"],
+    "rule": "Host approval permits host transport only. It never becomes AuthorizationResult or Blu authorization automatically."
+  },
+  "authorization_evidence_transport": {
+    "possible_status_values": ["available", "unavailable", "insufficient", "unknown"],
+    "required_bindings_when_available": [
+      "authorization_request_ref",
+      "host_session_binding_ref",
+      "protected_action_scope",
+      "protected_resource_scope",
+      "provider_evidence_ref",
+      "freshness_scope"
+    ],
+    "sign_in_rule": "A user signed into ChatGPT or Codex is not usable Blu authorization evidence unless the supported adapter interface exposes independently verifiable identity, role, or credential evidence for the required policy scope.",
+    "forbidden_inferences": [
+      "tone",
+      "writing_style",
+      "conversation_history",
+      "model_memory",
+      "knowledge_of_private_facts",
+      "claimed_account_name"
+    ],
+    "adapter_authority": "transport_only",
+    "authorization_result_producer": "authorization_evaluator"
+  },
+  "authorization_result_binding": {
+    "required_properties": [
+      "request_binding",
+      "host_session_binding_when_cross_turn",
+      "action_scope",
+      "resource_scope",
+      "issued_and_expiry_evidence",
+      "revocation_or_reset_state",
+      "provider_evidence_refs"
+    ],
+    "string_equality_sufficient": false,
+    "conversation_identity_sufficient": false
+  },
+  "sur011_boundary": "BC-020 reports correlation evidence but does not decide what happens when an unrelated turn arrives during a pending protected authorization interaction. Protected attempt values, retry/lockout/backoff, cancellation/reset, and new-request-after-exhaustion policy remain SUR-011."
+}

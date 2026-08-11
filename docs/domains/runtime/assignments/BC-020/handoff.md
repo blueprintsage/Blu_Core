@@ -1,8 +1,8 @@
 # BC-020 — Specification Handoff
 
-status: review
+status: done
 owner: Codex
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-10
 
 ## Identity
 
@@ -10,9 +10,10 @@ last_reviewed: 2026-08-08
 - Base commit: `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f`
 - Work branch: `bc-020-chat-codex-adapter-contracts`
 - Substantive work commit: `09c484418e51365cf9b156cf304eebae7fecde5d`
-- Metadata commit: pending
-- Push status: pending
-- Working-tree status: substantive commit created; metadata commit and final clean check pending
+- Metadata commit: `ccf3206ad033d588246e09001d47ddce3ac50a31`
+- Original work/review lineage: published and integrated into `main`
+- Working-tree status: original work lineage integrated; closure branch status
+  is recorded in the final closure validation
 
 ## Result
 
@@ -122,8 +123,9 @@ tools/validate_host_adapter_contracts.py
 - Failures: no collision-domain-authorized reusable failure entry; the
   assignment-specific version-probe and initial wording-check failures are in
   `validation.md`.
-- Next steps: Claude review only; BC-030 remains ready for spec but unstarted;
-  runtime implementation remains unauthorized.
+- Next steps: administrative closure complete; BC-030 remains ready for spec
+  but unstarted; Chat live probing and runtime implementation require separate
+  authorization.
 
 ## Reviewer focus
 
@@ -131,3 +133,28 @@ Capability overclaiming, surface conflation, session/Auth false assurance,
 attempt-state rollback, replay/correlation gaps, approval/Auth separation,
 receipt honesty, time/scheduling honesty, generic-contract leakage, and
 accidental implementation.
+
+## Final closure receipt — 2026-08-10
+
+- Closure authority: Dad, Project Owner, and Blu, Project Lead.
+- Exact integrated closure base:
+  `642a5df7340c4f87ac723bffb4d308fef09bf2b2`.
+- Closure branch: `bc-020-closure`.
+- Original base: `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f`.
+- Substantive specification:
+  `09c484418e51365cf9b156cf304eebae7fecde5d`.
+- Specification metadata:
+  `ccf3206ad033d588246e09001d47ddce3ac50a31`.
+- Original Claude review:
+  `370278cd91fd9ecca2c64cd0953cae7ed63c4d16`;
+  disposition `return-for-correction`; one blocking finding, BF-1.
+- BC-020-C1 correction and final review lineage is recorded in the C1 handoff.
+- Final Claude C1 re-review:
+  `b51912a655d3f895651eb0bdbbe0c41ba1e7f132`;
+  disposition `approve-with-notes`; BF-1 resolved; zero blocking findings.
+- Final status: `done`.
+- Substantive closure commit:
+  `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533`.
+- Closure changes assignment and continuity metadata plus the canonical
+  manifest only. It authorizes no adapter runtime, successor Python runtime,
+  BC-030 work, Chat live probing, or PASS/SkillForge work.

@@ -1,12 +1,12 @@
 # BC-020 — Chat and Codex Capability Adapter Contracts
 
-status: review
+status: done
 owner: Codex
 reviewer: Claude
 project_lead: Blu
 project_owner: Dad
 domain: runtime
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-10
 
 ## Authorization and identity
 
@@ -180,4 +180,27 @@ the working tree is clean. Claude performs the independent semantic review.
 
 ## Approved amendments
 
-No amendments.
+### 2026-08-10 — Final closure authorization
+
+Dad, Project Owner, and Blu, Project Lead, authorized administrative closure
+from exact integrated `main` base
+`642a5df7340c4f87ac723bffb4d308fef09bf2b2` on branch
+`bc-020-closure`.
+
+- Final status: `done`.
+- Original exact base: `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f`.
+- Substantive specification:
+  `09c484418e51365cf9b156cf304eebae7fecde5d`.
+- Specification metadata:
+  `ccf3206ad033d588246e09001d47ddce3ac50a31`.
+- Original Claude review:
+  `370278cd91fd9ecca2c64cd0953cae7ed63c4d16`;
+  disposition `return-for-correction`; one blocking finding, BF-1.
+- BC-020-C1 correction lineage:
+  `b770be849d625e924f7e65cae4efb8894a7e4c23` followed by metadata
+  `8eb29165d5d59b99ccaa3b06fe6d8613dcaa11e2`.
+- Final Claude C1 re-review:
+  `b51912a655d3f895651eb0bdbbe0c41ba1e7f132`;
+  disposition `approve-with-notes`; BF-1 resolved; zero blocking findings.
+- Closure is administrative only. It changes no adapter semantics, authorizes
+  no runtime implementation, and does not start BC-030 or Chat live probing.

@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-10
 
 ## 2026-08-05 — Bootstrap
 
@@ -827,3 +827,26 @@ last_reviewed: 2026-08-08
   `assignments/BC-020-C1/validation.md` and `handoff.md`.
 - Claude performs an independent semantic re-review of the C1 metadata head;
   Dad or Blu decides integration and closure.
+
+## 2026-08-10 — BC-020 and BC-020-C1 closed
+
+- Dad and Blu authorized final administrative closure from integrated `main`
+  at `642a5df7340c4f87ac723bffb4d308fef09bf2b2`.
+- BC-020 original work `09c484418e51365cf9b156cf304eebae7fecde5d`,
+  metadata `ccf3206ad033d588246e09001d47ddce3ac50a31`, and Claude review
+  `370278cd91fd9ecca2c64cd0953cae7ed63c4d16` remain preserved; the original
+  disposition was `return-for-correction` with BF-1.
+- BC-020-C1 corrected BF-1 through substantive commit
+  `b770be849d625e924f7e65cae4efb8894a7e4c23` and metadata commit
+  `8eb29165d5d59b99ccaa3b06fe6d8613dcaa11e2`.
+- Claude's final C1 re-review
+  `b51912a655d3f895651eb0bdbbe0c41ba1e7f132` returned
+  `approve-with-notes`; BF-1 is resolved and zero blockers remain.
+- SUR-011 remains unresolved. SUR-012 remains resolved only at the generic
+  host-evidence-contract level; no current Chat/Codex security-grade protected
+  cross-turn continuation is implied.
+- BC-030 remains `spec-needed`, architecturally `ready_for_spec`, and unstarted.
+  No Chat live probe, adapter runtime, successor Python runtime, Local Mirror,
+  or PASS/SkillForge work occurred.
+- Substantive administrative closure commit:
+  `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533`.

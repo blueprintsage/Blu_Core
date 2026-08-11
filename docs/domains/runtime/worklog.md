@@ -789,3 +789,41 @@ last_reviewed: 2026-08-08
   `09c484418e51365cf9b156cf304eebae7fecde5d`
 - Metadata receipt commit: reported externally because a commit cannot contain
   its own final SHA
+
+## 2026-08-09 — BC-020-C1 scheduling capability evidence correction
+
+### What changed
+
+- Corrected `schedule.create`, `schedule.recurring`, and
+  `schedule.update_cancel` from `verified_available` to `unknown` on the
+  observed Codex surface while preserving scheduling-interface exposure.
+- Expanded each row's limitations to separate interface presence from
+  provider/account connection, permission, operational usability, operation
+  success, future execution, and receipt availability.
+- Carried the documented desktop-only limitation that future local scheduled
+  execution may depend on the relevant machine and app remaining available.
+- Hardened verified capability validation with a curated mapping from
+  capability/status to existing `supports[]` tokens and `does_not_prove[]`
+  boundaries.
+- Added focused regression tests for the three scheduling rows and Claude's
+  three demonstrated evidence-relevance defects.
+
+### Evidence and counts
+
+- Corrected Codex totals are 52 capabilities: 24 `verified_available`, 6
+  `verified_unavailable`, 4 `documented_possible`, 17 `unknown`, and 1
+  `not_applicable`.
+- `schedule.receipt` remains `unknown`; scheduling operations remain
+  receipt-required; the side-effect completion rule is unchanged.
+- Codex evidence now has 22 entries after adding the narrowly scoped desktop
+  scheduling limitation source.
+
+### Boundaries and next safe step
+
+- No schedule was created. No adapter, runtime, Local Mirror, BC-030, or
+  successor architecture work was started.
+- Claude's original BC-020 review remains byte-unchanged.
+- Exact validation and commit receipts are in
+  `assignments/BC-020-C1/validation.md` and `handoff.md`.
+- Claude performs an independent semantic re-review of the C1 metadata head;
+  Dad or Blu decides integration and closure.

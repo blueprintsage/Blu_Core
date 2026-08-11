@@ -71,9 +71,12 @@ semantics. Individual integrations never become kernel dependencies.
 
 The time provider proved exactly one current result and UTC offset for the
 observed invocation; no permanent availability is inferred. The exposed
-automation interface proves a current create/update/delete/recurrence interface,
-but no schedule was created merely to strengthen the matrix and the normalized
-success-receipt shape remains unknown until a real requested operation occurs.
+automation metadata proves only that a create/update/cancel/recurrence interface
+is present. It does not prove provider/account connection, required permission,
+operational usability, operation success, future execution, or receipt
+availability, so all three operational scheduling capabilities remain `unknown`.
+For documented desktop scheduled tasks only, future local execution may depend
+on the relevant machine and app remaining powered on and available.
 
 The observed interface supplies host action approval evidence for named
 operations, but this is not Blu authorization. Its automatic reviewer is not

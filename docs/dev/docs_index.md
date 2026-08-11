@@ -132,6 +132,12 @@ normalized capability/evidence/receipt/session/Auth-transport contracts, and
 resolve SUR-012 at the generic host-evidence level. They are specifications,
 not Chat/Codex adapters, provider implementations, or a successor runtime.
 
+BC-020-C1 is the bounded scheduling-evidence correction under
+`docs/domains/runtime/assignments/BC-020-C1/`. It leaves the exposed Codex
+automation interface recorded while classifying the three operational
+scheduling capabilities as unknown and requiring semantically relevant current
+evidence for verified capability claims.
+
 ## Historical archive source map
 
 ```text

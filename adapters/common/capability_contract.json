@@ -63,8 +63,8 @@
       "authorization_scope"
     ],
     "unknown_field_rule": "Optional fields are omitted when unknown; required values may explicitly use unknown where the vocabulary permits it. Precision is never fabricated.",
-    "verified_available_rule": "At least one referenced evidence entry must be local_probe or host_receipt. official_documentation alone is insufficient.",
-    "verified_unavailable_rule": "Requires current local_probe or host_receipt evidence scoped to the claimed unavailability.",
+    "verified_available_rule": "At least one referenced local_probe or host_receipt must semantically bear on the capability through supports[]. Evidence whose does_not_prove[] disclaims the claimed property cannot independently establish it. official_documentation alone is insufficient.",
+    "verified_unavailable_rule": "Requires current local_probe or host_receipt evidence whose supports[] semantically bears on the claimed unavailability and is scoped to that unavailability.",
     "side_effect_success_rule": "A side-effect capability may be available, but a particular operation is completed only by an appropriate HostActionReceipt or provider evidence."
   },
   "capability_families": [

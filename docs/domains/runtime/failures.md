@@ -128,3 +128,18 @@ last_reviewed: 2026-08-08
   `attempt_count`. BC-020/SUR-012 must evaluate tamper and rollback resistance,
   while the disposition of an unrelated intervening turn remains a separate
   security-policy input under SUR-011.
+
+## 2026-08-09 — BC-020-C1 capability-evidence relevance limits
+
+- A strong evidence class is not semantic support. A current receipt or local
+  probe must bear on the normalized capability being claimed; current time does
+  not prove Git push, and web search does not prove raw network.
+- Interface/schema exposure is not operational availability. A visible
+  scheduling interface does not prove provider/account connection, permission,
+  usability, successful scheduling operations, future execution, or receipts.
+- Evidence of absence cannot establish the positive property it says is absent.
+  The security-gap probe can support unavailable attempt-count integrity but
+  cannot support verified positive integrity.
+- Use explicit `supports[]` and `does_not_prove[]` boundaries with a curated
+  capability mapping. Do not replace the bounded contract check with free-form
+  semantic inference.

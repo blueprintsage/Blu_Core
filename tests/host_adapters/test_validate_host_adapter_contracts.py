@@ -84,12 +84,95 @@ class HostAdapterContractValidationTests(unittest.TestCase):
         self.save(path, data)
         self.assert_has("verified_available lacks current runtime evidence")
 
+    def test_verified_rule_requires_semantic_evidence_relevance(self) -> None:
+        path = "adapters/common/capability_contract.json"
+        data = self.load(path)
+        data["capability_record"]["verified_available_rule"] = (
+            "At least one referenced evidence entry must be local_probe or host_receipt. "
+            "official_documentation alone is insufficient."
+        )
+        self.save(path, data)
+        self.assert_has("verified capability rule lacks semantic evidence relevance")
+
     def test_unknown_status_is_permitted(self) -> None:
         path = "adapters/codex/capability_matrix.json"
         data = self.load(path)
         record = next(item for item in data["capabilities"] if item["capability_id"] == "action.git.commit")
         record["status"] = "unknown"
         self.save(path, data)
+        self.assertEqual([], self.errors())
+
+    def test_corrected_unknown_scheduling_rows_pass(self) -> None:
+        data = self.load("adapters/codex/capability_matrix.json")
+        scheduling = {
+            item["capability_id"]: item["status"]
+            for item in data["capabilities"]
+            if item["capability_id"] in {
+                "schedule.create", "schedule.recurring", "schedule.update_cancel"
+            }
+        }
+        self.assertEqual(
+            {
+                "schedule.create": "unknown",
+                "schedule.recurring": "unknown",
+                "schedule.update_cancel": "unknown",
+            },
+            scheduling,
+        )
+        self.assertEqual([], self.errors())
+
+    def _assert_interface_only_schedule_fails(self, capability_id: str) -> None:
+        path = "adapters/codex/capability_matrix.json"
+        data = self.load(path)
+        record = next(item for item in data["capabilities"] if item["capability_id"] == capability_id)
+        record["status"] = "verified_available"
+        record["evidence_refs"] = ["CODEX-EVID-PROBE-TOOLS"]
+        self.save(path, data)
+        self.assert_has(f"lacks semantically relevant current evidence: {capability_id}")
+        self.assert_has(f"verified scheduling lacks operational evidence: codex {capability_id}")
+
+    def test_schedule_create_interface_exposure_cannot_verify_available(self) -> None:
+        self._assert_interface_only_schedule_fails("schedule.create")
+
+    def test_schedule_recurring_interface_exposure_cannot_verify_available(self) -> None:
+        self._assert_interface_only_schedule_fails("schedule.recurring")
+
+    def test_schedule_update_cancel_interface_exposure_cannot_verify_available(self) -> None:
+        self._assert_interface_only_schedule_fails("schedule.update_cancel")
+
+    def test_unrelated_time_receipt_cannot_verify_git_push(self) -> None:
+        path = "adapters/codex/capability_matrix.json"
+        data = self.load(path)
+        record = next(item for item in data["capabilities"] if item["capability_id"] == "action.git.push")
+        record["status"] = "verified_available"
+        record["evidence_refs"] = ["CODEX-EVID-RECEIPT-TIME"]
+        self.save(path, data)
+        self.assert_has("lacks semantically relevant current evidence: action.git.push")
+
+    def test_web_search_evidence_cannot_verify_raw_network(self) -> None:
+        path = "adapters/codex/capability_matrix.json"
+        data = self.load(path)
+        record = next(item for item in data["capabilities"] if item["capability_id"] == "action.raw_network")
+        record["status"] = "verified_available"
+        record["evidence_refs"] = ["CODEX-EVID-RECEIPT-WEB"]
+        self.save(path, data)
+        self.assert_has("lacks semantically relevant current evidence: action.raw_network")
+
+    def test_negative_attempt_gap_cannot_verify_positive_integrity(self) -> None:
+        path = "adapters/codex/capability_matrix.json"
+        data = self.load(path)
+        record = next(
+            item for item in data["capabilities"]
+            if item["capability_id"] == "security.attempt_count_integrity"
+        )
+        record["status"] = "verified_available"
+        record["evidence_refs"] = ["CODEX-EVID-PROBE-SECURITY-GAP"]
+        self.save(path, data)
+        self.assert_has(
+            "lacks semantically relevant current evidence: security.attempt_count_integrity"
+        )
+
+    def test_existing_valid_verified_rows_have_relevant_evidence(self) -> None:
         self.assertEqual([], self.errors())
 
     def test_host_adapter_cannot_produce_turn_request(self) -> None:

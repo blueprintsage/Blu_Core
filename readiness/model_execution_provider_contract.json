@@ -1,0 +1,50 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "interface": "IF-MODEL-EXECUTION",
+  "architectural_component": "model_execution_boundary",
+  "new_component_added": false,
+  "provider_contract": {
+    "provider_identity": ["provider_id", "provider_type", "api_profile", "endpoint_identity"],
+    "provider_configuration": ["endpoint", "authentication_ref", "timeout_seconds", "transport_options"],
+    "availability_observation": ["observation_id", "observed_at", "valid_until", "endpoint_state", "limitations", "evidence_refs"],
+    "model_identity": ["configured_model_key", "observed_model_key", "model_instance_id", "provider_id"],
+    "model_selection": "The configured model must match an observed loaded LLM instance. Configuration or visibility alone is not selection evidence.",
+    "request_invocation": ["request_id", "model_instance_id", "canon_projection_ref", "turn_request_ref", "control_decision_ref", "messages_or_input", "context_budget", "stream", "store"],
+    "response_completion": "Completion requires a provider response with matching request/provider/model identities, a terminal response observation, normalized output, and no unresolved transport or provider error.",
+    "structured_output": "Capability is provider-dependent and optional in Phase 1. Deterministic security, routing, and validation must not depend on model-produced JSON.",
+    "tool_call_candidate": ["candidate_id", "provider_id", "model_instance_id", "tool_name", "arguments", "parse_status", "raw_evidence_ref"],
+    "streaming_policy": "unsupported_in_phase1; requests set stream=false and partial output is never terminal evidence",
+    "timeout_failure": "Normalize to UNAVAILABLE when the provider cannot complete within the configured finite timeout; do not reuse partial text as completed output.",
+    "malformed_response": "Normalize to INVALID when response structure, identity, or output items cannot be validated; do not expose unvalidated candidate output.",
+    "context_limitation": "Report configured budget, observed loaded context length, provider maximum when present, and truncation refusal. Unknown or insufficient required context is UNAVAILABLE, not silent truncation.",
+    "provider_receipt": ["request_id", "provider_id", "provider_type", "api_profile", "endpoint_observation_ref", "configured_model_key", "observed_model_key", "model_instance_id", "submitted_at", "completed_at", "status", "output_kinds", "usage_or_stats", "limitations", "raw_evidence_ref"],
+    "capability_negotiation": "Configuration, model metadata, loaded state, and successful operation evidence are distinct stages. Each capability records declared, observed, tested, unsupported, and limitation state.",
+    "unsupported_capability": "Reject a request that requires an unsupported or unverified capability. Never silently weaken security or validation."
+  },
+  "phase1_capabilities": [
+    {"capability": "ordinary_chat_completion", "classification": "required", "proof": "one completed non-streaming inference with matching model instance and normalized message output"},
+    {"capability": "structured_output", "classification": "provider-dependent", "phase1_use": "optional_not_required"},
+    {"capability": "tool_call_generation", "classification": "provider-dependent", "phase1_use": "candidate_normalization_only_no_execution"},
+    {"capability": "tool_execution", "classification": "unsupported", "failure": "UNAVAILABLE_without_attempt"},
+    {"capability": "streaming", "classification": "unsupported", "request_value": false},
+    {"capability": "context_length_observation", "classification": "required", "proof": "loaded-instance inventory evidence"},
+    {"capability": "model_load", "classification": "unsupported", "operator_responsibility": true},
+    {"capability": "model_selection", "classification": "required", "proof": "configured key matches observed loaded instance"},
+    {"capability": "timeout_and_error_normalization", "classification": "required"}
+  ],
+  "tool_candidate_truth_chain": [
+    "model_tool_call_candidate",
+    "authorization_not_established",
+    "host_approval_not_established",
+    "attempt_not_established",
+    "completion_not_established",
+    "verified_receipt_not_established"
+  ],
+  "lm_studio_acceptance_requirement": "A future Python Blu runtime shall use LM Studio as a locally hosted Model Execution provider without changing canonical Persona, behavioral law, security semantics, continuity semantics, or validation semantics.",
+  "hardware": {
+    "reference_environment": "RTX 4090 24 GB",
+    "architectural_requirement": false,
+    "prohibited_pinning": ["model_family", "parameter_count", "quantization", "context_size", "GPU_model"]
+  }
+}

@@ -37,3 +37,19 @@ last_reviewed: 2026-08-11
   `blocking_for_BC030=false`. The resolution does not select or implement a
   provider; provider technology, durability, security, backup/capacity, binding,
   and protected-authorization evidence remain future implementation inputs.
+
+## BC-040 — Continuity contract hardening
+
+- `ContinuityMutationRequest` carries caller-owned request, provider,
+  operation, scope, record, and expected-version identity. Receipts repeat that
+  binding so consumers can check it.
+- `not_found` returns no records, and no non-completed retrieval embeds a
+  completed receipt.
+- `requested_action == operation` is schema-enforced. Non-completed mutations
+  cannot claim a successful resulting version or recorded supersession.
+- Portable references reject POSIX, drive-letter, UNC, and file-URI absolute
+  forms where the boundary promises relocation portability.
+- `availability_probe` is receipt-only observation evidence and makes no
+  record-state transition.
+- Instance conformance uses `jsonschema==4.26.0` with Draft 2020-12 and format
+  checking. Schema text inspection alone is insufficient.

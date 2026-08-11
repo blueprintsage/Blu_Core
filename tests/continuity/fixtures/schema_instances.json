@@ -1,0 +1,903 @@
+{
+  "fixture_version": "1.0.0",
+  "assignment": "BC-040",
+  "cases": [
+    {
+      "case_id": "record_valid",
+      "schema": "continuity_record.schema.json",
+      "valid": true,
+      "instance": {
+        "record_id": "rec-1",
+        "version_id": "ver-1",
+        "record_type": "profile",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "schema_version": "1.0.0",
+        "version": 1,
+        "created_evidence": {
+          "observed_at": "2026-08-11T12:00:00Z",
+          "receipt_ref": "receipt:create-1"
+        },
+        "updated_evidence": {
+          "observed_at": "2026-08-11T12:00:00Z",
+          "receipt_ref": "receipt:create-1"
+        },
+        "status": "current",
+        "predecessor": null,
+        "successor": null,
+        "payload_ref": {
+          "kind": "corpus_relative",
+          "locator": "records/rec-1.json"
+        },
+        "integrity_ref": {
+          "algorithm": "sha256",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "evidence_ref": "evidence:integrity-1"
+        },
+        "sensitivity": "internal",
+        "visibility": {
+          "class": "owner",
+          "authorized_subjects_or_policy_ref": "subject:dad"
+        },
+        "provider_id": "provider:test",
+        "provider_native_ref": "opaque:rec-1",
+        "provenance_refs": [
+          "source:test"
+        ]
+      }
+    },
+    {
+      "case_id": "record_invalid_drive_absolute_ref",
+      "schema": "continuity_record.schema.json",
+      "valid": false,
+      "instance": {
+        "record_id": "rec-1",
+        "version_id": "ver-1",
+        "record_type": "profile",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "schema_version": "1.0.0",
+        "version": 1,
+        "created_evidence": {
+          "observed_at": "2026-08-11T12:00:00Z",
+          "receipt_ref": "receipt:create-1"
+        },
+        "updated_evidence": {
+          "observed_at": "2026-08-11T12:00:00Z",
+          "receipt_ref": "receipt:create-1"
+        },
+        "status": "current",
+        "predecessor": null,
+        "successor": null,
+        "payload_ref": {
+          "kind": "corpus_relative",
+          "locator": "records/rec-1.json"
+        },
+        "integrity_ref": {
+          "algorithm": "sha256",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "evidence_ref": "evidence:integrity-1"
+        },
+        "sensitivity": "internal",
+        "visibility": {
+          "class": "owner",
+          "authorized_subjects_or_policy_ref": "subject:dad"
+        },
+        "provider_id": "provider:test",
+        "provider_native_ref": "C:\\\\Dad\\\\rec.json",
+        "provenance_refs": [
+          "source:test"
+        ]
+      }
+    },
+    {
+      "case_id": "record_invalid_posix_corpus_locator",
+      "schema": "continuity_record.schema.json",
+      "valid": false,
+      "instance": {
+        "record_id": "rec-1",
+        "version_id": "ver-1",
+        "record_type": "profile",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "schema_version": "1.0.0",
+        "version": 1,
+        "created_evidence": {
+          "observed_at": "2026-08-11T12:00:00Z",
+          "receipt_ref": "receipt:create-1"
+        },
+        "updated_evidence": {
+          "observed_at": "2026-08-11T12:00:00Z",
+          "receipt_ref": "receipt:create-1"
+        },
+        "status": "current",
+        "predecessor": null,
+        "successor": null,
+        "payload_ref": {
+          "kind": "corpus_relative",
+          "locator": "/var/blu/rec.json"
+        },
+        "integrity_ref": {
+          "algorithm": "sha256",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "evidence_ref": "evidence:integrity-1"
+        },
+        "sensitivity": "internal",
+        "visibility": {
+          "class": "owner",
+          "authorized_subjects_or_policy_ref": "subject:dad"
+        },
+        "provider_id": "provider:test",
+        "provider_native_ref": "opaque:rec-1",
+        "provenance_refs": [
+          "source:test"
+        ]
+      }
+    },
+    {
+      "case_id": "receipt_completed_create_valid",
+      "schema": "continuity_receipt.schema.json",
+      "valid": true,
+      "instance": {
+        "receipt_id": "receipt:create-completed",
+        "request_id": "request:create",
+        "operation": "create",
+        "requested_action": "create",
+        "provider_id": "provider:test",
+        "record_id": "rec-1",
+        "provider_ref": "opaque:rec-1",
+        "status": "completed",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "completed_at": "2026-08-11T12:00:00Z",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "availability": "available",
+        "integrity_evidence": {
+          "algorithm": "sha256",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "evidence_ref": "evidence:integrity-1"
+        },
+        "prior_version": null,
+        "expected_version": null,
+        "resulting_version": 1,
+        "supersession_result": "not_applicable",
+        "related_record_refs": [],
+        "failure_reason": null,
+        "limitations": [],
+        "evidence_method": "provider_verified_readback"
+      }
+    },
+    {
+      "case_id": "receipt_failed_valid",
+      "schema": "continuity_receipt.schema.json",
+      "valid": true,
+      "instance": {
+        "receipt_id": "receipt:update-failed",
+        "request_id": "request:update",
+        "operation": "update",
+        "requested_action": "update",
+        "provider_id": "provider:test",
+        "record_id": "rec-1",
+        "provider_ref": "opaque:rec-1",
+        "status": "failed",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "completed_at": null,
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "availability": "available",
+        "integrity_evidence": null,
+        "prior_version": 1,
+        "expected_version": 1,
+        "resulting_version": null,
+        "supersession_result": "not_applicable",
+        "related_record_refs": [],
+        "failure_reason": {
+          "code": "FAILED",
+          "safe_detail": "operation did not complete"
+        },
+        "limitations": [],
+        "evidence_method": "provider_verified_readback"
+      }
+    },
+    {
+      "case_id": "receipt_stale_expected_version_conflict_valid",
+      "schema": "continuity_receipt.schema.json",
+      "valid": true,
+      "instance": {
+        "receipt_id": "receipt:update-conflict",
+        "request_id": "request:update",
+        "operation": "update",
+        "requested_action": "update",
+        "provider_id": "provider:test",
+        "record_id": "rec-1",
+        "provider_ref": "opaque:rec-1",
+        "status": "conflict",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "completed_at": null,
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "availability": "available",
+        "integrity_evidence": null,
+        "prior_version": 1,
+        "expected_version": 1,
+        "resulting_version": null,
+        "supersession_result": "conflict",
+        "related_record_refs": [],
+        "failure_reason": {
+          "code": "CONFLICT",
+          "safe_detail": "operation did not complete"
+        },
+        "limitations": [],
+        "evidence_method": "provider_verified_readback"
+      }
+    },
+    {
+      "case_id": "receipt_mismatched_action_invalid",
+      "schema": "continuity_receipt.schema.json",
+      "valid": false,
+      "instance": {
+        "receipt_id": "receipt:create-completed",
+        "request_id": "request:create",
+        "operation": "create",
+        "requested_action": "update",
+        "provider_id": "provider:test",
+        "record_id": "rec-1",
+        "provider_ref": "opaque:rec-1",
+        "status": "completed",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "completed_at": "2026-08-11T12:00:00Z",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "availability": "available",
+        "integrity_evidence": {
+          "algorithm": "sha256",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "evidence_ref": "evidence:integrity-1"
+        },
+        "prior_version": null,
+        "expected_version": null,
+        "resulting_version": 1,
+        "supersession_result": "not_applicable",
+        "related_record_refs": [],
+        "failure_reason": null,
+        "limitations": [],
+        "evidence_method": "provider_verified_readback"
+      }
+    },
+    {
+      "case_id": "receipt_noncompleted_success_fields_invalid",
+      "schema": "continuity_receipt.schema.json",
+      "valid": false,
+      "instance": {
+        "receipt_id": "receipt:update-conflict",
+        "request_id": "request:update",
+        "operation": "update",
+        "requested_action": "update",
+        "provider_id": "provider:test",
+        "record_id": "rec-1",
+        "provider_ref": "opaque:rec-1",
+        "status": "conflict",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "completed_at": null,
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "availability": "available",
+        "integrity_evidence": null,
+        "prior_version": 1,
+        "expected_version": 1,
+        "resulting_version": 2,
+        "supersession_result": "recorded",
+        "related_record_refs": [],
+        "failure_reason": {
+          "code": "CONFLICT",
+          "safe_detail": "operation did not complete"
+        },
+        "limitations": [],
+        "evidence_method": "provider_verified_readback"
+      }
+    },
+    {
+      "case_id": "receipt_supersession_reciprocity_valid",
+      "schema": "continuity_receipt.schema.json",
+      "valid": true,
+      "instance": {
+        "receipt_id": "receipt:supersede-completed",
+        "request_id": "request:supersede",
+        "operation": "supersede",
+        "requested_action": "supersede",
+        "provider_id": "provider:test",
+        "record_id": "rec-1",
+        "provider_ref": "opaque:rec-1",
+        "status": "completed",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "completed_at": "2026-08-11T12:00:00Z",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "availability": "available",
+        "integrity_evidence": {
+          "algorithm": "sha256",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "evidence_ref": "evidence:integrity-1"
+        },
+        "prior_version": 1,
+        "expected_version": 1,
+        "resulting_version": 2,
+        "supersession_result": "recorded",
+        "related_record_refs": [
+          {
+            "record_id": "rec-1",
+            "version_id": "ver-1",
+            "relation": "superseded_predecessor"
+          },
+          {
+            "record_id": "rec-2",
+            "version_id": "ver-2",
+            "relation": "current_successor"
+          }
+        ],
+        "failure_reason": null,
+        "limitations": [],
+        "evidence_method": "provider_verified_readback"
+      }
+    },
+    {
+      "case_id": "receipt_supersession_reciprocity_invalid",
+      "schema": "continuity_receipt.schema.json",
+      "valid": false,
+      "instance": {
+        "receipt_id": "receipt:supersede-completed",
+        "request_id": "request:supersede",
+        "operation": "supersede",
+        "requested_action": "supersede",
+        "provider_id": "provider:test",
+        "record_id": "rec-1",
+        "provider_ref": "opaque:rec-1",
+        "status": "completed",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "completed_at": "2026-08-11T12:00:00Z",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "availability": "available",
+        "integrity_evidence": {
+          "algorithm": "sha256",
+          "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "evidence_ref": "evidence:integrity-1"
+        },
+        "prior_version": 1,
+        "expected_version": 1,
+        "resulting_version": 2,
+        "supersession_result": "recorded",
+        "related_record_refs": [
+          {
+            "record_id": "rec-1",
+            "version_id": "ver-1",
+            "relation": "superseded_predecessor"
+          }
+        ],
+        "failure_reason": null,
+        "limitations": [],
+        "evidence_method": "provider_verified_readback"
+      }
+    },
+    {
+      "case_id": "query_valid",
+      "schema": "continuity_query.schema.json",
+      "valid": true,
+      "instance": {
+        "query_id": "query-1",
+        "provider_id": "provider:test",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "selector": {
+          "record_id": "rec-1"
+        },
+        "status_filter": "current",
+        "version_selector": "current",
+        "limit": 10,
+        "cursor": null,
+        "include_payload": true,
+        "authorization_ref": null
+      }
+    },
+    {
+      "case_id": "query_limit_invalid",
+      "schema": "continuity_query.schema.json",
+      "valid": false,
+      "instance": {
+        "query_id": "query-1",
+        "provider_id": "provider:test",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "selector": {
+          "record_id": "rec-1"
+        },
+        "status_filter": "current",
+        "version_selector": "current",
+        "limit": 101,
+        "cursor": null,
+        "include_payload": true,
+        "authorization_ref": null
+      }
+    },
+    {
+      "case_id": "retrieval_completed_valid",
+      "schema": "continuity_retrieval_result.schema.json",
+      "valid": true,
+      "instance": {
+        "result_id": "result-1",
+        "query_id": "query-1",
+        "provider_id": "provider:test",
+        "status": "completed",
+        "availability": "available",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "records": [
+          {
+            "record_id": "rec-1",
+            "version_id": "ver-1",
+            "record_type": "profile",
+            "scope": {
+              "namespace": "blu",
+              "subject_ref": "subject:dad",
+              "owner_ref": "owner:dad",
+              "purpose": "ordinary_continuity"
+            },
+            "schema_version": "1.0.0",
+            "version": 1,
+            "created_evidence": {
+              "observed_at": "2026-08-11T12:00:00Z",
+              "receipt_ref": "receipt:create-1"
+            },
+            "updated_evidence": {
+              "observed_at": "2026-08-11T12:00:00Z",
+              "receipt_ref": "receipt:create-1"
+            },
+            "status": "current",
+            "predecessor": null,
+            "successor": null,
+            "payload_ref": {
+              "kind": "corpus_relative",
+              "locator": "records/rec-1.json"
+            },
+            "integrity_ref": {
+              "algorithm": "sha256",
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "evidence_ref": "evidence:integrity-1"
+            },
+            "sensitivity": "internal",
+            "visibility": {
+              "class": "owner",
+              "authorized_subjects_or_policy_ref": "subject:dad"
+            },
+            "provider_id": "provider:test",
+            "provider_native_ref": "opaque:rec-1",
+            "provenance_refs": [
+              "source:test"
+            ]
+          }
+        ],
+        "receipt": {
+          "receipt_id": "receipt:retrieve-completed",
+          "request_id": "request:retrieve",
+          "operation": "retrieve",
+          "requested_action": "retrieve",
+          "provider_id": "provider:test",
+          "record_id": "rec-1",
+          "provider_ref": "opaque:rec-1",
+          "status": "completed",
+          "observed_at": "2026-08-11T12:00:00Z",
+          "completed_at": "2026-08-11T12:00:00Z",
+          "scope": {
+            "namespace": "blu",
+            "subject_ref": "subject:dad",
+            "owner_ref": "owner:dad",
+            "purpose": "ordinary_continuity"
+          },
+          "availability": "available",
+          "integrity_evidence": null,
+          "prior_version": 1,
+          "expected_version": null,
+          "resulting_version": null,
+          "supersession_result": "not_applicable",
+          "related_record_refs": [],
+          "failure_reason": null,
+          "limitations": [],
+          "evidence_method": "provider_verified_readback"
+        },
+        "limitations": [],
+        "next_cursor": null
+      }
+    },
+    {
+      "case_id": "retrieval_not_found_valid",
+      "schema": "continuity_retrieval_result.schema.json",
+      "valid": true,
+      "instance": {
+        "result_id": "result-2",
+        "query_id": "query-1",
+        "provider_id": "provider:test",
+        "status": "not_found",
+        "availability": "available",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "records": [],
+        "receipt": {
+          "receipt_id": "receipt:retrieve-not_found",
+          "request_id": "request:retrieve",
+          "operation": "retrieve",
+          "requested_action": "retrieve",
+          "provider_id": "provider:test",
+          "record_id": null,
+          "provider_ref": null,
+          "status": "not_found",
+          "observed_at": "2026-08-11T12:00:00Z",
+          "completed_at": null,
+          "scope": {
+            "namespace": "blu",
+            "subject_ref": "subject:dad",
+            "owner_ref": "owner:dad",
+            "purpose": "ordinary_continuity"
+          },
+          "availability": "available",
+          "integrity_evidence": null,
+          "prior_version": 1,
+          "expected_version": null,
+          "resulting_version": null,
+          "supersession_result": "not_applicable",
+          "related_record_refs": [],
+          "failure_reason": {
+            "code": "NOT_FOUND",
+            "safe_detail": "operation did not complete"
+          },
+          "limitations": [],
+          "evidence_method": "provider_verified_readback"
+        },
+        "limitations": [],
+        "next_cursor": null
+      }
+    },
+    {
+      "case_id": "retrieval_not_found_with_records_invalid",
+      "schema": "continuity_retrieval_result.schema.json",
+      "valid": false,
+      "instance": {
+        "result_id": "result-3",
+        "query_id": "query-1",
+        "provider_id": "provider:test",
+        "status": "not_found",
+        "availability": "available",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "records": [
+          {
+            "record_id": "rec-1",
+            "version_id": "ver-1",
+            "record_type": "profile",
+            "scope": {
+              "namespace": "blu",
+              "subject_ref": "subject:dad",
+              "owner_ref": "owner:dad",
+              "purpose": "ordinary_continuity"
+            },
+            "schema_version": "1.0.0",
+            "version": 1,
+            "created_evidence": {
+              "observed_at": "2026-08-11T12:00:00Z",
+              "receipt_ref": "receipt:create-1"
+            },
+            "updated_evidence": {
+              "observed_at": "2026-08-11T12:00:00Z",
+              "receipt_ref": "receipt:create-1"
+            },
+            "status": "current",
+            "predecessor": null,
+            "successor": null,
+            "payload_ref": {
+              "kind": "corpus_relative",
+              "locator": "records/rec-1.json"
+            },
+            "integrity_ref": {
+              "algorithm": "sha256",
+              "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "evidence_ref": "evidence:integrity-1"
+            },
+            "sensitivity": "internal",
+            "visibility": {
+              "class": "owner",
+              "authorized_subjects_or_policy_ref": "subject:dad"
+            },
+            "provider_id": "provider:test",
+            "provider_native_ref": "opaque:rec-1",
+            "provenance_refs": [
+              "source:test"
+            ]
+          }
+        ],
+        "receipt": {
+          "receipt_id": "receipt:retrieve-not_found",
+          "request_id": "request:retrieve",
+          "operation": "retrieve",
+          "requested_action": "retrieve",
+          "provider_id": "provider:test",
+          "record_id": null,
+          "provider_ref": null,
+          "status": "not_found",
+          "observed_at": "2026-08-11T12:00:00Z",
+          "completed_at": null,
+          "scope": {
+            "namespace": "blu",
+            "subject_ref": "subject:dad",
+            "owner_ref": "owner:dad",
+            "purpose": "ordinary_continuity"
+          },
+          "availability": "available",
+          "integrity_evidence": null,
+          "prior_version": 1,
+          "expected_version": null,
+          "resulting_version": null,
+          "supersession_result": "not_applicable",
+          "related_record_refs": [],
+          "failure_reason": {
+            "code": "NOT_FOUND",
+            "safe_detail": "operation did not complete"
+          },
+          "limitations": [],
+          "evidence_method": "provider_verified_readback"
+        },
+        "limitations": [],
+        "next_cursor": null
+      }
+    },
+    {
+      "case_id": "retrieval_noncompleted_with_completed_receipt_invalid",
+      "schema": "continuity_retrieval_result.schema.json",
+      "valid": false,
+      "instance": {
+        "result_id": "result-4",
+        "query_id": "query-1",
+        "provider_id": "provider:test",
+        "status": "not_found",
+        "availability": "available",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "records": [],
+        "receipt": {
+          "receipt_id": "receipt:retrieve-completed",
+          "request_id": "request:retrieve",
+          "operation": "retrieve",
+          "requested_action": "retrieve",
+          "provider_id": "provider:test",
+          "record_id": "rec-1",
+          "provider_ref": "opaque:rec-1",
+          "status": "completed",
+          "observed_at": "2026-08-11T12:00:00Z",
+          "completed_at": "2026-08-11T12:00:00Z",
+          "scope": {
+            "namespace": "blu",
+            "subject_ref": "subject:dad",
+            "owner_ref": "owner:dad",
+            "purpose": "ordinary_continuity"
+          },
+          "availability": "available",
+          "integrity_evidence": null,
+          "prior_version": 1,
+          "expected_version": null,
+          "resulting_version": null,
+          "supersession_result": "not_applicable",
+          "related_record_refs": [],
+          "failure_reason": null,
+          "limitations": [],
+          "evidence_method": "provider_verified_readback"
+        },
+        "limitations": [],
+        "next_cursor": null
+      }
+    },
+    {
+      "case_id": "availability_available_valid",
+      "schema": "continuity_provider_availability.schema.json",
+      "valid": true,
+      "instance": {
+        "observation_id": "obs-1",
+        "provider_id": "provider:test",
+        "state": "available",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "valid_until": "2026-08-11T12:05:00Z",
+        "supported_operations": [
+          "retrieve"
+        ],
+        "evidence_ref": "evidence:probe-1",
+        "limitations": [],
+        "failure_reason": null
+      }
+    },
+    {
+      "case_id": "availability_degraded_valid",
+      "schema": "continuity_provider_availability.schema.json",
+      "valid": true,
+      "instance": {
+        "observation_id": "obs-1",
+        "provider_id": "provider:test",
+        "state": "degraded",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "valid_until": "2026-08-11T12:05:00Z",
+        "supported_operations": [
+          "retrieve"
+        ],
+        "evidence_ref": "evidence:probe-1",
+        "limitations": [
+          "retrieve_only"
+        ],
+        "failure_reason": null
+      }
+    },
+    {
+      "case_id": "availability_unavailable_valid",
+      "schema": "continuity_provider_availability.schema.json",
+      "valid": true,
+      "instance": {
+        "observation_id": "obs-1",
+        "provider_id": "provider:test",
+        "state": "unavailable",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "valid_until": "2026-08-11T12:05:00Z",
+        "supported_operations": [],
+        "evidence_ref": null,
+        "limitations": [],
+        "failure_reason": "provider offline"
+      }
+    },
+    {
+      "case_id": "availability_available_without_evidence_invalid",
+      "schema": "continuity_provider_availability.schema.json",
+      "valid": false,
+      "instance": {
+        "observation_id": "obs-1",
+        "provider_id": "provider:test",
+        "state": "available",
+        "observed_at": "2026-08-11T12:00:00Z",
+        "valid_until": "2026-08-11T12:05:00Z",
+        "supported_operations": [],
+        "evidence_ref": null,
+        "limitations": [],
+        "failure_reason": null
+      }
+    },
+    {
+      "case_id": "mutation_create_valid",
+      "schema": "continuity_mutation_request.schema.json",
+      "valid": true,
+      "instance": {
+        "request_id": "request:create",
+        "provider_id": "provider:test",
+        "operation": "create",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "record_id": "rec-1",
+        "expected_version": null
+      }
+    },
+    {
+      "case_id": "mutation_expected_version_update_valid",
+      "schema": "continuity_mutation_request.schema.json",
+      "valid": true,
+      "instance": {
+        "request_id": "request:update",
+        "provider_id": "provider:test",
+        "operation": "update",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "record_id": "rec-1",
+        "expected_version": 1
+      }
+    },
+    {
+      "case_id": "mutation_update_missing_expected_version_invalid",
+      "schema": "continuity_mutation_request.schema.json",
+      "valid": false,
+      "instance": {
+        "request_id": "request:update",
+        "provider_id": "provider:test",
+        "operation": "update",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "record_id": "rec-1",
+        "expected_version": null
+      }
+    },
+    {
+      "case_id": "mutation_create_with_expected_version_invalid",
+      "schema": "continuity_mutation_request.schema.json",
+      "valid": false,
+      "instance": {
+        "request_id": "request:create",
+        "provider_id": "provider:test",
+        "operation": "create",
+        "scope": {
+          "namespace": "blu",
+          "subject_ref": "subject:dad",
+          "owner_ref": "owner:dad",
+          "purpose": "ordinary_continuity"
+        },
+        "record_id": "rec-1",
+        "expected_version": 1
+      }
+    }
+  ]
+}

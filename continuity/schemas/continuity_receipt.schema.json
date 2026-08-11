@@ -20,6 +20,7 @@
     "availability",
     "integrity_evidence",
     "prior_version",
+    "expected_version",
     "resulting_version",
     "supersession_result",
     "related_record_refs",
@@ -53,6 +54,7 @@
       ]
     },
     "prior_version": {"type": ["integer", "null"], "minimum": 1},
+    "expected_version": {"type": ["integer", "null"], "minimum": 1},
     "resulting_version": {"type": ["integer", "null"], "minimum": 1},
     "supersession_result": {"enum": ["not_applicable", "recorded", "not_recorded", "conflict"]},
     "related_record_refs": {
@@ -132,6 +134,47 @@
           "related_record_refs": {"minItems": 2}
         }
       }
+    },
+    {
+      "if": {"properties": {"status": {"not": {"const": "completed"}}}, "required": ["status"]},
+      "then": {
+        "properties": {
+          "resulting_version": {"type": "null"},
+          "supersession_result": {"enum": ["not_applicable", "not_recorded", "conflict"]}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"operation": {"const": "create"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "create"}, "expected_version": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "retrieve"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "retrieve"}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "update"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "update"}, "expected_version": {"type": "integer", "minimum": 1}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "supersede"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "supersede"}, "expected_version": {"type": "integer", "minimum": 1}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "retire"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "retire"}, "expected_version": {"type": "integer", "minimum": 1}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "recover_history"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "recover_history"}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "validate"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "validate"}}}
+    },
+    {
+      "if": {"properties": {"operation": {"const": "availability_probe"}}, "required": ["operation"]},
+      "then": {"properties": {"requested_action": {"const": "availability_probe"}}}
     }
   ],
   "x-blu-action-binding-rule": "requested_action must equal operation and the receipt is valid only for its matching request_id, provider_id, record_id, scope, and related record references.",

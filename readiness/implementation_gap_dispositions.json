@@ -1,0 +1,298 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "source_register": "contracts/runtime/unresolved_register.json",
+  "source_gap_count": 28,
+  "phase_names": [
+    "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+    "Python Runtime Phase 2 - Deterministic Contract and Diagnostics Hardening",
+    "Python Runtime Phase 3 - Optional Source and Workflow Services",
+    "Protected Security Implementation",
+    "Continuity Provider Implementation",
+    "Optional Behavior Increments"
+  ],
+  "dispositions": [
+    {
+      "gap_id": "UR-001",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-001"],
+      "behavior_at_risk": "anti-drift restraint before ordinary execution",
+      "implementation_decision": "obsolete architecture mechanism whose behavior is preserved elsewhere",
+      "rationale": "Operations Law and the approved security/validation boundaries preserve the behavior; no AntiDrift library returns.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "canon digest, restraint-order, and validation-egress scenarios"
+    },
+    {
+      "gap_id": "UR-002",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-002"],
+      "behavior_at_risk": "Operations Law restraint",
+      "implementation_decision": "preserved current behavior via model-facing canon",
+      "rationale": "Operations Law stays canonical and provable invariants belong to Validation and Egress; no OpsRestraint service is created.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "exact Operations source loading and terminal truth scenarios"
+    },
+    {
+      "gap_id": "UR-003",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-003"],
+      "behavior_at_risk": "authentication and protected render behavior",
+      "implementation_decision": "requires protected security assignment",
+      "rationale": "Phase 1 exposes no Auth route and missing protected policy receives no inferred values.",
+      "target_phase": "Protected Security Implementation",
+      "changes_current_behavior": false,
+      "validation_requirement": "protected-route unavailable tests and separate security-authorized review"
+    },
+    {
+      "gap_id": "UR-004",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-004"],
+      "behavior_at_risk": "repository source lookup",
+      "implementation_decision": "implement in later named phase",
+      "rationale": "Source retrieval is outside the ordinary-turn slice and remains behind host/provider evidence.",
+      "target_phase": "Python Runtime Phase 3 - Optional Source and Workflow Services",
+      "changes_current_behavior": false,
+      "validation_requirement": "source scope, positive support, provider receipt, and unavailable-path tests"
+    },
+    {
+      "gap_id": "UR-005",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-005"],
+      "behavior_at_risk": "diagnostic ownership and receipts",
+      "implementation_decision": "obsolete architecture mechanism whose behavior is preserved elsewhere",
+      "rationale": "Receipt-backed diagnostics belong to Validation and Egress; EchoTrace is not restored.",
+      "target_phase": "Python Runtime Phase 2 - Deterministic Contract and Diagnostics Hardening",
+      "changes_current_behavior": false,
+      "validation_requirement": "diagnostics contain only verified current-turn receipt evidence"
+    },
+    {
+      "gap_id": "UR-006",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-006"],
+      "behavior_at_risk": "kernel-work and SimCode authorization",
+      "implementation_decision": "deliberately unsupported",
+      "rationale": "Phase 1 performs no kernel work or SimCode and invents no BluCode contract.",
+      "target_phase": "Protected Security Implementation",
+      "changes_current_behavior": false,
+      "validation_requirement": "SimCode and kernel-mutation requests terminate unavailable without side effects"
+    },
+    {
+      "gap_id": "UR-007",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-007"],
+      "behavior_at_risk": "portable runtime configuration truth",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "BC-040 freezes a typed configuration schema separate from capability evidence and canon.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "valid/invalid config fixtures, no embedded secrets or machine paths, and capability-evidence separation"
+    },
+    {
+      "gap_id": "UR-008",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-008"],
+      "behavior_at_risk": "pre-ingress protection of source and clone requests",
+      "implementation_decision": "requires protected security assignment",
+      "rationale": "The successor boundary is fixed but the exact matcher/redaction contract remains unavailable; no permissive fallback is allowed.",
+      "target_phase": "Protected Security Implementation",
+      "changes_current_behavior": false,
+      "validation_requirement": "security-authorized minimum matcher/redaction fixtures before any real user turn"
+    },
+    {
+      "gap_id": "UR-009",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-009"],
+      "behavior_at_risk": "SimCode and Memory validation gates",
+      "implementation_decision": "deliberately unsupported",
+      "rationale": "Neither Program is in Phase 1; generic validation behavior is preserved without historical gates.",
+      "target_phase": "Python Runtime Phase 3 - Optional Source and Workflow Services",
+      "changes_current_behavior": false,
+      "validation_requirement": "unsupported Program routes never execute; any future route uses approved Validation and Egress"
+    },
+    {
+      "gap_id": "UR-010",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-010"],
+      "behavior_at_risk": "public mood command behavior",
+      "implementation_decision": "optional/non-core",
+      "rationale": "No mood route or service enters Phase 1; natural affect remains Persona behavior.",
+      "target_phase": "Optional Behavior Increments",
+      "changes_current_behavior": false,
+      "validation_requirement": "no /mood route and no mood-owned routing or identity"
+    },
+    {
+      "gap_id": "UR-011",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-011"],
+      "behavior_at_risk": "workflow lane classification",
+      "implementation_decision": "obsolete architecture mechanism whose behavior is preserved elsewhere",
+      "rationale": "The Phase 1 catalog has one explicit ordinary route and no historical lane enum or /memory route.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "finite route registry with exactly one Phase 1 owner"
+    },
+    {
+      "gap_id": "UR-012",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-012"],
+      "behavior_at_risk": "StateTree identity and status",
+      "implementation_decision": "obsolete architecture mechanism whose behavior is preserved elsewhere",
+      "rationale": "StateTree is not a successor component or Phase 1 service; turn state uses approved typed contracts.",
+      "target_phase": "Optional Behavior Increments",
+      "changes_current_behavior": false,
+      "validation_requirement": "no StateTree module or service and no silent historical status choice"
+    },
+    {
+      "gap_id": "UR-013",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-013", "contracts/successor/packet_registry.json#TurnRequest"],
+      "behavior_at_risk": "turn/task request normalization",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "The successor TurnRequest replaces the underspecified historical task packet and remains Turn Controller-owned.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "typed valid/invalid TurnRequest fixtures and sole-producer checks"
+    },
+    {
+      "gap_id": "UR-014",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-014", "contracts/successor/packet_registry.json#CapabilityReport"],
+      "behavior_at_risk": "capability honesty",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "Provider configuration, observation, loaded state, and successful inference are separately evidenced.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "configuration-never-proves-capability and loaded-name-never-proves-inference tests"
+    },
+    {
+      "gap_id": "UR-015",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-015", "contracts/successor/packet_registry.json#TerminalPacket"],
+      "behavior_at_risk": "current-turn receipt identity",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "ExecutionReceipt remains embedded in TerminalPacket and does not add a ninth packet.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "one TerminalPacket with provider completion and validation references"
+    },
+    {
+      "gap_id": "UR-016",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-016"],
+      "behavior_at_risk": "historical Program compatibility owners",
+      "implementation_decision": "deliberately unsupported",
+      "rationale": "Empty historical declarations do not define successor owners and no Program framework enters Phase 1.",
+      "target_phase": "Python Runtime Phase 3 - Optional Source and Workflow Services",
+      "changes_current_behavior": false,
+      "validation_requirement": "no inferred compatibility owner or hidden Program route"
+    },
+    {
+      "gap_id": "UR-017",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-017", "readiness/phase1_executable_slice.json#ordinary_conversation"],
+      "behavior_at_risk": "ordinary conversation owner identity",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "The successor stable owner is model_execution_boundary under Turn Controller lock; no Exec component returns.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "one-owner route and model-boundary ownership tests"
+    },
+    {
+      "gap_id": "UR-018",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-018"],
+      "behavior_at_risk": "external continuity source inputs",
+      "implementation_decision": "implement in later named phase",
+      "rationale": "PEL and Identity_Lore are not loaded as unreceipted Phase 1 continuity; provider retrieval remains separate.",
+      "target_phase": "Continuity Provider Implementation",
+      "changes_current_behavior": false,
+      "validation_requirement": "provider-scoped retrieval, provenance, authorization, and receipt tests"
+    },
+    {
+      "gap_id": "UR-019",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-019", "readiness/model_execution_provider_contract.json"],
+      "behavior_at_risk": "host and provider capability truth",
+      "implementation_decision": "requires provider evidence",
+      "rationale": "Phase 1 uses only model inventory, loaded-instance, context, and completed-inference evidence; optional host capabilities remain unavailable.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "evidence freshness, limitation, unavailable, and completion-receipt scenarios"
+    },
+    {
+      "gap_id": "UR-020",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-020"],
+      "behavior_at_risk": "Program packet validation",
+      "implementation_decision": "obsolete architecture mechanism whose behavior is preserved elsewhere",
+      "rationale": "Validation and Egress owns approved validation behavior; GateKernel is not restored.",
+      "target_phase": "Python Runtime Phase 3 - Optional Source and Workflow Services",
+      "changes_current_behavior": false,
+      "validation_requirement": "future Program candidates must pass Validation and Egress without a new component"
+    },
+    {
+      "gap_id": "UR-021",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-021"],
+      "behavior_at_risk": "Memory Program packet completeness",
+      "implementation_decision": "implement in later named phase",
+      "rationale": "Memory Program is outside Phase 1; future continuity uses the generic provider contract rather than inferred fields.",
+      "target_phase": "Continuity Provider Implementation",
+      "changes_current_behavior": false,
+      "validation_requirement": "separately authorized route and typed request/result contract"
+    },
+    {
+      "gap_id": "UR-022",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-022"],
+      "behavior_at_risk": "stable owner aliases",
+      "implementation_decision": "obsolete architecture mechanism whose behavior is preserved elsewhere",
+      "rationale": "Successor component and route IDs are already stable; historical ExecLib aliases are not synthesized.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "unique successor IDs and no generated historical aliases"
+    },
+    {
+      "gap_id": "UR-023",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-023"],
+      "behavior_at_risk": "humor expression",
+      "implementation_decision": "preserved current behavior via model-facing canon",
+      "rationale": "Humor remains bounded Persona expression and receives no service, router, or deterministic owner in Phase 1.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "Persona scenario review and absence of Humor service/module"
+    },
+    {
+      "gap_id": "UR-024",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-024"],
+      "behavior_at_risk": "safe error identity and rendering",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "Phase 1 uses the approved six-status successor error model and safe reason codes, not either historical catalog label.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "finite status and safe error-render fixtures"
+    },
+    {
+      "gap_id": "UR-025",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-025"],
+      "behavior_at_risk": "user-visible error rendering",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "Validation and Egress renders safe finite terminal results; no separate error-renderer component exists.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "no raw macro leakage and deterministic status-to-safe-output fixtures"
+    },
+    {
+      "gap_id": "UR-026",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-026"],
+      "behavior_at_risk": "Persona continuity and expression",
+      "implementation_decision": "preserved current behavior via model-facing canon",
+      "rationale": "Persona remains the direct canonical model-facing source; no Persona Engine is created.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "exact Persona digest and cross-deployment behavioral scenarios"
+    },
+    {
+      "gap_id": "UR-027",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-027"],
+      "behavior_at_risk": "blocked-state rendering",
+      "implementation_decision": "implement in Phase 1",
+      "rationale": "Successor terminal statuses and safe reason codes replace undefined macro render text without projecting a value into CTS.",
+      "target_phase": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+      "changes_current_behavior": false,
+      "validation_requirement": "UNAVAILABLE and BLOCK scenario fixtures without invented historical macro prose"
+    },
+    {
+      "gap_id": "UR-028",
+      "source_evidence": ["contracts/runtime/unresolved_register.json#UR-028", "docs/architecture/successor_kernel.md"],
+      "behavior_at_risk": "OPSEC ordering and route relationship",
+      "implementation_decision": "requires protected security assignment",
+      "rationale": "Successor OPSEC is a pre-ingress restraint, not a route lane; exact protected matching remains unresolved and is not projected backward into CTS.",
+      "target_phase": "Protected Security Implementation",
+      "changes_current_behavior": false,
+      "validation_requirement": "pre-ingress ordering, no ordinary route entry before PASS, and protected policy authorization"
+    }
+  ],
+  "sur010_phase1_result": "all_28_current_source_gaps_have_explicit_dispositions_and_every_phase1_relevant_gap_has_a_validation_requirement",
+  "current_cts_rewritten": false
+}

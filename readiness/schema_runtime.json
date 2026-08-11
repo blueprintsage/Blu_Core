@@ -1,0 +1,22 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "language": "Python",
+  "package": "jsonschema",
+  "version": "4.26.0",
+  "validator": "Draft202012Validator",
+  "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+  "format_checker": true,
+  "dependency_record": "requirements-contracts.txt",
+  "selection_evidence": [
+    "https://pypi.org/project/jsonschema/",
+    "https://python-jsonschema.readthedocs.io/en/stable/creating/"
+  ],
+  "policy": [
+    "Every schema is checked against its metaschema before instance tests.",
+    "All local $ref targets are registered by canonical $id.",
+    "Format checking is explicitly enabled.",
+    "Valid fixtures must validate and invalid fixtures must fail for the intended conditional.",
+    "Schema text inspection alone is insufficient."
+  ]
+}

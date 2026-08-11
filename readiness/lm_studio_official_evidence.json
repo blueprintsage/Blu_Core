@@ -1,0 +1,82 @@
+{
+  "assignment": "BC-040",
+  "observed_on": "2026-08-11",
+  "authority": "official_lm_studio_developer_documentation",
+  "records": [
+    {
+      "evidence_id": "LM-EVID-001",
+      "url": "https://lmstudio.ai/docs/developer/rest",
+      "supports": [
+        "LM Studio has a native v1 REST API under /api/v1",
+        "GET /api/v1/models lists models",
+        "POST /api/v1/chat performs chat inference",
+        "the native chat endpoint can receive a per-request context length"
+      ],
+      "does_not_prove": ["current endpoint reachability", "loaded-model availability", "successful inference"]
+    },
+    {
+      "evidence_id": "LM-EVID-002",
+      "url": "https://lmstudio.ai/docs/developer/rest/list",
+      "supports": [
+        "model records expose unique keys, loaded instances, configured context length, maximum context length, format, and optional capabilities"
+      ],
+      "does_not_prove": ["a selected model is loaded now", "a declared capability succeeds for a particular request"]
+    },
+    {
+      "evidence_id": "LM-EVID-003",
+      "url": "https://lmstudio.ai/docs/developer/rest/chat",
+      "supports": [
+        "POST /api/v1/chat accepts model, input, system_prompt, stream, timeout-relevant request processing, context_length, and store controls",
+        "non-streaming is the default",
+        "store=false can avoid server-side chat storage",
+        "responses identify the model instance and return typed output items and token/performance statistics",
+        "unsupported reasoning settings error rather than silently succeeding"
+      ],
+      "does_not_prove": ["every model supports every optional setting", "tool-call validity", "completion merely because a request was accepted"]
+    },
+    {
+      "evidence_id": "LM-EVID-004",
+      "url": "https://lmstudio.ai/docs/developer/rest/load",
+      "supports": [
+        "POST /api/v1/models/load can load a selected model and returns a loaded model instance identity",
+        "load configuration can include context length"
+      ],
+      "does_not_prove": ["Phase 1 runtime should own model loading", "successful inference after load"]
+    },
+    {
+      "evidence_id": "LM-EVID-005",
+      "url": "https://lmstudio.ai/docs/developer/openai-compat/structured-output",
+      "supports": [
+        "LM Studio can enforce JSON-schema structured output through /v1/chat/completions",
+        "not all models are capable of structured output"
+      ],
+      "does_not_prove": ["structured output for the configured model", "structured output on the selected native Phase 1 chat profile"]
+    },
+    {
+      "evidence_id": "LM-EVID-006",
+      "url": "https://lmstudio.ai/docs/developer/openai-compat/tools",
+      "supports": [
+        "tool use is a model request for code to execute rather than model-side execution",
+        "native and fallback tool-use support differ and results vary by model"
+      ],
+      "does_not_prove": ["authorization", "host approval", "tool execution", "successful side effect", "verified receipt"]
+    },
+    {
+      "evidence_id": "LM-EVID-007",
+      "url": "https://lmstudio.ai/docs/developer/openai-compat/chat-completions",
+      "supports": [
+        "LM Studio exposes POST /v1/chat/completions and supports non-streaming and streaming request parameters"
+      ],
+      "does_not_prove": ["that the compatibility endpoint is required for the native Phase 1 binding"]
+    }
+  ],
+  "phase1_protocol_decision": {
+    "provider_profile": "lm_studio_native_rest_v1",
+    "inventory_endpoint": "GET /api/v1/models",
+    "inference_endpoint": "POST /api/v1/chat",
+    "stream": false,
+    "store": false,
+    "runtime_model_loading": "unsupported_in_phase1_operator_loads_model_before_boot",
+    "rationale": "The native v1 profile exposes loaded-instance and context evidence plus a typed non-streaming response. The provider binding remains beneath IF-MODEL-EXECUTION and may be replaced without changing Blu canon."
+  }
+}

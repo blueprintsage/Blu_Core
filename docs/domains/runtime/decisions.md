@@ -97,3 +97,26 @@ Approved specification decisions, pending independent semantic review:
   Both terminal paths use the originating `SecurityDecision` authority and
   owner `security_restraint`; `SecurityDecision` remains limited to `PASS`,
   `BLOCK`, and `ASK`.
+
+## 2026-08-11 — BC-040 One-Blu readiness boundary
+
+- ChatGPT Custom GPT and Python/LM Studio are required deployments of one Blu
+  canon. Codex is optional best effort and cannot drive the architecture.
+- Persona and Operations Law remain exact model-facing authority. Historical
+  Exec/ExecLib/Commands/Programs remain current CTS authority but do not become
+  future canon without explicit behavioral traceability.
+- LM Studio binds only beneath the existing Model Execution Boundary. Phase 1
+  uses the official native v1 inventory/chat profile, non-streaming and
+  `store=false`; configuration or a loaded name never proves inference.
+- The planned first slice has one route, `ordinary_conversation`, and no tools,
+  slash commands, protected action, durable continuity, scheduling, artifacts,
+  Programs, MMU, Mood service, School Engine, or PASS/SkillForge.
+- SUR-003 is resolved for that finite slice. SUR-010 is mapped across all 28
+  current-source gaps. SUR-002, SUR-011, and SUR-012 block protected features
+  only and fail closed.
+- BC-040's readiness result is `not_ready_for_python_phase1`. SUR-001 is the
+  only actual blocker because arbitrary natural-language ingress/egress cannot
+  be proven safe from protected-source requests without the separately
+  authorized minimum OPSEC match/redaction contract.
+- No protected value is invented. The next safe assignment is the minimum
+  protected security contract, not Python runtime implementation.

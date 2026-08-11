@@ -2,7 +2,17 @@
 
 status: active
 owner: docs/domains/continuity
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
+
+## Schema prose is not instance conformance
+
+- **Observed:** BC-030 correctly described expected-version, action binding,
+  path portability, and non-completed outcomes, but prose and schema-text
+  guards did not execute the schema conditionals against instances.
+- **Prevention:** select the actual consuming Draft 2020-12 runtime, check each
+  metaschema, register local `$id` references, enable format checking, and
+  require valid and invalid fixtures for every schema. Git-scope tests must use
+  an actual throwaway repository so early-return guards are exercised.
 
 ## Reference corpus is not a continuity receipt
 

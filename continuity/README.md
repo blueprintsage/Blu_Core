@@ -25,6 +25,8 @@ continue to cross `IF-CONTINUITY-PROVIDER` through `ServiceExchange`.
 - `schemas/continuity_retrieval_result.schema.json`: provenance-preserving result.
 - `schemas/continuity_provider_availability.schema.json`: observed provider
   availability.
+- `schemas/continuity_mutation_request.schema.json`: caller-owned mutation
+  identity and expected-version binding.
 - `evidence_stages.json`: stages that must not be collapsed into durable success.
 - `lifecycle.json`: create, update, supersede, retire, historical recovery,
   validation, conflict, failure, and corruption transitions.
@@ -50,6 +52,8 @@ continue to cross `IF-CONTINUITY-PROVIDER` through `ServiceExchange`.
   references.
 - Failed, unavailable, conflicting, or integrity-failed mutations make no state
   transition.
+- `availability_probe` is receipt-only observation evidence and never performs
+  a record-state transition.
 - The contract exposes no deletion or destruction operation.
 - Protected authorization state requires stronger evidence than ordinary
   continuity. The supplied reference corpus does not prove that capability.

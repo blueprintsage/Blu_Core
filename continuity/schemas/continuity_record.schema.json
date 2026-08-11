@@ -52,7 +52,13 @@
       "properties": {
         "kind": {"enum": ["inline_envelope", "provider_object", "corpus_relative"]},
         "locator": {"type": "string", "minLength": 1}
-      }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "corpus_relative"}}, "required": ["kind"]},
+          "then": {"properties": {"locator": {"$ref": "#/$defs/portableReference"}}}
+        }
+      ]
     },
     "integrity_ref": {
       "type": "object",
@@ -76,8 +82,7 @@
     },
     "provider_id": {"type": "string", "minLength": 1},
     "provider_native_ref": {
-      "type": "string",
-      "minLength": 1,
+      "$ref": "#/$defs/portableReference",
       "description": "Opaque or corpus-relative reference; never a machine-specific absolute path."
     },
     "provenance_refs": {
@@ -88,6 +93,12 @@
     }
   },
   "$defs": {
+    "portableReference": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!(?:[A-Za-z]:[\\\\/]|[\\\\/]{2}|/|[Ff][Ii][Ll][Ee]:)).+$",
+      "description": "Portable opaque or relative reference; rejects drive-letter, UNC, POSIX-absolute, and file-URI forms."
+    },
     "scope": {
       "type": "object",
       "additionalProperties": false,

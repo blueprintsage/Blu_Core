@@ -1,0 +1,41 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "classifications": ["required", "optional_best_effort"],
+  "targets": [
+    {
+      "target_id": "chatgpt_custom_gpt",
+      "classification": "required",
+      "behavior_canon_parity": "required",
+      "host_capability": "host-dependent and must be reported honestly",
+      "enforcement_mechanism": "model-executed canonical sources plus only those deterministic host controls and receipts the surface actually exposes",
+      "projection": "current CTS deployment instruction plus six golden capsules until an approved generated successor projection exists",
+      "allowed_host_limits": ["tools", "receipts", "persistence", "host_session evidence", "scheduling", "artifacts", "deterministic enforcement"],
+      "prohibited": ["independent Persona", "independent Operations Law", "invented deterministic guarantees", "unreceipted persistence claims"]
+    },
+    {
+      "target_id": "python_lm_studio",
+      "classification": "required",
+      "behavior_canon_parity": "required",
+      "host_capability": "provider and local-model dependent with explicit evidence",
+      "enforcement_mechanism": "four deterministic core components plus three approved external boundaries",
+      "projection": "canonical loader plus generated model-facing projection and deterministic contracts",
+      "model_provider": "lm_studio_native_rest_v1",
+      "offline_local_inference_required": true,
+      "cloud_inference_dependency_allowed_for_acceptance": false,
+      "continuity_optional_for_phase1": true,
+      "prohibited": ["LM Studio as identity owner", "local model as canon", "LM Studio as continuity owner", "model capability inferred from configuration"]
+    },
+    {
+      "target_id": "codex",
+      "classification": "optional_best_effort",
+      "behavior_canon_parity": "required_if_supported",
+      "architecture_driver": false,
+      "blocks_python": false,
+      "implementation_in_BC040": false,
+      "prohibited": ["separate Blu canon", "successor redesign for Codex convenience"]
+    }
+  ],
+  "same_blu_rule": "Identity, Persona, Compass/core values, behavioral law, teaching behavior, security and authorization semantics, continuity truth, validation truth, receipt discipline, source authority, and architectural invariants come only from canonical sources. Host projections may bind or omit unavailable capabilities but may not redefine them.",
+  "offline_acceptance": "With LM Studio running, a compatible local model loaded, and local configuration selected, Python Blu completes the Phase 1 ordinary-conversation path without OpenAI or ChatGPT cloud inference."
+}

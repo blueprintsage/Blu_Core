@@ -1,0 +1,92 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "source_register": "contracts/successor/unresolved_register.json",
+  "source_items": 12,
+  "source_blocking_for_implementation": ["SUR-001", "SUR-002", "SUR-003", "SUR-010", "SUR-011", "SUR-012"],
+  "categories": [
+    "must_resolve_before_phase1",
+    "phase1_fail_closed_supported",
+    "not_in_phase1_scope",
+    "blocks_protected_feature_only",
+    "requires_separate_security_authority"
+  ],
+  "dispositions": [
+    {
+      "id": "SUR-001",
+      "phase1_category": "must_resolve_before_phase1",
+      "security_authority": "requires_separate_security_authority",
+      "decision": "A real unstructured ordinary-conversation ingress and egress cannot be proven safe while the minimum OPSEC match/redaction contract is unavailable. Blocking every protected route is insufficient because a natural-language request can seek protected source reproduction inside the ordinary lane.",
+      "fail_closed_behavior": "Before the minimum policy exists, no real user turn may reach the local model. Test fixtures may exercise downstream contracts only.",
+      "protected_values_published": false,
+      "next_required_packet": "Protected Security Phase 1 Minimum OPSEC Match and Redaction Contract"
+    },
+    {
+      "id": "SUR-002",
+      "phase1_category": "blocks_protected_feature_only",
+      "security_authority": "requires_separate_security_authority",
+      "decision": "Phase 1 exposes no protected action and performs no Auth evaluation. Missing evidence classes and thresholds never downgrade to model judgment.",
+      "fail_closed_behavior": "Any authorization-required action returns UNAVAILABLE without attempt.",
+      "protected_values_published": false
+    },
+    {
+      "id": "SUR-003",
+      "phase1_category": "phase1_fail_closed_supported",
+      "decision": "Resolved for Phase 1 by the one-route ordinary_conversation catalog in readiness/phase1_executable_slice.json. All slash, protected, tool, source, artifact, scheduling, continuity-mutation, and Program routes are unsupported.",
+      "phase1_resolved": true
+    },
+    {
+      "id": "SUR-004",
+      "phase1_category": "not_in_phase1_scope",
+      "decision": "Natural-language claim-to-source tooling is not required for ordinary background conversation. No source_only route exists in Phase 1."
+    },
+    {
+      "id": "SUR-005",
+      "phase1_category": "phase1_fail_closed_supported",
+      "decision": "Model-provider observations carry observed_at, valid_until, scope, limitations, and evidence refs. Unknown or stale required evidence is UNAVAILABLE. Other providers remain outside Phase 1."
+    },
+    {
+      "id": "SUR-006",
+      "phase1_category": "not_in_phase1_scope",
+      "decision": "Phase 1 terminal host delivery and LM Studio completion receipts are bounded here. Chat/Codex delivery, artifacts, time, scheduling, and tools remain host-specific and unclaimed."
+    },
+    {
+      "id": "SUR-007",
+      "phase1_category": "phase1_fail_closed_supported",
+      "decision": "Resolved at the generic continuity-contract level by BC-030. Phase 1 selects an unavailable continuity provider and ordinary turn-local conversation does not require durable continuity."
+    },
+    {
+      "id": "SUR-008",
+      "phase1_category": "not_in_phase1_scope",
+      "decision": "No mood/profile storage enters Phase 1; Persona alone supplies expression."
+    },
+    {
+      "id": "SUR-009",
+      "phase1_category": "not_in_phase1_scope",
+      "decision": "No classroom state or School Engine enters Phase 1; teaching remains model-facing."
+    },
+    {
+      "id": "SUR-010",
+      "phase1_category": "phase1_fail_closed_supported",
+      "decision": "Resolved sufficiently for implementation readiness by explicit dispositions for UR-001 through UR-028 in readiness/implementation_gap_dispositions.json.",
+      "phase1_resolved": true
+    },
+    {
+      "id": "SUR-011",
+      "phase1_category": "blocks_protected_feature_only",
+      "security_authority": "requires_separate_security_authority",
+      "decision": "Phase 1 performs no cross-turn protected authorization, publishes no attempt values, and issues no pending authorization request.",
+      "fail_closed_behavior": "Protected continuation is UNAVAILABLE and no new request is synthesized.",
+      "protected_values_published": false
+    },
+    {
+      "id": "SUR-012",
+      "phase1_category": "blocks_protected_feature_only",
+      "decision": "Generic host-evidence requirements remain intact, but no Chat, Codex, Python terminal, or LM Studio surface is claimed to provide protected continuation. Ordinary conversation does not depend on it.",
+      "fail_closed_behavior": "Protected cross-turn continuation is UNAVAILABLE."
+    }
+  ],
+  "phase1_gate_result": "not_ready_for_python_phase1",
+  "actual_blockers": ["SUR-001"],
+  "non_blocker_rule": "SUR-002, SUR-011, and SUR-012 block protected features only because Phase 1 exposes no protected operation or continuation. SUR-003 and SUR-010 are resolved for the finite slice."
+}

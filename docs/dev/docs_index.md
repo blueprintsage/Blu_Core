@@ -159,6 +159,22 @@ it does not implement Local Mirror, a Python runtime, an LM Studio adapter, or
 provider-backed persistence. SUR-007 is resolved at the generic specification
 level while SUR-011 remains unresolved.
 
+## One-Blu portability and Python readiness
+
+```text
+docs/domains/runtime/one_blu_python_readiness.md
+docs/domains/runtime/assignments/BC-040/
+readiness/
+```
+
+BC-040 freezes the One-Blu deployment/canon map, provider and configuration
+contracts, package layout, finite ordinary-turn slice, gap and blocker
+dispositions, and parity/readiness gates. It also hardens BC-030 continuity
+schemas and instance validation. Its preliminary result is
+`not_ready_for_python_phase1` because SUR-001's separately authorized minimum
+OPSEC match/redaction contract is unavailable. It introduces no production Blu
+runtime, LM Studio client, Local Mirror provider, or Codex implementation.
+
 ## Historical archive source map
 
 ```text

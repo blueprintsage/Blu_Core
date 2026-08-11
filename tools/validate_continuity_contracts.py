@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Validate BC-030 continuity specification integrity and guardrails."""
+"""Validate BC-030 continuity contracts plus BC-040 schema hardening."""
 
 from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import re
 import subprocess
@@ -12,8 +13,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from jsonschema import Draft202012Validator, FormatChecker
+from referencing import Registry, Resource
 
-BASE_COMMIT = "a5f149355bd68b2aea1695e5f25ec60a2cb88b0c"
+
+BASE_COMMIT = "66e7ed52f5777bdef2e32c71a5e83b439b0d0ade"
 SPEC_DIR = Path("continuity")
 ASSIGNMENT_DIR = Path("docs/domains/continuity/assignments/BC-030")
 REQUIRED = {
@@ -23,6 +27,7 @@ REQUIRED = {
     SPEC_DIR / "schemas/continuity_query.schema.json",
     SPEC_DIR / "schemas/continuity_retrieval_result.schema.json",
     SPEC_DIR / "schemas/continuity_provider_availability.schema.json",
+    SPEC_DIR / "schemas/continuity_mutation_request.schema.json",
     SPEC_DIR / "evidence_stages.json",
     SPEC_DIR / "lifecycle.json",
     SPEC_DIR / "rehydration.json",
@@ -39,6 +44,8 @@ REQUIRED = {
     ASSIGNMENT_DIR / "validation.md",
     ASSIGNMENT_DIR / "review.md",
     Path("MANIFEST.sha256"),
+    Path("tests/continuity/fixtures/schema_instances.json"),
+    Path("requirements-contracts.txt"),
 }
 JSON_FILES = {path for path in REQUIRED if path.suffix == ".json"}
 LIFETIMES = {"none", "turn", "host_session", "durable_external"}
@@ -150,6 +157,8 @@ def _validate_git_scope(root: Path) -> list[str]:
     allowed_python = {
         "tools/validate_continuity_contracts.py",
         "tests/continuity/test_validate_continuity_contracts.py",
+        "tools/validate_python_readiness.py",
+        "tests/readiness/test_validate_python_readiness.py",
     }
     for path in all_changed:
         normalized = path.replace("\\", "/").lower()
@@ -174,6 +183,22 @@ def _validate_no_implementation_tree(root: Path) -> list[str]:
     return errors
 
 
+def _git_index_bytes(root: Path, path: str) -> bytes | None:
+    result = subprocess.run(
+        ["git", "-C", str(root), "show", f":{path}"],
+        check=False,
+        capture_output=True,
+    )
+    return result.stdout if result.returncode == 0 else None
+
+
+def _canonical_worktree_bytes(path: Path) -> bytes:
+    value = path.read_bytes()
+    if b"\x00" not in value:
+        value = value.replace(b"\r\n", b"\n")
+    return value
+
+
 def _validate_manifest_coverage(root: Path) -> list[str]:
     if not (root / ".git").exists():
         return []
@@ -187,13 +212,16 @@ def _validate_manifest_coverage(root: Path) -> list[str]:
         return ["unable to enumerate repository files for manifest coverage"]
     expected = {line.strip() for line in result.stdout.splitlines() if line.strip()} - {"MANIFEST.sha256"}
     actual: list[str] = []
+    manifest_digests: dict[str, str] = {}
     for line in (root / "MANIFEST.sha256").read_text(encoding="utf-8").splitlines():
         if not line.strip():
             continue
         parts = line.split(None, 1)
         if len(parts) != 2:
             return ["invalid MANIFEST.sha256 entry"]
-        actual.append(parts[1].strip())
+        digest, path = parts[0].lower(), parts[1].strip()
+        actual.append(path)
+        manifest_digests[path] = digest
     errors: list[str] = []
     for path in sorted(expected - set(actual)):
         errors.append(f"tracked or assignment file missing from MANIFEST.sha256: {path}")
@@ -201,6 +229,65 @@ def _validate_manifest_coverage(root: Path) -> list[str]:
         errors.append(f"stale path present in MANIFEST.sha256: {path}")
     for path in sorted({item for item in actual if actual.count(item) > 1}):
         errors.append(f"duplicate MANIFEST.sha256 path: {path}")
+    for path in sorted(expected & set(actual)):
+        canonical = _git_index_bytes(root, path)
+        if canonical is None:
+            target = root / path
+            if not target.is_file():
+                continue
+            canonical = _canonical_worktree_bytes(target)
+        digest = hashlib.sha256(canonical).hexdigest()
+        if manifest_digests.get(path) != digest:
+            errors.append(f"MANIFEST.sha256 digest mismatch: {path}")
+    return errors
+
+
+def _schema_registry(schemas: list[dict[str, Any]]) -> Registry:
+    resources = []
+    for schema in schemas:
+        Draft202012Validator.check_schema(schema)
+        resources.append((schema["$id"], Resource.from_contents(schema)))
+    return Registry().with_resources(resources)
+
+
+def _validate_schema_instances(root: Path, data: dict[Path, Any]) -> list[str]:
+    errors: list[str] = []
+    schema_paths = sorted(path for path in JSON_FILES if path.name.endswith(".schema.json"))
+    schemas = [data[path] for path in schema_paths]
+    try:
+        registry = _schema_registry(schemas)
+    except Exception as exc:  # schema errors must be explicit validation failures
+        return [f"invalid Draft 2020-12 continuity schema: {exc}"]
+
+    try:
+        fixtures = _load(root / "tests/continuity/fixtures/schema_instances.json")
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        return [f"invalid schema instance fixture matrix: {exc}"]
+
+    by_name = {path.name: data[path] for path in schema_paths}
+    covered: set[tuple[str, bool]] = set()
+    for case in fixtures.get("cases", []):
+        case_id = case.get("case_id", "<missing>")
+        schema_name = case.get("schema")
+        expected_valid = case.get("valid")
+        if schema_name not in by_name or not isinstance(expected_valid, bool):
+            errors.append(f"invalid schema fixture metadata: {case_id}")
+            continue
+        covered.add((schema_name, expected_valid))
+        validator = Draft202012Validator(
+            by_name[schema_name], registry=registry, format_checker=FormatChecker()
+        )
+        instance_errors = list(validator.iter_errors(case.get("instance")))
+        if expected_valid and instance_errors:
+            errors.append(f"valid schema fixture rejected: {case_id}: {instance_errors[0].message}")
+        if not expected_valid and not instance_errors:
+            errors.append(f"invalid schema fixture accepted: {case_id}")
+    for schema_name in sorted(by_name):
+        for expected_valid in (True, False):
+            if (schema_name, expected_valid) not in covered:
+                errors.append(
+                    f"schema lacks {'valid' if expected_valid else 'invalid'} instance fixture: {schema_name}"
+                )
     return errors
 
 
@@ -278,7 +365,7 @@ def validate(root: Path) -> list[str]:
         errors.append("ContinuityRecord identity or path-proof invariant is incomplete")
 
     receipt = data[SPEC_DIR / "schemas/continuity_receipt.schema.json"]
-    if not {"requested_action", "related_record_refs"}.issubset(_required(receipt)):
+    if not {"requested_action", "expected_version", "related_record_refs"}.issubset(_required(receipt)):
         errors.append("ContinuityReceipt action or related-record binding is incomplete")
     if _enum(receipt, "operation") != RECEIPT_OPERATIONS:
         errors.append("ContinuityReceipt operation vocabulary is incomplete")
@@ -291,6 +378,15 @@ def validate(root: Path) -> list[str]:
         errors.append("ContinuityReceipt is not bound to its requested action and related records")
     if not _contains_all(receipt.get("x-blu-failure-rule", ""), {"non-completed", "unchanged", "failure"}):
         errors.append("failed writes can become durable state")
+
+    mutation = data[SPEC_DIR / "schemas/continuity_mutation_request.schema.json"]
+    mutation_required = {"request_id", "provider_id", "operation", "scope", "record_id", "expected_version"}
+    if not mutation_required.issubset(_required(mutation)):
+        errors.append("ContinuityMutationRequest required fields are incomplete")
+    if _enum(mutation, "operation") != {"create", "update", "supersede", "retire"}:
+        errors.append("ContinuityMutationRequest operation vocabulary is incomplete")
+    if not _contains_all(mutation.get("x-blu-receipt-binding-rule", ""), {"request_id", "provider_id", "operation", "scope", "record_id", "expected_version", "exactly"}):
+        errors.append("mutation request is not checkably bound to its receipt")
 
     query = data[SPEC_DIR / "schemas/continuity_query.schema.json"]
     if query.get("properties", {}).get("limit", {}).get("maximum") != 100:
@@ -334,6 +430,8 @@ def validate(root: Path) -> list[str]:
         errors.append("history retention or no-deletion rule is incomplete")
     if not _contains_all(lifecycle.get("corruption_rule", ""), {"integrity_failure", "no", "repair", "historical", "receipt"}):
         errors.append("corruption behavior can fabricate or silently repair state")
+    if not _contains_all(lifecycle.get("availability_probe_rule", ""), {"receipt-only", "observation", "no record-state transition"}):
+        errors.append("availability_probe record-state semantics are unclear")
 
     rehydration = data[SPEC_DIR / "rehydration.json"]
     required_sequence = [
@@ -396,7 +494,15 @@ def validate(root: Path) -> list[str]:
     if source_sur011 is None:
         errors.append("source SUR-011 record is missing")
 
+    try:
+        installed_jsonschema = importlib.metadata.version("jsonschema")
+    except importlib.metadata.PackageNotFoundError:
+        errors.append("selected jsonschema runtime is not installed")
+    else:
+        if installed_jsonschema != "4.26.0":
+            errors.append(f"selected jsonschema runtime version mismatch: {installed_jsonschema}")
 
+    errors.extend(_validate_schema_instances(root, data))
     errors.extend(_validate_golden(root))
     errors.extend(_validate_git_scope(root))
     errors.extend(_validate_no_implementation_tree(root))

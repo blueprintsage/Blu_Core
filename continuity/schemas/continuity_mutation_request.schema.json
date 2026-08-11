@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/continuity/schemas/continuity_mutation_request.schema.json",
+  "title": "ContinuityMutationRequest",
+  "description": "Caller-owned request identity and expected-version contract for a continuity mutation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_id",
+    "provider_id",
+    "operation",
+    "scope",
+    "record_id",
+    "expected_version"
+  ],
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "provider_id": {"type": "string", "minLength": 1},
+    "operation": {"enum": ["create", "update", "supersede", "retire"]},
+    "scope": {"$ref": "continuity_record.schema.json#/$defs/scope"},
+    "record_id": {"type": "string", "minLength": 1},
+    "expected_version": {"type": ["integer", "null"], "minimum": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"operation": {"const": "create"}}, "required": ["operation"]},
+      "then": {"properties": {"expected_version": {"type": "null"}}},
+      "else": {"properties": {"expected_version": {"type": "integer", "minimum": 1}}}
+    }
+  ],
+  "x-blu-receipt-binding-rule": "The resulting ContinuityReceipt must repeat request_id, provider_id, operation, scope, record_id, and expected_version exactly so conflict behavior is consumer-checkable."
+}

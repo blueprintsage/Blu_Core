@@ -138,6 +138,27 @@ automation interface recorded while classifying the three operational
 scheduling capabilities as unknown and requiring semantically relevant current
 evidence for verified capability claims.
 
+## Local Mirror continuity contracts
+
+```text
+docs/domains/continuity/local_mirror_continuity.md
+docs/domains/continuity/assignments/BC-030/
+continuity/README.md
+continuity/schemas/
+continuity/evidence_stages.json
+continuity/lifecycle.json
+continuity/rehydration.json
+continuity/security_evidence.json
+continuity/local_mirror_profile.json
+continuity/sur007_disposition.json
+```
+
+BC-030 specializes the existing Generic Continuity Provider Boundary for
+receipted `durable_external` continuity. It defines schemas and lifecycle only;
+it does not implement Local Mirror, a Python runtime, an LM Studio adapter, or
+provider-backed persistence. SUR-007 is resolved at the generic specification
+level while SUR-011 remains unresolved.
+
 ## Historical archive source map
 
 ```text

@@ -1,0 +1,57 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-030",
+  "profiles": {
+    "ordinary_continuity": {
+      "required_properties": [
+        "stable_record_identity",
+        "exact_scope",
+        "provider_identity",
+        "version_identity",
+        "provenance",
+        "integrity_evidence",
+        "operation_receipt",
+        "expected_version_conflict_handling"
+      ],
+      "sufficient_for_protected_authorization": false
+    },
+    "protected_authorization": {
+      "required_properties": [
+        "state_record_identity",
+        "authorization_request_binding",
+        "protected_action_scope",
+        "protected_resource_scope",
+        "issued_at_and_finite_expiry",
+        "integrity",
+        "prior_consumption_and_replay_state",
+        "atomic_expected_version_transition",
+        "monotonic_or_rollback_resistant_attempt_state",
+        "provider_operation_receipt_ref"
+      ],
+      "failure_rule": "If any property is absent, stale, mismatched, rolled back, replayed, corrupted, or unverified, protected cross-turn continuation is unavailable and fails closed.",
+      "model_or_conversation_fallback_allowed": false,
+      "ordinary_continuity_receipt_sufficient": false
+    }
+  },
+  "pending_authorization_state_rule": "Durable storage of PendingAuthorizationState does not make the state active, trusted, resumable, or authorized. The existing Security Restraint and Authorization Evaluator contracts still decide those semantics from qualifying evidence.",
+  "local_mirror_reference_disposition": {
+    "ordinary_continuity": "useful structural evidence only; provider implementation and live availability remain unproven",
+    "protected_authorization": "insufficient_evidence",
+    "missing_properties": [
+      "authenticated provider identity",
+      "atomic compare-and-set receipt",
+      "replay and consumption state",
+      "monotonic or rollback-resistant attempt state",
+      "crash-consistent durable mutation receipt",
+      "authorization and confidentiality enforcement"
+    ]
+  },
+  "sur011_state": "unresolved_security_policy_input",
+  "sur011_not_decided": [
+    "unrelated-turn behavior while authorization is pending",
+    "retry policy and attempt values",
+    "lockout or backoff policy",
+    "cancellation and reset policy",
+    "new-request-after-exhaustion policy"
+  ]
+}

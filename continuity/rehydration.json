@@ -1,0 +1,27 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-030",
+  "sequence": [
+    "new_runtime_or_hosted_turn",
+    "observe_provider_availability",
+    "issue_bounded_continuity_query",
+    "receive_provider_result_and_receipt",
+    "validate_identity_scope_status_version_provenance_authorization_integrity",
+    "stage_authorized_bounded_turn_context",
+    "invoke_model_if_appropriate"
+  ],
+  "success_label": "continuity_rehydrated",
+  "success_requirements": [
+    "availability is available or operation-compatible degraded with evidence",
+    "retrieval result status is completed",
+    "retrieval receipt status is completed and matches query, provider, scope, and returned records",
+    "record integrity and provenance validation completed",
+    "context staging respects authorization, sensitivity, scope, and bounded size"
+  ],
+  "failure_labels": ["continuity_unavailable", "continuity_not_found", "continuity_invalid", "continuity_integrity_failure", "continuity_forbidden", "continuity_degraded"],
+  "failure_rule": "A failed gate does not stage unvalidated material and does not permit the model to fill gaps from claimed memory.",
+  "model_context_rule": "Staged context is turn-local input. It is not a durable store, a receipt, or evidence that the model remembered anything.",
+  "restart_rule": "Every new process or hosted turn that needs durable continuity repeats availability, retrieval, receipt, validation, and staging gates.",
+  "host_session_rule": "host_session evidence may help bind the current host event but cannot substitute for durable_external retrieval evidence, and a continuity receipt cannot establish a current host_session.",
+  "bounded_context_requirements": ["explicit record identities", "explicit scope", "explicit version/status", "provenance refs", "integrity result", "size or item limit", "limitations preserved"]
+}

@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/continuity/schemas/continuity_record.schema.json",
+  "title": "ContinuityRecord",
+  "description": "Provider-returned metadata for one immutable version in a stable durable-external record lineage.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "record_id",
+    "version_id",
+    "record_type",
+    "scope",
+    "schema_version",
+    "version",
+    "created_evidence",
+    "updated_evidence",
+    "status",
+    "predecessor",
+    "successor",
+    "payload_ref",
+    "integrity_ref",
+    "sensitivity",
+    "visibility",
+    "provider_id",
+    "provider_native_ref",
+    "provenance_refs"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable logical lineage identity; updates must preserve it."
+    },
+    "version_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Immutable identity for this exact record version."
+    },
+    "record_type": {"type": "string", "minLength": 1},
+    "scope": {"$ref": "#/$defs/scope"},
+    "schema_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "version": {"type": "integer", "minimum": 1},
+    "created_evidence": {"$ref": "#/$defs/timeEvidence"},
+    "updated_evidence": {"$ref": "#/$defs/timeEvidence"},
+    "status": {"enum": ["current", "superseded", "retired"]},
+    "predecessor": {"anyOf": [{"$ref": "#/$defs/relation"}, {"type": "null"}]},
+    "successor": {"anyOf": [{"$ref": "#/$defs/relation"}, {"type": "null"}]},
+    "payload_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "locator"],
+      "properties": {
+        "kind": {"enum": ["inline_envelope", "provider_object", "corpus_relative"]},
+        "locator": {"type": "string", "minLength": 1}
+      }
+    },
+    "integrity_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "digest", "evidence_ref"],
+      "properties": {
+        "algorithm": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "minLength": 1},
+        "evidence_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "sensitivity": {"enum": ["public", "internal", "restricted", "protected_authorization"]},
+    "visibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "authorized_subjects_or_policy_ref"],
+      "properties": {
+        "class": {"enum": ["public", "owner", "bounded_group", "policy_controlled"]},
+        "authorized_subjects_or_policy_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "provider_id": {"type": "string", "minLength": 1},
+    "provider_native_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Opaque or corpus-relative reference; never a machine-specific absolute path."
+    },
+    "provenance_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  },
+  "$defs": {
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespace", "subject_ref", "owner_ref", "purpose"],
+      "properties": {
+        "namespace": {"type": "string", "minLength": 1},
+        "subject_ref": {"type": "string", "minLength": 1},
+        "owner_ref": {"type": "string", "minLength": 1},
+        "purpose": {"type": "string", "minLength": 1}
+      }
+    },
+    "timeEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_at", "receipt_ref"],
+      "properties": {
+        "observed_at": {"type": "string", "format": "date-time"},
+        "receipt_ref": {"type": "string", "minLength": 1}
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "version_id", "relation", "receipt_ref"],
+      "properties": {
+        "record_id": {"type": "string", "minLength": 1},
+        "version_id": {"type": "string", "minLength": 1},
+        "relation": {"enum": ["previous_version", "next_version", "superseded_by", "supersedes"]},
+        "receipt_ref": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "x-blu-invariants": [
+    "record_id is stable across update versions",
+    "version_id is immutable and unique within the provider",
+    "provider_native_ref path is opaque or corpus-relative and is never persistence proof",
+    "current has no successor; superseded has a successor; retired is not current",
+    "record metadata is accepted only with a matching provider result and receipt"
+  ]
+}

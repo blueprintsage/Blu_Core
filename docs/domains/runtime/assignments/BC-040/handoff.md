@@ -9,8 +9,9 @@ last_reviewed: 2026-08-11
 - Assignment: BC-040
 - Exact base: `66e7ed52f5777bdef2e32c71a5e83b439b0d0ade`
 - Branch: `bc-040-one-blu-readiness`
-- Substantive commit: recorded by the required metadata-only follow-up
-- Metadata commit: pending
+- Substantive commit: `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`
+- Metadata commit: this required metadata-only follow-up; its own final SHA is
+  reported externally
 - Push status: pending
 - Working-tree status: clean staged specification at final validation; final
   post-commit receipt pending
@@ -95,6 +96,6 @@ No future runtime source root or provider implementation file exists.
 
 ## Final receipts
 
-The metadata-only follow-up records the exact substantive SHA, final clean-tree
-state, and push receipt. Claude then reviews the exact metadata head and
-substantive target independently.
+This metadata-only follow-up records the exact substantive SHA. Its own final
+SHA, final clean-tree state, and push receipt are reported externally. Claude
+then reviews the exact metadata head and substantive target independently.

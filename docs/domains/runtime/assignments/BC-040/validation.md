@@ -121,3 +121,10 @@ or runtime behavior. No live provider or Chat probe is part of BC-040.
 Actual blocker: SUR-001 only. The next safe assignment is `Protected Security
 Phase 1 Minimum OPSEC Match and Redaction Contract`. No runtime implementation
 packet is authorized by BC-040.
+
+## Commit identity
+
+- Substantive specification commit:
+  `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`
+- Metadata method: this follow-up records the substantive SHA without
+  attempting to embed a commit's own final SHA in its tree.

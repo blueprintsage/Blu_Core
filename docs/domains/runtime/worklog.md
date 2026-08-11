@@ -34,6 +34,12 @@ last_reviewed: 2026-08-11
 - After full validation, commit and push the BC-040 specification for Claude
   review. Do not begin Python Runtime Phase 1.
 
+### Commit identity
+
+- Substantive specification:
+  `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`
+- Metadata receipt: this follow-up; reported externally after creation.
+
 ## 2026-08-05 — Bootstrap
 
 - Created the domain continuity lane.

@@ -1,8 +1,8 @@
 # Successor Continuity Provider Contracts
 
-status: review
+status: active
 owner: docs/domains/continuity
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
 assignment: BC-030
 
 ## Purpose

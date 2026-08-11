@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/worklogs
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
 canonical_base: 7aed76e
 
 ## Rules
@@ -30,7 +30,7 @@ canonical_base: 7aed76e
 | BC-017-C1 | Historical Archaeology Review Corrections | Codex | done | `docs/domains/runtime/assignments/BC-017-C1/assignment.md` | `c323cff06c9f111408f4a416817d78fc0f3e2d2b` | B-01/B-02/B-03 correction only; work `87c4e49333d30a471a00483fc1384e1918626ee1`; metadata `fd7f1707e242aa0e9621ab9f7293364860cab21d`; Claude re-review `bea9463f0dbbae1c3944c5f44a7843c757d7f0bb`; `approve-with-notes`, no blockers; integrated reviewed state `b88902d997685057ee0e76709df7117f8a83f295`; closure commit `b0182581c16bbb4dbeced715ae6e35bcee8bf097` |
 | BC-020 | Define Chat and Codex capability adapter contracts | Codex | done | `docs/domains/runtime/assignments/BC-020/assignment.md` | `d4157e79fc7e2df6e1bd53b589cabfa19cd7238f` | Work `09c484418e51365cf9b156cf304eebae7fecde5d`; metadata `ccf3206ad033d588246e09001d47ddce3ac50a31`; original Claude review `370278cd91fd9ecca2c64cd0953cae7ed63c4d16` returned BF-1; closed after BC-020-C1 and final Claude re-review `b51912a655d3f895651eb0bdbbe0c41ba1e7f132` (`approve-with-notes`, no blockers); integrated closure base `642a5df7340c4f87ac723bffb4d308fef09bf2b2`; closure commit `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533`; specification only, no runtime implementation |
 | BC-020-C1 | Scheduling Capability Evidence Correction | Codex | done | `docs/domains/runtime/assignments/BC-020-C1/assignment.md` | `370278cd91fd9ecca2c64cd0953cae7ed63c4d16` | BF-1 correction only; work `b770be849d625e924f7e65cae4efb8894a7e4c23`; metadata `8eb29165d5d59b99ccaa3b06fe6d8613dcaa11e2`; Claude re-review `b51912a655d3f895651eb0bdbbe0c41ba1e7f132`; `approve-with-notes`, BF-1 resolved, zero blockers; integrated closure base `642a5df7340c4f87ac723bffb4d308fef09bf2b2`; closure commit `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533` |
-| BC-030 | Define Local Mirror continuity schema and lifecycle | Codex | review | `docs/domains/continuity/assignments/BC-030/assignment.md` | `a5f149355bd68b2aea1695e5f25ec60a2cb88b0c` | Work `6812513d10eeb69f1e5b477617ffdccc52e5067b`; metadata is the follow-up record commit; specification, schemas, lifecycle, validator, and tests only; no provider/runtime/LM Studio implementation; Claude semantic review pending |
+| BC-030 | Define Local Mirror continuity schema and lifecycle | Codex | done | `docs/domains/continuity/assignments/BC-030/assignment.md` | `a5f149355bd68b2aea1695e5f25ec60a2cb88b0c` | Work `6812513d10eeb69f1e5b477617ffdccc52e5067b`; metadata `4c4ef004aef2d93937de3fdb4bbbdeae4f2d9843`; work integration `d679357426899c660d905326ef345d7229974b0b`; Claude review `adda640c05035d14057a22fb1ac85c19c326fe4f` (`approve-with-notes`, zero blockers); reviewed integration base `c76843e82a42ab091810c110e8c01a4e32ed311e`; SUR-007 resolved at generic contract level; SUR-011 preserved; specification-only, no provider/runtime/LM Studio implementation; closure `a77393d6fc63e644f57a70992af6fec050a2e802` |
 
 ## Design assignments
 
@@ -42,6 +42,20 @@ canonical_base: 7aed76e
 
 ## Completed
 
+- BC-030 — Local Mirror Continuity Schema and Lifecycle closed at the
+  specification boundary after substantive work
+  `6812513d10eeb69f1e5b477617ffdccc52e5067b`, metadata
+  `4c4ef004aef2d93937de3fdb4bbbdeae4f2d9843`, work integration
+  `d679357426899c660d905326ef345d7229974b0b`, and Claude review
+  `adda640c05035d14057a22fb1ac85c19c326fe4f` returned
+  `approve-with-notes` with zero blockers. SUR-007 is resolved at the generic
+  continuity-contract level; SUR-011 and all provider implementation inputs
+  remain unresolved. Claude N1-N8 and instance-level schema-conformance notes
+  carry forward as implementation-readiness inputs. Closure introduced no
+  provider, successor Python runtime, LM Studio adapter, Chat/Codex adapter
+  implementation, or PASS/SkillForge work. Reviewed integration base:
+  `c76843e82a42ab091810c110e8c01a4e32ed311e`; closure commit
+  `a77393d6fc63e644f57a70992af6fec050a2e802`.
 - BC-020-C1 — Scheduling Capability Evidence Correction closed after
   substantive correction `b770be849d625e924f7e65cae4efb8894a7e4c23`, metadata
   `8eb29165d5d59b99ccaa3b06fe6d8613dcaa11e2`, and Claude re-review

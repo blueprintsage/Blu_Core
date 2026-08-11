@@ -1,8 +1,8 @@
 # BC-030 — Validation Record
 
-status: review
+status: done
 owner: Codex
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
 
 ## Environment
 
@@ -158,3 +158,90 @@ runtime behavior, or model behavioral parity.
 - Metadata method: this follow-up commit records the substantive SHA without
   attempting the impossible operation of embedding a commit's own final SHA in
   its tree.
+
+## Final closure validation — 2026-08-11
+
+Commands were rerun from `bc-030-closure` at exact integrated base
+`c76843e82a42ab091810c110e8c01a4e32ed311e` after the authorized closure edits.
+
+```text
+git diff --check
+python tools/validate_runtime_contracts.py
+python -m unittest discover -s tests/contracts -p "test_*.py"
+python tools/validate_viability_audit.py
+python -m unittest discover -s tests/viability -p "test_*.py"
+python tools/validate_historical_archive_inventory.py
+python -m unittest discover -s tests/historical_archives -p "test_*.py"
+python tools/validate_historical_behavioral_archaeology.py
+python -m unittest discover -s tests/historical_archaeology -p "test_*.py"
+python tools/validate_successor_kernel_spec.py
+python -m unittest discover -s tests/successor_kernel -p "test_*.py"
+python tools/validate_host_adapter_contracts.py
+python -m unittest discover -s tests/host_adapters -p "test_*.py"
+python tools/validate_continuity_contracts.py
+python -m unittest discover -s tests/continuity -p "test_*.py"
+```
+
+Results:
+
+```text
+git diff --check: passed
+runtime contract validator: passed
+runtime contract tests: Ran 21, OK
+viability validator: passed
+viability tests: Ran 9, OK
+historical archive validator: passed
+historical archive tests: Ran 12, OK
+historical archaeology validator: passed
+historical archaeology tests: Ran 18, OK
+successor kernel validator: passed
+successor kernel tests: Ran 40, OK
+host adapter validator: one expected authorized-scope finding
+  (contracts/successor/unresolved_register.json changed from the BC-020 base)
+host adapter tests: Ran 34, OK
+continuity validator: one expected authorized-scope finding
+  (contracts/successor/unresolved_register.json changed from the BC-030 base)
+continuity tests: Ran 34, OK
+```
+
+Both direct validator commands completed their contract checks but returned exit
+1 because their historical Git-scope guards classify every change to
+`contracts/successor/unresolved_register.json` as protected. This closure
+explicitly authorizes the SUR-007-only reconciliation and explicitly excludes a
+validator change, so the guards were left unchanged. Running each validator
+against the identical staged tree without repository-history scope enforcement
+passed, confirming that the one direct-command finding is the authorized path
+change rather than a contract-content failure. The direct exit-1 results remain
+the authoritative command receipts; they are not reported as passing.
+
+Additional closure results:
+
+```text
+golden CTS SHA-256: 8/8 passed
+canonical manifest: 239 entries; 239 tracked expected; 0 missing; 0 extra;
+  0 duplicate; 0 mismatch against staged Git blob bytes
+successor components: 7
+successor packets: 8
+successor interfaces: 9
+state lifetimes: none, turn, host_session, durable_external
+host_session != durable_external: preserved
+SUR-007: resolved_at_generic_continuity_contract_level
+SUR-011: unresolved_security_policy_input
+Claude review blob changes: 0
+golden kernel changes: 0
+current CTS runtime changes: 0
+provider/runtime/LM Studio/Chat/Codex implementation files added: 0
+PASS/SkillForge path changes: 0
+```
+
+The manifest was regenerated from the canonical staged Git blob view, not the
+CRLF-materialized working-tree bytes described in Claude note N11.
+
+These checks establish specification consistency and closure bookkeeping only.
+They do not prove live durability, provider availability, a durable write,
+crash consistency, protected durable authorization, or runtime behavior.
+
+The substantive closure commit is
+`a77393d6fc63e644f57a70992af6fec050a2e802`. This metadata-only follow-up
+records that immutable identity; the metadata commit cannot record its own
+final identity.

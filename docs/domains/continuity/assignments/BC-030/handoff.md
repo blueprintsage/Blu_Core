@@ -1,8 +1,8 @@
 # BC-030 — Implementation Handoff
 
-status: review
+status: done
 owner: Codex
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
 
 ## Identity
 
@@ -10,8 +10,13 @@ last_reviewed: 2026-08-10
 - Base commit: `a5f149355bd68b2aea1695e5f25ec60a2cb88b0c`
 - Work branch: `bc-030-local-mirror-continuity`
 - Work commit: `6812513d10eeb69f1e5b477617ffdccc52e5067b`
-- Push status: pending at metadata commit; final Git receipt required
-- Working-tree status: clean after substantive commit; metadata-only record follows
+- Push and integration status: substantive commit
+  `6812513d10eeb69f1e5b477617ffdccc52e5067b` and metadata commit
+  `4c4ef004aef2d93937de3fdb4bbbdeae4f2d9843` were pushed and integrated by
+  `d679357426899c660d905326ef345d7229974b0b`; Claude review
+  `adda640c05035d14057a22fb1ac85c19c326fe4f` was integrated by
+  `c76843e82a42ab091810c110e8c01a4e32ed311e`
+- Working-tree status: final closure status is recorded in closure validation
 
 ## Result
 
@@ -87,3 +92,31 @@ MANIFEST.sha256
   replay requirements.
 - Correct preservation of the seven/eight/nine architecture, current CTS,
   SUR-011, model/host boundaries, and implementation prohibitions.
+
+## Final closure receipt — 2026-08-11
+
+- Closure authority: Dad, Project Owner, and Blu, Project Lead.
+- Exact integrated closure base:
+  `c76843e82a42ab091810c110e8c01a4e32ed311e`.
+- Closure branch: `bc-030-closure`.
+- Original base: `a5f149355bd68b2aea1695e5f25ec60a2cb88b0c`.
+- Substantive specification:
+  `6812513d10eeb69f1e5b477617ffdccc52e5067b`.
+- Specification metadata:
+  `4c4ef004aef2d93937de3fdb4bbbdeae4f2d9843`.
+- Work integration:
+  `d679357426899c660d905326ef345d7229974b0b`.
+- Claude review:
+  `adda640c05035d14057a22fb1ac85c19c326fe4f`;
+  disposition `approve-with-notes`; zero blocking findings.
+- Final reviewed-state integration:
+  `c76843e82a42ab091810c110e8c01a4e32ed311e`.
+- Final status: `done` at the specification boundary.
+- SUR-007 is reconciled as
+  `resolved_at_generic_continuity_contract_level`; this does not claim a
+  continuity provider or protected-authorization capability.
+- SUR-011 remains unresolved.
+- Substantive closure commit:
+  `a77393d6fc63e644f57a70992af6fec050a2e802`.
+- The closure introduces no provider, successor Python runtime, LM Studio
+  adapter, Chat/Codex adapter implementation, or PASS/SkillForge work.

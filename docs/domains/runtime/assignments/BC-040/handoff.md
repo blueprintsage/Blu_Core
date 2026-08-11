@@ -15,7 +15,8 @@ last_reviewed: 2026-08-11
 - Reviewed/integrated closure base:
   `8801ae138deb0261deff47d02269c7a16773c892`
 - Closure branch: `bc-040-closure`
-- Closure substantive commit: recorded by the required metadata follow-up
+- Closure substantive commit:
+  `d78f58972327434c83d7e79a2cb9372e487a9629`
 - Closure metadata commit: reported externally because it cannot contain its
   own final SHA
 - Original work publication: published and integrated by

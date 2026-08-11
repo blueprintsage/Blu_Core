@@ -258,3 +258,11 @@ Claude's disposition remains `approve-with-notes` with zero BC-040 blocking
 findings. All ten notes remain nonblocking future inputs. The next separately
 authorized assignment is `Protected Security Phase 1 — Minimum OPSEC Match and
 Redaction Contract`. Python Runtime Phase 1 is not authorized by this closure.
+
+### Closure commit receipt
+
+- Substantive administrative closure:
+  `d78f58972327434c83d7e79a2cb9372e487a9629`
+- Metadata method: the required follow-up records the substantive SHA. The
+  metadata commit's own final SHA is reported externally rather than embedded
+  in its tree.

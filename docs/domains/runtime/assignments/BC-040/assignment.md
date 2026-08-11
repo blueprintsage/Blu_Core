@@ -202,6 +202,8 @@ scope or authorize implementation.
 - Final reviewed/integrated base:
   `8801ae138deb0261deff47d02269c7a16773c892`
 - Closure branch: `bc-040-closure`
+- Closure substantive commit:
+  `d78f58972327434c83d7e79a2cb9372e487a9629`
 - Final assignment status: `done`
 - Final BC-040 readiness result: `not_ready_for_python_phase1`
 

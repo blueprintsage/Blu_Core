@@ -46,6 +46,8 @@ last_reviewed: 2026-08-11
 Exact final commands, suite counts, manifest coverage, golden CTS results,
 architecture counts, protected-boundary checks, limitations, and commit
 receipts are recorded in `assignments/BC-040/validation.md` and `handoff.md`.
+Substantive administrative closure commit:
+`d78f58972327434c83d7e79a2cb9372e487a9629`.
 
 ## 2026-08-11 — BC-040 One-Blu portability and readiness
 

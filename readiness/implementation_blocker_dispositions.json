@@ -1,9 +1,9 @@
 {
-  "spec_version": "1.0.0",
-  "assignment": "BC-040",
+  "spec_version": "1.1.0",
+  "assignment": "BC-041",
   "source_register": "contracts/successor/unresolved_register.json",
   "source_items": 12,
-  "source_blocking_for_implementation": ["SUR-001", "SUR-002", "SUR-003", "SUR-010", "SUR-011", "SUR-012"],
+  "source_blocking_for_implementation": ["SUR-002", "SUR-003", "SUR-010", "SUR-011", "SUR-012"],
   "categories": [
     "must_resolve_before_phase1",
     "phase1_fail_closed_supported",
@@ -14,12 +14,15 @@
   "dispositions": [
     {
       "id": "SUR-001",
-      "phase1_category": "must_resolve_before_phase1",
+      "phase1_category": "phase1_fail_closed_supported",
       "security_authority": "requires_separate_security_authority",
-      "decision": "A real unstructured ordinary-conversation ingress and egress cannot be proven safe while the minimum OPSEC match/redaction contract is unavailable. Blocking every protected route is insufficient because a natural-language request can seek protected source reproduction inside the ordinary lane.",
-      "fail_closed_behavior": "Before the minimum policy exists, no real user turn may reach the local model. Test fixtures may exercise downstream contracts only.",
+      "disposition": "resolved_at_minimum_phase1_contract_level",
+      "phase1_resolved": true,
+      "decision": "BC-041 defines the minimum deterministic public matcher, protected-policy schema and opaque reference, fail-closed loading stages, ingress PASS/BLOCK mapping, egress block/redaction mapping, and content-safe evidence needed for the ordinary Phase 1 route.",
+      "fail_closed_behavior": "Missing, unreadable, malformed, schema-invalid, integrity-mismatched, or unusable protected policy is terminal UNAVAILABLE without SecurityDecision PASS, model invocation, or public candidate output.",
       "protected_values_published": false,
-      "next_required_packet": "Protected Security Phase 1 Minimum OPSEC Match and Redaction Contract"
+      "resolution_contract": "contracts/security/opsec/minimum_contract.json",
+      "remaining_limitations": ["Production policy values remain external and require protected authority.", "Deterministic normalized-phrase matching does not prove arbitrary semantic paraphrase equivalence.", "Auth and protected continuation remain unavailable in Phase 1."]
     },
     {
       "id": "SUR-002",
@@ -86,7 +89,7 @@
       "fail_closed_behavior": "Protected cross-turn continuation is UNAVAILABLE."
     }
   ],
-  "phase1_gate_result": "not_ready_for_python_phase1",
-  "actual_blockers": ["SUR-001"],
+  "phase1_gate_result": "ready_for_python_phase1",
+  "actual_blockers": [],
   "non_blocker_rule": "SUR-002, SUR-011, and SUR-012 block protected features only because Phase 1 exposes no protected operation or continuation. SUR-003 and SUR-010 are resolved for the finite slice."
 }

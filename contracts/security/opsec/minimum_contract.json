@@ -1,0 +1,150 @@
+{
+  "contract_version": "1.0.0",
+  "assignment": "BC-041",
+  "disposition": "resolved_at_minimum_phase1_contract_level",
+  "authority": {
+    "recovered_current_law": [
+      "kernel/golden/v0.22.0/00_Instructions.md#OPSEC / Privacy",
+      "kernel/golden/v0.22.0/02_Operations_Law.md#Terminal Packet Doctrine",
+      "kernel/golden/v0.22.0/03_Exec.md#§7 — RuntimeGate.Ingress"
+    ],
+    "authorized_successor_mechanism": "BC-041 public minimum deterministic match and redaction contract",
+    "does_not_redefine_current_cts": true
+  },
+  "architecture": {
+    "ingress_owner": "security_restraint",
+    "egress_owner": "validation_egress",
+    "component_added": false,
+    "packet_added": false,
+    "interface_added": false,
+    "route_added": false
+  },
+  "security_decision_values": ["PASS", "BLOCK", "ASK"],
+  "phase1_match_decision_mapping": {
+    "no_match": "PASS",
+    "protected_match": "BLOCK",
+    "authorization_case_created": false,
+    "unavailable_or_invalid_policy": "terminal_UNAVAILABLE_without_SecurityDecision"
+  },
+  "policy_reference": {
+    "kind": "environment_file",
+    "configuration_contains": ["locator_environment_variable_name", "sha256_environment_variable_name"],
+    "environment_contains": ["machine_local_policy_location", "expected_policy_sha256"],
+    "configuration_must_not_contain": ["filesystem_location", "policy_payload", "protected_value", "expected_digest"],
+    "required_stages": [
+      "reference_configured",
+      "target_located",
+      "payload_loaded",
+      "schema_validated",
+      "integrity_validated",
+      "policy_usable"
+    ],
+    "only_policy_usable_permits_evaluation": true
+  },
+  "normalization": {
+    "input_type": "unicode_text",
+    "ordered_steps": [
+      "reject_non_string_input",
+      "unicode_NFKC",
+      "normalize_CRLF_CR_and_all_unicode_whitespace_to_ASCII_space",
+      "map_bounded_common_separators_dot_comma_colon_semicolon_hyphen_underscore_slash_backslash_pipe_to_ASCII_space",
+      "collapse_repeated_ASCII_space",
+      "trim_ASCII_space",
+      "unicode_casefold_only_for_case_insensitive_rule_evaluation"
+    ],
+    "separator_set": [".", ",", ":", ";", "-", "_", "/", "\\", "|"],
+    "deterministic": true,
+    "semantic_paraphrase_detection": false
+  },
+  "matcher": {
+    "rule_type": "normalized_phrase",
+    "match_boundary": "unicode_word_token",
+    "rule_order": "ascending_opaque_rule_ref",
+    "all_matches_collected": true,
+    "model_invocation_allowed": false,
+    "confidence_or_likely_intent_allowed": false
+  },
+  "ingress": {
+    "sequence": [
+      "load_validate_and_integrity_check_policy",
+      "normalize_raw_host_input",
+      "evaluate_all_ingress_rules",
+      "emit_SecurityDecision"
+    ],
+    "PASS_reaches_turn_controller": true,
+    "BLOCK_reaches_turn_controller": false,
+    "policy_failure_reaches_model": false,
+    "positive_match_echo_allowed": false
+  },
+  "egress": {
+    "sequence": [
+      "normalize_candidate_output",
+      "evaluate_all_egress_rules",
+      "apply_block_or_policy_authorized_redaction",
+      "rescan_redacted_output",
+      "authorize_or_withhold_terminal_print"
+    ],
+    "result_values": ["CLEAR", "REDACTED", "BLOCKED", "UNAVAILABLE", "INVALID"],
+    "CLEAR_printable": true,
+    "REDACTED_printable": true,
+    "BLOCKED_printable": false,
+    "UNAVAILABLE_printable": false,
+    "INVALID_printable": false
+  },
+  "redaction": {
+    "replacement": "[protected content omitted]",
+    "authorization": "every matched rule must specify egress_action REDACT",
+    "public_form": "canonicalized candidate only; raw candidate is never reconstructed for public print",
+    "required_postconditions": [
+      "every matched span replaced",
+      "no protected rule matches the redacted result",
+      "residual contains at least one alphanumeric character outside replacement tokens",
+      "no invalid or overlapping span",
+      "no matched value appears in output evidence diagnostics or logs"
+    ],
+    "postcondition_failure": "BLOCKED"
+  },
+  "safe_evidence": {
+    "allowed_fields": [
+      "evaluation_phase",
+      "result",
+      "policy_revision",
+      "opaque_rule_refs",
+      "candidate_hmac_sha256",
+      "safe_reason_code",
+      "error_code"
+    ],
+    "candidate_digest": "HMAC-SHA-256 over normalized candidate using the protected policy evidence_hmac_key",
+    "forbidden_fields": [
+      "raw_input",
+      "raw_candidate_output",
+      "matched_text",
+      "rule_value",
+      "original_span",
+      "evidence_hmac_key",
+      "unkeyed_protected_text_digest"
+    ]
+  },
+  "safe_error_codes": [
+    "POLICY_REF_MISSING",
+    "POLICY_TARGET_UNAVAILABLE",
+    "POLICY_MALFORMED",
+    "POLICY_SCHEMA_INVALID",
+    "POLICY_INTEGRITY_MISMATCH",
+    "POLICY_UNUSABLE",
+    "INPUT_INVALID",
+    "INGRESS_PROTECTED_MATCH",
+    "EGRESS_PROTECTED_MATCH",
+    "EGRESS_REDACTION_INVALID"
+  ],
+  "scope_exclusions": [
+    "Auth policy or evidence thresholds",
+    "SUR-011 attempt retry lockout cancellation or unrelated-turn policy",
+    "model inference",
+    "tool execution",
+    "continuity mutation",
+    "production runtime implementation",
+    "arbitrary semantic paraphrase or obfuscation detection"
+  ],
+  "synthetic_fixture_statement": "synthetic test policy != production protected policy"
+}

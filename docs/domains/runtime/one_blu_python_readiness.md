@@ -3,23 +3,22 @@
 status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
-assignment: BC-040
+assignment: BC-041
 
 ## Result
 
-BC-040 defines the implementation-ready architecture and first executable
-slice, but the authorization result is:
+BC-040 defined the architecture and first executable slice. BC-041 now resolves
+its sole contract blocker at the bounded minimum Phase 1 level. The readiness
+result is:
 
 ```text
-not_ready_for_python_phase1
+ready_for_python_phase1
 ```
 
-The only actual blocker is SUR-001: the repository does not contain the
-separately authorized minimum OPSEC match/redaction contract needed to prove
-that arbitrary natural-language ingress and egress cannot request or reproduce
-protected Blu source. Explicit protected routes, tools, Auth, continuity,
-commands, and side effects can all fail closed, but an ordinary text lane still
-needs that boundary. BC-040 does not invent it.
+`runtime_phase1_packet_may_be_authored_next` is `true`. This means Dad/Blu may
+consider authoring `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio
+Model Boundary`. It does not authorize implementation, automatic start, merge,
+or release.
 
 ## One Blu
 
@@ -102,11 +101,20 @@ those paths return `UNAVAILABLE` without attempt. SUR-003 is resolved by the
 finite one-route catalog. SUR-010 is resolved sufficiently for the slice by an
 explicit disposition for every UR-001 through UR-028 current-source gap.
 
-SUR-001 remains different. A real text turn cannot safely bypass pre-ingress
-policy merely because explicit protected commands are absent. Until a
-security-authorized minimum matcher/redaction contract exists, test fixtures
-may exercise downstream interfaces but a real user turn must not reach the
-local model.
+SUR-001 is now `resolved_at_minimum_phase1_contract_level`. BC-041 defines a
+public deterministic normalized-phrase matcher, protected-policy schema,
+portable environment-file reference, fail-closed loading stages, ingress
+PASS/BLOCK mapping, egress block/redaction mapping, and content-safe evidence.
+Production values, policy location, and expected digest remain outside public
+configuration. Missing, malformed, schema-invalid, integrity-mismatched, or
+otherwise unusable policy is terminal `UNAVAILABLE`; it cannot reach Turn
+Controller or LM Studio.
+
+The minimum matcher prevents the specified trivial formatting bypasses and
+tests conservative near-matches. It does not claim arbitrary paraphrase,
+semantic-equivalence, or general obfuscation detection. Auth and protected
+continuation remain unavailable, and SUR-002, SUR-011, and SUR-012 retain their
+prior dispositions.
 
 ## Continuity hardening
 
@@ -125,12 +133,13 @@ manifest coverage, and canonical blob digest validation.
 
 ## Next safe step
 
-Dad/Blu may authorize `Protected Security Phase 1 Minimum OPSEC Match and
-Redaction Contract`. After that packet closes with independent review, they may
-consider the already named runtime packet:
+Claude performs the independent semantic review of BC-041. Dad/Blu inspect the
+exact result and decide integration and whether to authorize the already named
+runtime packet:
 
 ```text
 Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary
 ```
 
-Neither assignment starts automatically from BC-040.
+Codex must not begin that runtime packet automatically, even though the
+contract-level readiness checklist is green.

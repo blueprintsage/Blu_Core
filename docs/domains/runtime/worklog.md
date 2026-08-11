@@ -4,6 +4,39 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
+## 2026-08-11 — BC-041 minimum OPSEC contract
+
+### What changed
+
+- Added public minimum OPSEC mechanism, policy/evaluation schemas, portable
+  environment-file policy reference, deterministic normalization/matching,
+  ingress and egress mappings, redaction postconditions, safe evidence, and
+  error codes under `contracts/security/opsec/`.
+- Added an explicitly synthetic policy/case matrix plus a nonproduction
+  conformance harness and focused tests. No production protected value or
+  machine-local policy binding was added.
+- Re-evaluated SUR-001 to
+  `resolved_at_minimum_phase1_contract_level` and Python readiness to
+  `ready_for_python_phase1`; the runtime packet may be authored next but does
+  not start automatically.
+- Preserved Auth separation, SUR-002/SUR-011/SUR-012, the one-route slice, and
+  the 7/8/9 successor architecture. Added no runtime/provider implementation,
+  tools, continuity mutation, or PASS/SkillForge path.
+- Narrowed the continuity validator's fixed-base protected-register exception
+  to the exact BC-041 SUR-001 resolution shape; every other successor-register
+  item and top-level field must remain byte-equivalent in meaning, and the
+  existing protected-path guard remains active. A focused Git-backed regression
+  test proves the exception accepts only that exact resolution and still rejects
+  an adjacent SUR-002 mutation.
+
+### Validation and next step
+
+Focused OPSEC validation and 22 tests passed during implementation. Complete
+suite, manifest, golden, publication-safety, commit, and push receipts are
+recorded in `assignments/BC-041/validation.md` and `handoff.md` at handoff.
+Claude performs the independent semantic review; Dad/Blu decide integration and
+any later Python Runtime Phase 1 authorization.
+
 ## 2026-08-11 — BC-040 final closure
 
 ### What changed

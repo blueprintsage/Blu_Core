@@ -94,12 +94,14 @@ class PythonReadinessValidationTests(unittest.TestCase):
         self.save(path, data)
         self.assert_has("not every successor unresolved item")
 
-    def test_sur001_cannot_be_cleared_without_policy(self) -> None:
+    def test_sur001_requires_bounded_resolution_contract(self) -> None:
         path = "readiness/implementation_blocker_dispositions.json"
         data = self.load(path)
-        data["actual_blockers"] = []
+        item = next(item for item in data["dispositions"] if item["id"] == "SUR-001")
+        item.pop("disposition")
+        item["phase1_resolved"] = False
         self.save(path, data)
-        self.assert_has("actual Phase 1 blocker set is not exact")
+        self.assert_has("not resolved at the minimum")
 
     def test_provider_configuration_cannot_imply_chat_capability(self) -> None:
         path = "readiness/model_execution_provider_contract.json"
@@ -132,14 +134,16 @@ class PythonReadinessValidationTests(unittest.TestCase):
         self.save(path, data)
         self.assert_has("exactly seven components")
 
-    def test_readiness_cannot_overclaim_authorization(self) -> None:
+    def test_readiness_cannot_retain_stale_blocker_state(self) -> None:
         path = "readiness/python_phase1_readiness_checklist.json"
         data = self.load(path)
-        data["result"] = "ready_for_python_phase1"
-        data["runtime_phase1_packet_may_be_authored_next"] = True
+        data["result"] = "not_ready_for_python_phase1"
+        data["runtime_phase1_packet_may_be_authored_next"] = False
+        data["actual_blockers"] = [{"id": "SUR-001"}]
         self.save(path, data)
-        self.assert_has("overclaims Python authorization")
-        self.assert_has("authorized despite SUR-001")
+        self.assert_has("does not reflect resolved SUR-001")
+        self.assert_has("retains stale blockers")
+        self.assert_has("may not be authored")
 
     def test_projection_guard_detects_missing_stale_and_redefinition(self) -> None:
         manifest = self.load("readiness/one_blu_canon_manifest.json")

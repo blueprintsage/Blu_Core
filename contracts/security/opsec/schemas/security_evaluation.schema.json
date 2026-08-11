@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/contracts/security/opsec/schemas/security_evaluation.schema.json",
+  "title": "OpsecSecurityEvaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["phase", "security_decision", "egress_result", "terminal_status", "eligible_for_turn_controller", "eligible_for_print", "public_output", "safe_error_code", "evidence", "logs"],
+  "properties": {
+    "phase": {"enum": ["ingress", "egress"]},
+    "security_decision": {"type": ["string", "null"], "enum": ["PASS", "BLOCK", "ASK", null]},
+    "egress_result": {"type": ["string", "null"], "enum": ["CLEAR", "REDACTED", "BLOCKED", "UNAVAILABLE", "INVALID", null]},
+    "terminal_status": {"type": ["string", "null"], "enum": ["UNAVAILABLE", "INVALID", null]},
+    "eligible_for_turn_controller": {"type": "boolean"},
+    "eligible_for_print": {"type": "boolean"},
+    "public_output": {"type": ["string", "null"]},
+    "safe_error_code": {"type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_]{2,63}$"},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evaluation_phase", "result", "policy_revision", "opaque_rule_refs", "candidate_hmac_sha256"],
+      "properties": {
+        "evaluation_phase": {"enum": ["ingress", "egress"]},
+        "result": {"type": "string", "minLength": 1},
+        "policy_revision": {"type": ["string", "null"]},
+        "opaque_rule_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "candidate_hmac_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "logs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event", "code"],
+        "properties": {
+          "event": {"enum": ["policy", "evaluation", "redaction"]},
+          "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$"}
+        }
+      }
+    }
+  }
+}

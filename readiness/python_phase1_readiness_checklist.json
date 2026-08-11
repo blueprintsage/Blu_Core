@@ -1,7 +1,7 @@
 {
-  "spec_version": "1.0.0",
-  "assignment": "BC-040",
-  "result": "not_ready_for_python_phase1",
+  "spec_version": "1.1.0",
+  "assignment": "BC-041",
+  "result": "ready_for_python_phase1",
   "full_successor_feature_complete": false,
   "checks": [
     {"id": "one_blu_canon_mapping_complete", "status": "pass"},
@@ -25,16 +25,11 @@
     {"id": "golden_CTS_unchanged", "status": "pass"},
     {"id": "no_runtime_code_introduced", "status": "pass"},
     {"id": "independent_Claude_review_required", "status": "pass"},
-    {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "fail", "blocking_item": "SUR-001"}
+    {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "pass", "resolution": "resolved_at_minimum_phase1_contract_level"}
   ],
-  "actual_blockers": [
-    {
-      "id": "SUR-001",
-      "reason": "The exact minimum OPSEC match/redaction contract needed to distinguish safe natural-language ingress and egress from protected-source reproduction is unavailable. Allowing a real local-model turn without it would weaken current security semantics; inventing it is prohibited.",
-      "smallest_next_assignment": "Protected Security Phase 1 Minimum OPSEC Match and Redaction Contract"
-    }
-  ],
-  "runtime_phase1_packet_may_be_authored_next": false,
+  "actual_blockers": [],
+  "runtime_phase1_packet_may_be_authored_next": true,
   "conditional_runtime_packet_after_blocker": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
-  "automatic_start_prohibited": true
+  "automatic_start_prohibited": true,
+  "authorization_boundary": "This readiness result permits Dad/Blu to consider authoring the named runtime packet. It does not authorize implementation, merge, release, or automatic start."
 }

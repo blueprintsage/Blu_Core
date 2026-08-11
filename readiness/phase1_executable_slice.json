@@ -1,11 +1,13 @@
 {
-  "spec_version": "1.0.0",
-  "assignment": "BC-040",
+  "spec_version": "1.1.0",
+  "assignment": "BC-041",
   "slice_id": "python_phase1_boot_ordinary_turn_lm_studio",
   "implementation_authorized": false,
   "purpose": "Smallest useful real Blu turn centered on ordinary conversation.",
   "boot_sequence": [
     "load_and_validate_portable_configuration",
+    "resolve_protected_policy_environment_binding",
+    "load_schema_and_integrity_validate_protected_policy",
     "load_and_digest_check_canonical_sources",
     "construct_seven_boundary_runtime_graph",
     "observe_lm_studio_endpoint_and_model_inventory",
@@ -17,7 +19,7 @@
   "route_catalog": [
     {
       "route_id": "ordinary_conversation",
-      "match": "no supported command or protected operation selected",
+      "match": "SecurityDecision PASS after no protected ingress match; no supported command selected",
       "owner": "model_execution_boundary",
       "requires": ["SecurityDecision PASS", "loaded canonical projection", "verified model instance", "verified context capacity"],
       "side_effects": false,
@@ -45,12 +47,14 @@
     "terminal_raw_host_event",
     "host_adapter_raw_host_input",
     "pre_ingress_security_restraint",
+    "pre_ingress_opsec_normalize_and_match",
     "SecurityDecision_PASS_required",
     "turn_controller_constructs_TurnRequest",
     "turn_controller_locks_ordinary_conversation_owner_and_ScopeLock",
     "model_execution_request_through_IF_MODEL_EXECUTION",
     "lm_studio_non_streaming_response",
     "normalize_model_output_or_nonexecuting_tool_candidate",
+    "egress_opsec_normalize_match_and_redact_or_block",
     "validation_and_egress",
     "one_TerminalPacket",
     "terminal_user_visible_reply"
@@ -79,5 +83,6 @@
     "provider_completion_evidence_ref"
   ],
   "sur003_disposition": "route_catalog_frozen_for_phase1",
-  "security_gate": "A real ordinary turn remains unauthorized until the missing minimum OPSEC match/redaction contract can deterministically separate safe ingress and egress from protected-source requests without publishing protected values."
+  "opsec_contract_ref": "contracts/security/opsec/minimum_contract.json",
+  "security_gate": "The implemented runtime must resolve, load, schema-validate, integrity-check, and mark the protected policy usable before evaluating ingress; only SecurityDecision PASS may reach Turn Controller. Candidate output must be cleared or safely redacted by the same policy before terminal print. Missing or invalid policy is UNAVAILABLE and never reaches the model."
 }

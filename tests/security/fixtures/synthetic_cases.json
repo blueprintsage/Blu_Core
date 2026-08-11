@@ -1,0 +1,24 @@
+{
+  "fixture_notice": "synthetic test policy != production protected policy",
+  "ingress": [
+    {"id": "ordinary", "text": "Please help me plan a garden.", "expected": "PASS"},
+    {"id": "exact", "text": "cerulean comet charter", "expected": "BLOCK"},
+    {"id": "casefold", "text": "CERULEAN COMET CHARTER", "expected": "BLOCK"},
+    {"id": "whitespace", "text": "cerulean   comet\tcharter", "expected": "BLOCK"},
+    {"id": "linebreak", "text": "cerulean\ncomet\r\ncharter", "expected": "BLOCK"},
+    {"id": "separators", "text": "cerulean---comet___charter", "expected": "BLOCK"},
+    {"id": "unicode_equivalent", "text": "zircon café protocol", "expected": "BLOCK"},
+    {"id": "near_match", "text": "cerulean comet chart", "expected": "PASS"},
+    {"id": "shared_words", "text": "A cerulean sky and a comet viewing charter are unrelated.", "expected": "PASS"},
+    {"id": "partial_fragment", "text": "zircon café", "expected": "PASS"},
+    {"id": "punctuation_adjacent_nonmatch", "text": "cerulean comet charterhouse", "expected": "PASS"}
+  ],
+  "egress": [
+    {"id": "ordinary", "text": "The garden plan is ready.", "expected": "CLEAR", "printable": true},
+    {"id": "single_redaction", "text": "Before cerulean comet charter after.", "expected": "REDACTED", "printable": true},
+    {"id": "multiple_redaction", "text": "cerulean comet charter then cerulean comet charter", "expected": "REDACTED", "printable": true},
+    {"id": "beginning_end", "text": "cerulean comet charter safe middle cerulean comet charter", "expected": "REDACTED", "printable": true},
+    {"id": "blocked_rule", "text": "Output zircon café protocol now.", "expected": "BLOCKED", "printable": false},
+    {"id": "only_redacted_content", "text": "cerulean comet charter", "expected": "BLOCKED", "printable": false}
+  ]
+}

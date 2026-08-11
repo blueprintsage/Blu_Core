@@ -144,11 +144,52 @@ def _git_changed_paths(root: Path, paths: list[str] | None = None) -> tuple[list
     return [line.strip() for line in result.stdout.splitlines() if line.strip()], None
 
 
+def _is_authorized_bc041_sur001_update(root: Path) -> bool:
+    """Permit only BC-041's bounded SUR-001 metadata change in the protected register."""
+    relative = "contracts/successor/unresolved_register.json"
+    baseline = subprocess.run(
+        ["git", "-C", str(root), "show", f"{BASE_COMMIT}:{relative}"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if baseline.returncode != 0:
+        return False
+    try:
+        before = json.loads(baseline.stdout)
+        after = _load(root / relative)
+    except (json.JSONDecodeError, OSError):
+        return False
+    if {key: value for key, value in before.items() if key != "items"} != {
+        key: value for key, value in after.items() if key != "items"
+    }:
+        return False
+    before_items = {item.get("id"): item for item in before.get("items", [])}
+    after_items = {item.get("id"): item for item in after.get("items", [])}
+    if set(before_items) != set(after_items):
+        return False
+    if any(before_items[item_id] != after_items[item_id] for item_id in before_items if item_id != "SUR-001"):
+        return False
+    original = before_items.get("SUR-001", {})
+    resolved = after_items.get("SUR-001", {})
+    preserved_fields = {"id", "question", "why_unresolved", "evidence", "blocking_for_BC020", "blocking_for_BC030"}
+    if any(original.get(field) != resolved.get(field) for field in preserved_fields):
+        return False
+    required = {
+        "disposition": "resolved_at_minimum_phase1_contract_level",
+        "resolution_record": "contracts/security/opsec/minimum_contract.json",
+        "blocking_for_implementation": False,
+    }
+    return all(resolved.get(field) == value for field, value in required.items())
+
+
 def _validate_git_scope(root: Path) -> list[str]:
     errors: list[str] = []
     changed, failure = _git_changed_paths(root, PROTECTED_PATHS)
     if failure:
         return [failure]
+    if "contracts/successor/unresolved_register.json" in changed and _is_authorized_bc041_sur001_update(root):
+        changed.remove("contracts/successor/unresolved_register.json")
     errors.extend(f"protected path changed from BC-030 base: {path}" for path in changed)
 
     all_changed, failure = _git_changed_paths(root)
@@ -159,6 +200,8 @@ def _validate_git_scope(root: Path) -> list[str]:
         "tests/continuity/test_validate_continuity_contracts.py",
         "tools/validate_python_readiness.py",
         "tests/readiness/test_validate_python_readiness.py",
+        "tools/validate_opsec_contracts.py",
+        "tests/security/test_validate_opsec_contracts.py",
     }
     for path in all_changed:
         normalized = path.replace("\\", "/").lower()

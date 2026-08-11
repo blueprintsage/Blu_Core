@@ -4,6 +4,19 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
+## 2026-08-11 — Deterministic phrase matching is not semantic authorization
+
+- **Observed:** normalization and token-bounded phrase rules can close specified
+  exact/trivial-formatting bypasses but cannot prove arbitrary paraphrase,
+  implication, or adversarial semantic equivalence.
+- **Unsafe shortcut:** describing a passing synthetic phrase suite as complete
+  OPSEC, or asking the model to infer protected intent when the deterministic
+  policy does not match.
+- **Prevention:** keep the Phase 1 claim bounded, keep production policy under
+  protected authority, fail closed when the policy is unusable, and treat new
+  semantic threat classes as explicit future security work rather than silently
+  expanding or weakening the matcher.
+
 ## 2026-08-11 — Explicit route exclusion is not a complete OPSEC boundary
 
 - **Observed:** a Phase 1 catalog can remove commands, tools, Auth, source

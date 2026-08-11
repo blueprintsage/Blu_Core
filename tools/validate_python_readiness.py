@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate BC-040 One-Blu portability and Python readiness contracts."""
+"""Validate One-Blu portability and BC-041 Python Phase 1 readiness."""
 
 from __future__ import annotations
 
@@ -16,9 +16,9 @@ from typing import Any
 from jsonschema import Draft202012Validator
 
 
-BASE_COMMIT = "66e7ed52f5777bdef2e32c71a5e83b439b0d0ade"
+BASE_COMMIT = "699ee1485cef39ffbe70c3b8e848763af02596e0"
 READINESS = Path("readiness")
-ASSIGNMENT = Path("docs/domains/runtime/assignments/BC-040")
+ASSIGNMENT = Path("docs/domains/runtime/assignments/BC-041")
 REQUIRED = {
     READINESS / "README.md",
     READINESS / "one_blu_canon_manifest.json",
@@ -39,6 +39,12 @@ REQUIRED = {
     Path("contracts/successor/packet_registry.json"),
     Path("contracts/successor/interface_registry.json"),
     Path("contracts/successor/unresolved_register.json"),
+    Path("contracts/security/opsec/README.md"),
+    Path("contracts/security/opsec/minimum_contract.json"),
+    Path("contracts/security/opsec/schemas/protected_policy.schema.json"),
+    Path("contracts/security/opsec/schemas/security_evaluation.schema.json"),
+    Path("tests/security/fixtures/synthetic_policy.json"),
+    Path("tests/security/fixtures/synthetic_cases.json"),
     Path("continuity/schemas/continuity_mutation_request.schema.json"),
     Path("tests/continuity/fixtures/schema_instances.json"),
     Path("docs/domains/runtime/one_blu_python_readiness.md"),
@@ -71,6 +77,8 @@ ALLOWED_PYTHON = {
     "tests/continuity/test_validate_continuity_contracts.py",
     "tools/validate_python_readiness.py",
     "tests/readiness/test_validate_python_readiness.py",
+    "tools/validate_opsec_contracts.py",
+    "tests/security/test_validate_opsec_contracts.py",
 }
 
 
@@ -109,7 +117,7 @@ def _validate_git_scope(root: Path) -> list[str]:
         return []
     result = _git(root, "diff", "--name-only", BASE_COMMIT, "--")
     if result.returncode != 0:
-        return ["unable to verify Git diff from BC-040 base"]
+        return ["unable to verify Git diff from BC-041 base"]
     errors: list[str] = []
     for path in [line.strip() for line in result.stdout.splitlines() if line.strip()]:
         normalized = path.replace("\\", "/")
@@ -255,7 +263,15 @@ def validate(root: Path) -> list[str]:
     if len(routes) != 1 or routes[0].get("route_id") != "ordinary_conversation":
         errors.append("Phase 1 route catalog is not finite ordinary conversation only")
     if phase1.get("implementation_authorized") is not False:
-        errors.append("BC-040 authorizes runtime implementation")
+        errors.append("BC-041 authorizes runtime implementation")
+    if phase1.get("opsec_contract_ref") != "contracts/security/opsec/minimum_contract.json":
+        errors.append("Phase 1 slice does not bind the BC-041 OPSEC contract")
+    required_security_steps = {
+        "pre_ingress_opsec_normalize_and_match",
+        "egress_opsec_normalize_match_and_redact_or_block",
+    }
+    if not required_security_steps.issubset(phase1.get("turn_sequence", [])):
+        errors.append("Phase 1 slice does not gate ingress and egress through OPSEC")
 
     source_gaps = data[Path("contracts/runtime/unresolved_register.json")].get("items", [])
     gap_contract = data[READINESS / "implementation_gap_dispositions.json"]
@@ -285,8 +301,22 @@ def validate(root: Path) -> list[str]:
             continue
         if dispositions[item_id].get("phase1_category") not in BLOCKER_CATEGORIES:
             errors.append(f"blocking item lacks a Phase 1 category: {item_id}")
-    if blocker_contract.get("actual_blockers") != ["SUR-001"]:
+    if blocker_contract.get("actual_blockers") != []:
         errors.append("actual Phase 1 blocker set is not exact")
+    sur001 = dispositions.get("SUR-001", {})
+    if sur001.get("disposition") != "resolved_at_minimum_phase1_contract_level" or sur001.get("phase1_resolved") is not True:
+        errors.append("SUR-001 is not resolved at the minimum Phase 1 contract level")
+    source_sur001 = next((item for item in source_unresolved if item.get("id") == "SUR-001"), {})
+    if source_sur001.get("disposition") != "resolved_at_minimum_phase1_contract_level" or source_sur001.get("blocking_for_implementation") is not False:
+        errors.append("successor SUR-001 disposition is stale")
+
+    opsec = data[Path("contracts/security/opsec/minimum_contract.json")]
+    if opsec.get("security_decision_values") != ["PASS", "BLOCK", "ASK"]:
+        errors.append("SecurityDecision vocabulary changed")
+    if opsec.get("matcher", {}).get("model_invocation_allowed") is not False:
+        errors.append("OPSEC matcher depends on model invocation")
+    if opsec.get("normalization", {}).get("semantic_paraphrase_detection") is not False:
+        errors.append("OPSEC contract overclaims semantic paraphrase detection")
 
     provider = data[READINESS / "model_execution_provider_contract.json"]
     if provider.get("architectural_component") != "model_execution_boundary" or provider.get("new_component_added") is not False:
@@ -319,6 +349,11 @@ def validate(root: Path) -> list[str]:
         errors.append(f"runtime configuration schema is invalid: {exc}")
     if "C:\\Users" in json.dumps(config_schema) or "/home/" in json.dumps(config_schema):
         errors.append("runtime configuration embeds a personal machine path")
+    protected_ref = config_schema.get("properties", {}).get("runtime", {}).get("properties", {}).get("protected_policy_ref", {})
+    if protected_ref.get("type") != "object" or protected_ref.get("properties", {}).get("kind", {}).get("const") != "environment_file":
+        errors.append("protected policy reference is not portable and opaque")
+    if "rules" in protected_ref.get("properties", {}) or "value" in protected_ref.get("properties", {}):
+        errors.append("protected policy values can be embedded in runtime configuration")
 
     layout = data[READINESS / "python_package_layout.json"]
     if layout.get("layout_type") != "src" or layout.get("implementation_present") is not False:
@@ -334,10 +369,17 @@ def validate(root: Path) -> list[str]:
         errors.append("BC-040 requires unauthorized live Chat probing")
 
     checklist = data[READINESS / "python_phase1_readiness_checklist.json"]
-    if checklist.get("result") != "not_ready_for_python_phase1":
-        errors.append("readiness result overclaims Python authorization")
-    if checklist.get("runtime_phase1_packet_may_be_authored_next") is not False:
-        errors.append("runtime packet is authorized despite SUR-001")
+    checks = {item.get("id"): item for item in checklist.get("checks", [])}
+    if checks.get("minimum_OPSEC_match_and_redaction_contract_available", {}).get("status") != "pass":
+        errors.append("minimum OPSEC contract readiness check is not pass")
+    if checklist.get("result") != "ready_for_python_phase1":
+        errors.append("readiness result does not reflect resolved SUR-001")
+    if checklist.get("actual_blockers") != []:
+        errors.append("readiness checklist retains stale blockers")
+    if checklist.get("runtime_phase1_packet_may_be_authored_next") is not True:
+        errors.append("runtime packet may not be authored despite resolved SUR-001")
+    if checklist.get("automatic_start_prohibited") is not True:
+        errors.append("readiness automatically starts runtime implementation")
     if checklist.get("full_successor_feature_complete") is not False:
         errors.append("BC-040 claims full successor feature completeness")
 

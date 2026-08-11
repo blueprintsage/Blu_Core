@@ -140,3 +140,33 @@ Approved specification decisions, pending independent semantic review:
 - Claude N-1 through N-10 remain nonblocking implementation and hardening
   inputs at their recorded targets. Closure does not convert them into BC-040
   blockers or begin their work.
+
+## 2026-08-11 — BC-041 minimum OPSEC mechanism
+
+- Recovered current law remains the CTS privacy/OPSEC boundary; BC-041 defines
+  an explicitly authorized successor mechanism where current sources did not
+  provide deterministic matcher values.
+- Production policy values remain external. Canonical configuration stores only
+  environment-variable names for a machine-local policy location and expected
+  SHA-256 digest.
+- A reference is not evidence of usability. The mandatory stages are reference
+  configured, target located, payload loaded, schema validated, integrity
+  validated, and policy usable. Any insufficient stage is terminal
+  `UNAVAILABLE` without model invocation.
+- The minimum matcher is Unicode NFKC plus bounded whitespace/separator
+  normalization and token-bounded normalized phrase matching. It does not use a
+  model, confidence, likely intent, Auth, or arbitrary semantic equivalence.
+- Ingress protected matches map to `SecurityDecision=BLOCK`; nonmatches map to
+  `PASS`. `ASK` remains in the exact three-value vocabulary but BC-041 invents
+  no new authorization case.
+- Candidate output is checked before print. Policy-authorized redaction must
+  remove all matches, rescan cleanly, retain meaningful residual text, and emit
+  no protected value in evidence or diagnostics; otherwise the output is fully
+  blocked.
+- SUR-001 is resolved only as
+  `resolved_at_minimum_phase1_contract_level`. SUR-002, SUR-011, and SUR-012 are
+  unchanged. The architecture remains 7 components, 8 packets, and 9
+  interfaces.
+- Contract-level readiness is `ready_for_python_phase1`, with no actual
+  blockers and `runtime_phase1_packet_may_be_authored_next: true`. Runtime
+  implementation remains unstarted and requires a separate Dad/Blu packet.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import hashlib
 import json
@@ -361,6 +362,23 @@ class ContinuityContractValidationTests(unittest.TestCase):
         data["fixture_mutation"] = True
         self.save(path, data)
         self.assert_has("protected path changed")
+
+    def test_git_scope_allows_only_exact_bc041_sur001_resolution(self) -> None:
+        path = "contracts/successor/unresolved_register.json"
+        resolved = self.load(path)
+        baseline = copy.deepcopy(resolved)
+        sur001 = next(item for item in baseline["items"] if item["id"] == "SUR-001")
+        for field in ("disposition", "resolution", "resolution_record", "remaining_security_inputs"):
+            sur001.pop(field, None)
+        sur001["blocking_for_implementation"] = True
+        self.save(path, baseline)
+        self.init_git_scope_fixture()
+        self.save(path, resolved)
+        self.assertEqual([], validator._validate_git_scope(self.root))
+        current = self.load(path)
+        next(item for item in current["items"] if item["id"] == "SUR-002")["risk"] = "mutated"
+        self.save(path, current)
+        self.assertTrue(any("protected path changed" in error for error in validator._validate_git_scope(self.root)))
 
     def test_git_scope_guard_rejects_disallowed_python(self) -> None:
         self.init_git_scope_fixture()

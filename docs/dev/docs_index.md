@@ -170,10 +170,29 @@ readiness/
 BC-040 freezes the One-Blu deployment/canon map, provider and configuration
 contracts, package layout, finite ordinary-turn slice, gap and blocker
 dispositions, and parity/readiness gates. It also hardens BC-030 continuity
-schemas and instance validation. Its preliminary result is
+schemas and instance validation. Its final result was
 `not_ready_for_python_phase1` because SUR-001's separately authorized minimum
-OPSEC match/redaction contract is unavailable. It introduces no production Blu
-runtime, LM Studio client, Local Mirror provider, or Codex implementation.
+OPSEC match/redaction contract was unavailable at BC-040 closure; BC-041 below
+is the later bounded resolution. BC-040 introduced no production Blu runtime,
+LM Studio client, Local Mirror provider, or Codex implementation.
+
+## Minimum OPSEC contract
+
+```text
+contracts/security/opsec/README.md
+contracts/security/opsec/minimum_contract.json
+contracts/security/opsec/schemas/
+docs/domains/runtime/assignments/BC-041/
+tools/validate_opsec_contracts.py
+tests/security/
+```
+
+BC-041 defines the public deterministic mechanism for an externally supplied
+protected policy without committing production values. It resolves SUR-001 at
+the bounded minimum Phase 1 contract level and re-evaluates readiness to
+`ready_for_python_phase1`. It remains specification/validation work only; the
+runtime packet may be authored next but is not automatically authorized or
+started.
 
 ## Historical archive source map
 

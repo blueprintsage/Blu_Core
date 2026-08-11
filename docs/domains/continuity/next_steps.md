@@ -2,18 +2,25 @@
 
 status: active
 owner: docs/domains/continuity
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
 
-- Claude performs independent semantic review of the BC-030 substantive commit,
-  focusing on receipt sufficiency, lifecycle consistency, Local Mirror evidence
-  limits, portability, protected authorization non-weakening, and SUR-011
-  preservation.
-- Dad may merge only after review; Blu performs integration and closure
-  authorization.
-- Do not implement a Local Mirror provider, Python runtime, LM Studio adapter,
-  Chat live probe, SUR-011 policy, or PASS/SkillForge integration without a new
-  bounded assignment.
-- Future implementation packets must select and prove a real provider mechanism
-  for durability, crash consistency, authentication/authorization,
-  confidentiality, operation receipts, and—if protected authorization is in
-  scope—atomic replay and rollback-resistant attempt state.
+- BC-030 is closed at the specification boundary. SUR-007 is resolved at the
+  generic continuity-contract level; SUR-011 remains unresolved.
+- No Local Mirror provider, successor Python runtime, or LM Studio adapter exists
+  yet. No Chat/Codex adapter implementation was added by BC-030.
+- Protected durable authorization remains unavailable unless a future provider
+  supplies the complete stronger evidence profile, including atomic replay and
+  rollback-resistant attempt state. Ordinary continuity receipts are
+  insufficient.
+- Claude notes N1-N8 remain implementation-readiness inputs: add a mutation
+  request with `expected_version`; tighten `not_found` and non-completed receipt
+  constraints; document `availability_probe`; mechanically enforce action
+  binding and absolute-path prohibition; regression-protect Git-scope and
+  manifest guards; and validate manifest digests. Add instance-level schema
+  conformance fixtures and select the consuming schema runtime.
+- The next successor assignment is the separately authorized
+  implementation-readiness / One-Blu portability contract. Do not begin it from
+  this closure.
+- Do not implement a provider, Python runtime, LM Studio adapter, Chat live
+  probe, Codex Blu work, SUR-011 policy, or PASS/SkillForge integration without
+  a new bounded assignment.

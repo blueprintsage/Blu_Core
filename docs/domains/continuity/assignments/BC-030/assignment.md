@@ -1,12 +1,12 @@
 # BC-030 — Local Mirror Continuity Schema and Lifecycle
 
-status: review
+status: done
 owner: Codex
 reviewer: Claude
 project_lead: Blu
 project_owner: Dad
 domain: continuity
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
 
 ## Authorization and identity
 
@@ -173,4 +173,31 @@ Dad retains merge authority; Blu retains integration/closure authorization.
 
 ## Approved amendments
 
-No amendments.
+### 2026-08-11 — Final closure authorization
+
+Dad, Project Owner, and Blu, Project Lead, authorized administrative closure
+from exact reviewed and integrated `main` base
+`c76843e82a42ab091810c110e8c01a4e32ed311e` on branch
+`bc-030-closure`.
+
+- Final status: `done` at the specification boundary.
+- Original exact base: `a5f149355bd68b2aea1695e5f25ec60a2cb88b0c`.
+- Substantive specification:
+  `6812513d10eeb69f1e5b477617ffdccc52e5067b`.
+- Specification metadata:
+  `4c4ef004aef2d93937de3fdb4bbbdeae4f2d9843`.
+- BC-030 work integration:
+  `d679357426899c660d905326ef345d7229974b0b`.
+- Claude semantic review:
+  `adda640c05035d14057a22fb1ac85c19c326fe4f`;
+  disposition `approve-with-notes`; zero blocking findings.
+- Final reviewed-state integration base:
+  `c76843e82a42ab091810c110e8c01a4e32ed311e`.
+- Closure is administrative and specification-only. It authorizes no Local
+  Mirror provider, successor Python runtime, LM Studio adapter, Chat/Codex
+  adapter implementation, SUR-011 resolution, or PASS/SkillForge work.
+- Claude notes N1-N8 and the instance-level schema-conformance gap remain
+  future implementation-readiness inputs rather than BC-030 blockers. N9 and
+  N10 are addressed by this closure; N11 remains an audit note.
+- The substantive closure commit is recorded by the authorized metadata-only
+  follow-up and is not embedded in its own tree.

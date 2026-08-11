@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/continuity/schemas/continuity_retrieval_result.schema.json",
+  "title": "ContinuityRetrievalResult",
+  "description": "Provider result preserving query, record, version, scope, and provenance identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "result_id",
+    "query_id",
+    "provider_id",
+    "status",
+    "availability",
+    "scope",
+    "records",
+    "receipt",
+    "limitations",
+    "next_cursor"
+  ],
+  "properties": {
+    "result_id": {"type": "string", "minLength": 1},
+    "query_id": {"type": "string", "minLength": 1},
+    "provider_id": {"type": "string", "minLength": 1},
+    "status": {"enum": ["completed", "not_found", "unavailable", "degraded", "forbidden", "invalid", "integrity_failure", "failed"]},
+    "availability": {"enum": ["available", "degraded", "unavailable", "unknown"]},
+    "scope": {"$ref": "continuity_record.schema.json#/$defs/scope"},
+    "records": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {"$ref": "continuity_record.schema.json"}
+    },
+    "receipt": {"$ref": "continuity_receipt.schema.json"},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "next_cursor": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "completed"}}},
+      "then": {"properties": {"receipt": {"properties": {"status": {"const": "completed"}}}}}
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["unavailable", "forbidden", "invalid", "integrity_failure", "failed"]}}},
+      "then": {"properties": {"records": {"maxItems": 0}}}
+    }
+  ],
+  "x-blu-staging-rule": "Records may enter bounded turn context only after identity, scope, status, version, provenance, authorization, and integrity validation.",
+  "x-blu-provenance-rule": "Fragments or payloads without record identity, version, scope, status, provider, and provenance are invalid retrieval material."
+}

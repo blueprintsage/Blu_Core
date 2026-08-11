@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/continuity/schemas/continuity_receipt.schema.json",
+  "title": "ContinuityReceipt",
+  "description": "Operation-scoped provider evidence that distinguishes intent and attempt from durable completion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "receipt_id",
+    "request_id",
+    "operation",
+    "requested_action",
+    "provider_id",
+    "record_id",
+    "provider_ref",
+    "status",
+    "observed_at",
+    "completed_at",
+    "scope",
+    "availability",
+    "integrity_evidence",
+    "prior_version",
+    "resulting_version",
+    "supersession_result",
+    "related_record_refs",
+    "failure_reason",
+    "limitations",
+    "evidence_method"
+  ],
+  "properties": {
+    "receipt_id": {"type": "string", "minLength": 1},
+    "request_id": {"type": "string", "minLength": 1},
+    "operation": {
+      "enum": ["create", "retrieve", "update", "supersede", "retire", "recover_history", "validate", "availability_probe"]
+    },
+    "requested_action": {
+      "enum": ["create", "retrieve", "update", "supersede", "retire", "recover_history", "validate", "availability_probe"]
+    },
+    "provider_id": {"type": "string", "minLength": 1},
+    "record_id": {"type": ["string", "null"]},
+    "provider_ref": {"type": ["string", "null"]},
+    "status": {
+      "enum": ["completed", "conflict", "not_found", "unavailable", "degraded", "forbidden", "invalid", "integrity_failure", "failed"]
+    },
+    "observed_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": ["string", "null"], "format": "date-time"},
+    "scope": {"$ref": "continuity_record.schema.json#/$defs/scope"},
+    "availability": {"enum": ["available", "degraded", "unavailable", "unknown"]},
+    "integrity_evidence": {
+      "anyOf": [
+        {"$ref": "continuity_record.schema.json#/properties/integrity_ref"},
+        {"type": "null"}
+      ]
+    },
+    "prior_version": {"type": ["integer", "null"], "minimum": 1},
+    "resulting_version": {"type": ["integer", "null"], "minimum": 1},
+    "supersession_result": {"enum": ["not_applicable", "recorded", "not_recorded", "conflict"]},
+    "related_record_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["record_id", "version_id", "relation"],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "version_id": {"type": "string", "minLength": 1},
+          "relation": {"enum": ["subject", "prior_version", "resulting_version", "superseded_predecessor", "current_successor"]}
+        }
+      }
+    },
+    "failure_reason": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code", "safe_detail"],
+          "properties": {
+            "code": {"type": "string", "minLength": 1},
+            "safe_detail": {"type": "string"}
+          }
+        },
+        {"type": "null"}
+      ]
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "evidence_method": {"enum": ["provider_attestation", "provider_signed", "provider_verified_readback"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "completed"}}},
+      "then": {
+        "properties": {
+          "completed_at": {"type": "string", "format": "date-time"},
+          "failure_reason": {"type": "null"}
+        }
+      },
+      "else": {
+        "properties": {
+          "failure_reason": {"type": "object"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {"enum": ["create", "update", "supersede", "retire"]},
+          "status": {"const": "completed"}
+        },
+        "required": ["operation", "status"]
+      },
+      "then": {
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "provider_ref": {"type": "string", "minLength": 1},
+          "resulting_version": {"type": "integer", "minimum": 1},
+          "integrity_evidence": {"type": "object"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "operation": {"const": "supersede"},
+          "status": {"const": "completed"}
+        },
+        "required": ["operation", "status"]
+      },
+      "then": {
+        "properties": {
+          "supersession_result": {"const": "recorded"},
+          "related_record_refs": {"minItems": 2}
+        }
+      }
+    }
+  ],
+  "x-blu-action-binding-rule": "requested_action must equal operation and the receipt is valid only for its matching request_id, provider_id, record_id, scope, and related record references.",
+  "x-blu-durable-success-rule": "Only status=completed from the continuity provider can prove the named durable operation; requested, attempted, configured, serialized, model-claimed, or path-present states cannot.",
+  "x-blu-failure-rule": "Every non-completed mutation leaves durable state unchanged and returns a finite failure status and reason."
+}

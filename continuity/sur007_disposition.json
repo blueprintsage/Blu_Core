@@ -1,0 +1,21 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-030",
+  "unresolved_id": "SUR-007",
+  "disposition": "resolved_at_generic_continuity_contract_level",
+  "conflict": "Expected-version mismatch returns conflict and performs no mutation; silent last-writer-wins is forbidden.",
+  "retention": "Completed update, supersede, and retire transitions preserve immutable prior versions and provenance for authorized history retrieval.",
+  "deletion": "BC-030 defines no delete or destroy operation. Provider loss, corruption, or external removal is failure evidence, not an authorized lifecycle transition.",
+  "provenance": "Every record version and retrieval result preserves provider identity, stable record identity, version identity, scope, source/provider reference, integrity reference, and operation receipt references.",
+  "local_mirror_mapping": "Relative links, status, version, supersession, and retired-history discovery are retained as structural evidence; durable mutation and receipt behavior require a future provider implementation.",
+  "implementation_authorized": false,
+  "sur011_state": "unresolved_security_policy_input",
+  "remaining_implementation_inputs": [
+    "provider technology selection",
+    "durability and crash-consistency mechanism",
+    "authentication, authorization, confidentiality, and key management",
+    "retention capacity and backup operations consistent with the no-delete interface",
+    "protected-authorization evidence capability",
+    "host deployment bindings"
+  ]
+}

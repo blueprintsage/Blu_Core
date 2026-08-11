@@ -1,0 +1,32 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-030",
+  "stage_values": [
+    "source_present",
+    "record_discovered",
+    "record_retrieved",
+    "write_requested",
+    "write_attempted",
+    "record_created",
+    "record_updated",
+    "supersession_recorded",
+    "record_retired",
+    "record_validated",
+    "durable_receipt_emitted",
+    "operation_failed",
+    "provider_unavailable"
+  ],
+  "rules": {
+    "no_implicit_promotion": "No stage implies any later stage. Every observation records only the stage directly evidenced.",
+    "durable_success": "A durable mutation is claimable only when the provider returns a matching ContinuityReceipt with status=completed and durable_receipt_emitted is observed.",
+    "source_boundary": "Source presence, a crawlable root, a filename, a relative link, a provider reference, or a serialized record is not durable-operation evidence.",
+    "model_boundary": "Model output, confidence, familiarity, conversation history, and prompt context cannot create, promote, or manufacture a stage.",
+    "failure_boundary": "operation_failed and provider_unavailable are terminal observations for that operation and cause no durable state transition."
+  },
+  "mutation_completion_requirements": {
+    "create": ["record_created", "record_validated", "durable_receipt_emitted"],
+    "update": ["record_updated", "record_validated", "durable_receipt_emitted"],
+    "supersede": ["supersession_recorded", "record_validated", "durable_receipt_emitted"],
+    "retire": ["record_retired", "record_validated", "durable_receipt_emitted"]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blu-core.local/continuity/schemas/continuity_provider_availability.schema.json",
+  "title": "ContinuityProviderAvailability",
+  "description": "Operation-scoped observed availability; configuration alone cannot set available.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "observation_id",
+    "provider_id",
+    "state",
+    "observed_at",
+    "valid_until",
+    "supported_operations",
+    "evidence_ref",
+    "limitations",
+    "failure_reason"
+  ],
+  "properties": {
+    "observation_id": {"type": "string", "minLength": 1},
+    "provider_id": {"type": "string", "minLength": 1},
+    "state": {"enum": ["available", "degraded", "unavailable", "unknown"]},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "valid_until": {"type": ["string", "null"], "format": "date-time"},
+    "supported_operations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["create", "retrieve", "update", "supersede", "retire", "recover_history", "validate"]}
+    },
+    "evidence_ref": {"type": ["string", "null"]},
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "failure_reason": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"state": {"enum": ["available", "degraded"]}}},
+      "then": {
+        "properties": {
+          "evidence_ref": {"type": "string", "minLength": 1},
+          "supported_operations": {"minItems": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"state": {"enum": ["unavailable", "unknown"]}}},
+      "then": {"properties": {"failure_reason": {"type": "string", "minLength": 1}}}
+    }
+  ],
+  "x-blu-truth-rule": "Configured, mounted, source-present, or previously available does not prove current availability; available and degraded require current observation evidence."
+}

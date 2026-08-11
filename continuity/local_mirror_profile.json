@@ -1,0 +1,56 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-030",
+  "profile_id": "local_mirror_mplpb_reference",
+  "implementation_status": "specification_only_no_provider_implementation",
+  "authority_class": "approved_reference_non_authoritative_for_runtime",
+  "reference_archive": {
+    "registered_name": "Local_Mirror.zip",
+    "sha256": "77745fa1fa726859edd0caf496241c2ba930e653a86a23ba0b2792ff9e8717f2",
+    "document_id": "MPLPB-LOCAL-008",
+    "document_version": "v4",
+    "observed_reference_properties": [
+      "bounded authoritative root",
+      "relative internal links",
+      "machine-readable document identity",
+      "scope metadata",
+      "current and retired status metadata",
+      "timestamp and version ordering",
+      "supersession relationships",
+      "graph discovery separated from retired-history audit",
+      "default-current and explicit historical retrieval",
+      "crawler/index separated from source and reasoning",
+      "relocation portability",
+      "mechanical validation and explicit falsifiers",
+      "stateless boot orientation"
+    ]
+  },
+  "generic_mapping": {
+    "mplpb_document_id": "ContinuityRecord.record_id or provider-native source identity; a conforming provider must separately assign version_id",
+    "mplpb_updated": "ContinuityRecord.updated_evidence plus version after provider validation; source text alone is not timestamp proof",
+    "mplpb_scope": "ContinuityRecord.scope purpose; namespace, subject, and owner remain explicit provider fields",
+    "mplpb_status": "ContinuityRecord.status",
+    "mplpb_supersedes": "ContinuityRecord predecessor/successor relations only after provider validation",
+    "relative_path": "payload_ref kind=corpus_relative and provider_native_ref; never a durability receipt",
+    "graph_crawl": "record_discovered evidence stage",
+    "search_result": "record_retrieved stage only when an actual provider result and receipt exist",
+    "filesystem_audit_retired_path": "historical discovery input; not a mutation receipt"
+  },
+  "portability_contract": {
+    "authoritative_root": "provider-local configuration outside portable record identity",
+    "portable_references": ["opaque provider object ID", "normalized corpus-relative path"],
+    "forbidden_references": ["drive-letter absolute path", "UNC absolute path", "file URI", "POSIX absolute path", "home-directory shorthand"],
+    "relocation_rule": "Moving the complete provider root must not change record_id, version_id, scope, lineage, or normalized corpus-relative references."
+  },
+  "not_proven_by_reference": [
+    "durable create or update operation",
+    "atomic supersession or retirement",
+    "provider receipt emission",
+    "crash consistency",
+    "current provider availability",
+    "authentication, authorization, or confidentiality",
+    "protected authorization evidence",
+    "rollback resistance or monotonic attempt state"
+  ],
+  "conformance_rule": "A future Local Mirror binding conforms only by implementing the generic schemas and lifecycle behind IF-CONTINUITY-PROVIDER and producing real operation-scoped evidence. The reference corpus alone is not a conforming provider."
+}

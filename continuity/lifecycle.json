@@ -1,0 +1,64 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-030",
+  "record_status_values": ["current", "superseded", "retired"],
+  "operation_values": ["create", "retrieve", "update", "supersede", "retire", "recover_history", "validate"],
+  "receipt_status_values": ["completed", "conflict", "not_found", "unavailable", "degraded", "forbidden", "invalid", "integrity_failure", "failed"],
+  "conflict_rule": "Every mutation after create supplies an expected-version value. A mismatch returns conflict, may disclose the observed version only when authorized, and performs no mutation. Silent overwrite is forbidden.",
+  "history_rule": "Every completed update, supersede, or retire preserves prior immutable versions, history, and provenance for authorized historical recovery. The BC-030 interface exposes no delete or destroy operation.",
+  "identity_rule": "update preserves stable record_id and increments version; supersede may create a different successor record_id and records reciprocal lineage links; version_id never changes.",
+  "transitions": [
+    {
+      "operation": "create",
+      "from": "absent",
+      "preconditions": ["authorized scope", "record_id not already current", "provider availability observed"],
+      "completed_result": "current version=1 with created and updated evidence bound to the receipt",
+      "failure_result": "no record exists"
+    },
+    {
+      "operation": "retrieve",
+      "from": "current|superseded|retired|absent",
+      "preconditions": ["bounded single-scope query", "authorization when required", "provider availability observed"],
+      "completed_result": "matching records and retrieval receipt; no state change",
+      "failure_result": "not_found, unavailable, degraded, forbidden, invalid, integrity_failure, or failed; no state change"
+    },
+    {
+      "operation": "update",
+      "from": "current version N",
+      "preconditions": ["expected_version=N", "same record_id", "authorized mutation"],
+      "completed_result": "new current version N+1; prior version superseded; reciprocal version links and receipt recorded atomically",
+      "failure_result": "no state change"
+    },
+    {
+      "operation": "supersede",
+      "from": "current predecessor record",
+      "preconditions": ["expected predecessor version", "authorized successor scope", "successor identity declared"],
+      "completed_result": "predecessor status superseded and successor status current with reciprocal lineage links in one receipted result",
+      "failure_result": "neither side changes"
+    },
+    {
+      "operation": "retire",
+      "from": "current version N",
+      "preconditions": ["expected_version=N", "authorized retirement"],
+      "completed_result": "new immutable retired version N+1; history preserved; no current successor implied",
+      "failure_result": "record remains current at version N"
+    },
+    {
+      "operation": "recover_history",
+      "from": "superseded|retired historical version",
+      "preconditions": ["explicit historical selector", "authorization", "successful integrity validation"],
+      "completed_result": "historical material returned with original status and receipt; no state change",
+      "failure_result": "no material staged and no state change"
+    },
+    {
+      "operation": "validate",
+      "from": "any returned record version",
+      "preconditions": ["identity, scope, version, provenance, and integrity evidence available"],
+      "completed_result": "validation receipt; no state change",
+      "failure_result": "integrity_failure or invalid; material quarantined from context staging"
+    }
+  ],
+  "availability_failure_rule": "Unavailable or unknown provider state returns unavailable evidence. Degraded permits only the explicitly observed supported operations and limitations.",
+  "corruption_rule": "Integrity mismatch returns integrity_failure, stages no payload, performs no repair, and does not infer which version is correct. Historical recovery and any restoration are separate explicit operations with receipts.",
+  "crash_rule": "An interrupted or ambiguous mutation is not durable success. Unless a later provider query returns a matching completed receipt and resulting version, the outcome remains failed or unknown and must be reconciled without replaying blindly."
+}

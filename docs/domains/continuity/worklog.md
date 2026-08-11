@@ -19,6 +19,9 @@ last_reviewed: 2026-08-10
   PASS/SkillForge implementation was added.
 - Recorded the assignment-specific result and evidence under
   `docs/domains/continuity/assignments/BC-030/`.
+- Substantive specification commit:
+  `6812513d10eeb69f1e5b477617ffdccc52e5067b`; a metadata-only follow-up records
+  that immutable work identity for semantic review.
 
 ## 2026-08-05 — Bootstrap
 

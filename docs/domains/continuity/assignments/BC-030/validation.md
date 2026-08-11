@@ -150,3 +150,11 @@ invariants, source identity, protected-path isolation, and regression stability.
 They do not prove a Local Mirror provider implementation, a durable write,
 crash consistency, live availability, protected authorization capability,
 runtime behavior, or model behavioral parity.
+
+## Commit identity
+
+- Substantive specification commit:
+  `6812513d10eeb69f1e5b477617ffdccc52e5067b`
+- Metadata method: this follow-up commit records the substantive SHA without
+  attempting the impossible operation of embedding a commit's own final SHA in
+  its tree.

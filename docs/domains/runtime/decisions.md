@@ -120,3 +120,23 @@ Approved specification decisions, pending independent semantic review:
   authorized minimum OPSEC match/redaction contract.
 - No protected value is invented. The next safe assignment is the minimum
   protected security contract, not Python runtime implementation.
+
+### Final closure disposition
+
+- BC-040 is `done` after work integration, independent Claude review, and
+  reviewed-state integration at
+  `8801ae138deb0261deff47d02269c7a16773c892`.
+- Claude's disposition is `approve-with-notes` with zero blocking findings.
+- Assignment closure does not upgrade readiness. The final result remains
+  `not_ready_for_python_phase1`; SUR-001 remains the sole actual Phase 1
+  blocker, and `runtime_phase1_packet_may_be_authored_next` remains `false`.
+- The next separately authorized assignment is `Protected Security Phase 1 —
+  Minimum OPSEC Match and Redaction Contract`. It may amend the currently
+  null-only protected-policy reference only under that separate protected
+  authority.
+- Python Runtime Phase 1 remains unauthorized. If SUR-001 closes and readiness
+  is deterministically re-evaluated, the conditional coding packet remains
+  `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary`.
+- Claude N-1 through N-10 remain nonblocking implementation and hardening
+  inputs at their recorded targets. Closure does not convert them into BC-040
+  blockers or begin their work.

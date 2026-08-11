@@ -4,46 +4,72 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
-## BC-040 current gate
+## BC-040 closed gate
 
-BC-040 is active on exact base
-`66e7ed52f5777bdef2e32c71a5e83b439b0d0ade`. It has frozen the One-Blu canon,
-required ChatGPT and Python/LM Studio targets, provider/configuration contracts,
-package layout, finite ordinary-turn slice, all 28 current-gap dispositions,
-and all successor blocker dispositions without adding runtime code.
+BC-040 is `done`. The One-Blu portability/readiness specification and Claude's
+independent review are complete. Claude's disposition is
+`approve-with-notes`, with zero blocking findings in BC-040 itself.
 
-The result is `not_ready_for_python_phase1`. The only actual blocker is
-SUR-001: a separately authorized minimum OPSEC match/redaction contract is
-required before arbitrary natural-language ingress and egress can safely reach
-a local model. SUR-002, SUR-011, and SUR-012 block protected features only;
-SUR-003 and SUR-010 are resolved for the finite slice.
+The final project result remains `not_ready_for_python_phase1`. SUR-001 is the
+sole actual blocker: arbitrary natural-language ingress and egress cannot
+safely reach a local model until a separately authorized minimum deterministic
+OPSEC match/redaction contract can distinguish safe ordinary text from a
+protected-source reproduction request. SUR-002 blocks protected features only;
+SUR-003 and SUR-010 are sufficiently resolved for the Phase 1 finite route
+catalog; SUR-011 blocks protected continuation behavior only; and SUR-012
+remains resolved only at the generic host-evidence-contract level.
 
-The next safe assignment, after BC-040 validation and independent review, is:
+The next separately authorized assignment is:
 
 ```text
-Protected Security Phase 1 Minimum OPSEC Match and Redaction Contract
+Protected Security Phase 1 — Minimum OPSEC Match and Redaction Contract
 ```
 
-Only after that closes may Dad/Blu consider authorizing:
+Python Runtime Phase 1 remains unauthorized. Only after SUR-001 closes and the
+readiness checklist is deterministically re-evaluated may Dad/Blu consider the
+conditional coding packet:
 
 ```text
 Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary
 ```
 
-Do not start either assignment automatically. Do not implement Python Blu, LM
-Studio access, Local Mirror, Chat/Codex support, protected authorization, or
-PASS/SkillForge under BC-040.
+Do not start either assignment automatically. BC-040 closure does not implement
+Python Blu, LM Studio access, Local Mirror, Chat/Codex support, protected
+authorization, or PASS/SkillForge.
 
 ## Closed lineage
 
 BC-010, BC-010-C1, BC-010-C2, BC-015, BC-016, BC-017, BC-017-C1,
-BC-018, BC-018-C1, BC-020, and BC-020-C1 are complete.
+BC-018, BC-018-C1, BC-020, BC-020-C1, BC-030, and BC-040 are complete.
 
 The runtime-contract extraction records the CTS source faithfully, including
 unresolved declarations. It does not prove behavioral parity or implement a
 Python runtime.
 
 ## Next safe step
+
+Open only the separately authorized `Protected Security Phase 1 — Minimum OPSEC
+Match and Redaction Contract` packet. It must preserve protected-value secrecy,
+may reopen `runtime_config.schema.json#runtime.protected_policy_ref` under its
+own protected authority, and must close with deterministic readiness
+re-evaluation. It must not be folded into BC-040 closure or Python coding.
+
+Claude's ten nonblocking notes remain future inputs, not current blockers:
+
+- Python Runtime Phase 1: classify every Phase 1 support path (N-1) and freeze
+  the exact model-facing canon projection/envelope and digest rule (N-2).
+- Future gap-model hardening: clarify `changes_current_behavior` (N-3).
+- Continuity Provider Implementation: normalize receipt/provenance portability
+  constraints (N-4) and add cross-object request/receipt mismatch coverage
+  (N-5).
+- Continuity vocabulary hardening: resolve `availability_probe` terminology
+  (N-6).
+- Review/checklist hardening: distinguish review required, pending, and complete
+  without rewriting the completed review history (N-7).
+- Protected Security Phase 1: amend the null-only protected-policy reference
+  only under separate authority (N-8).
+- Readiness hardening: add real Git fixtures for readiness scope/manifest guards
+  (N-9) and distinguish dependency mismatch from contract failure (N-10).
 
 The closed BC-018 lineage includes the successor boundary specification and
 BC-018-C1 cross-turn security-state correction. Claude's original BC-018
@@ -74,16 +100,14 @@ The observed Codex scheduling interface remains recorded, while
 totals are 52 capabilities: 24 verified available, 6 verified unavailable, 4
 documented possible, 17 unknown, and 1 not applicable.
 
-SUR-011 remains unresolved as a future security-authorized policy input for protected attempt
-values, retry/lockout/backoff, cancellation/reset, new-request-after-exhaustion,
-and unrelated intervening turns. BC-030 remains `spec-needed` globally and
-`ready_for_spec` architecturally: `host_session` remains host-local and
-`durable_external` still requires an explicit continuity-provider receipt.
-
-BC-030 is unstarted and must not be promoted to active without a separately
-approved packet and named base. Chat live probing is a separate future
-assignment requiring explicit authorization. Successor runtime implementation
-remains unauthorized.
+SUR-011 remains unresolved as a future security-authorized policy input for
+protected attempt values, retry/lockout/backoff, cancellation/reset,
+new-request-after-exhaustion, and unrelated intervening turns. BC-030 is
+closed at the generic continuity-contract level: `host_session` remains
+host-local and `durable_external` still requires an explicit
+continuity-provider receipt. Provider implementation remains separately
+unauthorized. Chat live probing is also a separate future assignment requiring
+explicit authorization. Successor runtime implementation remains unauthorized.
 
 The following non-blocking archaeology-quality notes remain preserved for
 separately authorized hardening work:
@@ -113,6 +137,7 @@ Historical archaeology must not spend analysis effort evaluating whether old PAS
 The newer PASS is the relevant successor reference and remains separate from
 historical archaeology.
 
-Do not begin BC-030 or Chat live probing; implement a Python runtime or successor
-control plane; restore historical capabilities; or resolve the 28 current-source
-gaps without an approved packet and named base.
+Do not begin Chat live probing, continuity-provider implementation, Python
+runtime implementation, or a successor control plane; restore historical
+capabilities; or reopen the 28 current-source gaps without an approved packet
+and named base.

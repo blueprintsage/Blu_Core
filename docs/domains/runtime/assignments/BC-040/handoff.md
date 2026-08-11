@@ -1,20 +1,29 @@
 # BC-040 — Implementation Handoff
 
-status: review
+status: done
 owner: Codex
 last_reviewed: 2026-08-11
 
 ## Identity
 
 - Assignment: BC-040
-- Exact base: `66e7ed52f5777bdef2e32c71a5e83b439b0d0ade`
-- Branch: `bc-040-one-blu-readiness`
-- Substantive commit: `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`
-- Metadata commit: this required metadata-only follow-up; its own final SHA is
-  reported externally
-- Push status: pending
-- Working-tree status: clean staged specification at final validation; final
-  post-commit receipt pending
+- Original authorized base: `66e7ed52f5777bdef2e32c71a5e83b439b0d0ade`
+- Substantive specification: `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`
+- Metadata/review head: `dc5429cabf03aff4ea8b383cbc1290789c370ebb`
+- Work integration: `a24cffc2fb3b3b7ffe3e0291915d0319a4db3e5f`
+- Claude review: `127ae61e296fe0d07072e1320dec8ca8c4b1dfed`
+- Reviewed/integrated closure base:
+  `8801ae138deb0261deff47d02269c7a16773c892`
+- Closure branch: `bc-040-closure`
+- Closure substantive commit: recorded by the required metadata follow-up
+- Closure metadata commit: reported externally because it cannot contain its
+  own final SHA
+- Original work publication: published and integrated by
+  `a24cffc2fb3b3b7ffe3e0291915d0319a4db3e5f`
+- Claude review publication: published and integrated by
+  `8801ae138deb0261deff47d02269c7a16773c892`
+- Closure publication and final clean-tree receipts: reported externally after
+  the metadata commit is pushed
 
 ## Result
 
@@ -29,6 +38,14 @@ BC-030 N1-N8 are addressed through schema changes, real Draft 2020-12 instance
 fixtures, Git-backed scope regression tests, and canonical manifest digest
 validation.
 
+Final closure status is `done`. This is assignment completion, not a readiness
+upgrade: `not_ready_for_python_phase1` remains the final BC-040 result,
+`minimum_OPSEC_match_and_redaction_contract_available` remains failed with
+`blocking_item: SUR-001`, and
+`runtime_phase1_packet_may_be_authored_next` remains `false`.
+
+Claude's final disposition is `approve-with-notes` with zero blocking findings.
+
 ## Actual blocker
 
 SUR-001 only. Without the separately authorized minimum OPSEC match/redaction
@@ -39,11 +56,39 @@ was invented, and the runtime packet is not authorized.
 
 ## Next safe assignment
 
-`Protected Security Phase 1 Minimum OPSEC Match and Redaction Contract`
+`Protected Security Phase 1 — Minimum OPSEC Match and Redaction Contract`
 
 After that blocker is resolved and independently reviewed, Dad/Blu may consider
 authorizing `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model
 Boundary`. BC-040 does not start either assignment.
+
+## Claude nonblocking notes carried forward
+
+- N-1: classify every Phase 1 support path under an approved boundary or an
+  explicit non-component support layer, with validation. Target: Python Runtime
+  Phase 1.
+- N-2: freeze model-facing canon-envelope composition, ordering, ownership,
+  projection generation, and digest generation. Target: Python Runtime Phase 1.
+- N-3: later clarify or split `changes_current_behavior` so it distinguishes no
+  retroactive CTS rewrite from successor choices where CTS was undefined.
+- N-4: apply continuity portability constraints consistently to receipt and
+  provenance reference fields. Target: Continuity Provider Implementation.
+- N-5: add a consumer-level mismatched continuity request/receipt fixture.
+  Target: Continuity Provider Implementation.
+- N-6: include `availability_probe` in the lifecycle vocabulary or rename the
+  vocabulary as state-transitioning operations only.
+- N-7: distinguish review required, pending, and complete. Closure records the
+  completed review receipt without redesigning the readiness-checklist schema.
+- N-8: the separately authorized SUR-001 packet may amend the currently
+  null-only `runtime_config.schema.json#runtime.protected_policy_ref`; BC-040
+  closure does not modify it.
+- N-9: exercise the readiness validator's Git-scope and manifest guards with
+  real Git fixtures in a later narrow hardening or readiness re-evaluation.
+- N-10: distinguish exact `jsonschema` dependency-environment mismatch from a
+  contract failure.
+
+All ten notes remain nonblocking implementation or hardening inputs. None is a
+BC-040 blocker and none authorizes work in this closure.
 
 ## Files changed
 
@@ -96,6 +141,7 @@ No future runtime source root or provider implementation file exists.
 
 ## Final receipts
 
-This metadata-only follow-up records the exact substantive SHA. Its own final
-SHA, final clean-tree state, and push receipt are reported externally. Claude
-then reviews the exact metadata head and substantive target independently.
+The original substantive and metadata commits, work integration, Claude review,
+and reviewed integration base are recorded above. The closure's substantive
+SHA is inserted by the required metadata-only follow-up. That follow-up's own
+SHA, the final clean-tree state, and the push receipt are reported externally.

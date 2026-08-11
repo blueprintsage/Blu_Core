@@ -848,3 +848,5 @@ last_reviewed: 2026-08-10
 - BC-030 remains `spec-needed`, architecturally `ready_for_spec`, and unstarted.
   No Chat live probe, adapter runtime, successor Python runtime, Local Mirror,
   or PASS/SkillForge work occurred.
+- Substantive administrative closure commit:
+  `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533`.

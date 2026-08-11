@@ -214,6 +214,8 @@ working-tree hashes were unchanged. The corrected check compared the exact base
 and staged Git blobs, found zero review changes, and completed all architecture
 and capability assertions shown above.
 
-The substantive closure commit is recorded by the metadata-only follow-up.
+The substantive closure commit is
+`1e42c5dd2ee049fa5ebe4280692d1caecc0a3533`, recorded by this metadata-only
+follow-up.
 Final metadata commit, push, and clean-tree receipts are reported externally
 because a commit cannot contain its own final identity.

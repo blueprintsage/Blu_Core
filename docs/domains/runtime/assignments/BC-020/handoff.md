@@ -153,7 +153,8 @@ accidental implementation.
   `b51912a655d3f895651eb0bdbbe0c41ba1e7f132`;
   disposition `approve-with-notes`; BF-1 resolved; zero blocking findings.
 - Final status: `done`.
-- Substantive closure commit: pending metadata receipt.
+- Substantive closure commit:
+  `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533`.
 - Closure changes assignment and continuity metadata plus the canonical
   manifest only. It authorizes no adapter runtime, successor Python runtime,
   BC-030 work, Chat live probing, or PASS/SkillForge work.

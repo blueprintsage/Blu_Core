@@ -120,7 +120,8 @@ generalized, and no protected boundary changed.
 - The seven nonblocking review notes remain nonblocking audit history and are
   not converted into closure requirements.
 - Final status: `done`.
-- Substantive closure commit: pending metadata receipt.
+- Substantive closure commit:
+  `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533`.
 - Closure changes assignment and continuity metadata plus the canonical
   manifest only. It authorizes no adapter runtime, successor Python runtime,
   BC-030 work, Chat live probing, or PASS/SkillForge work.

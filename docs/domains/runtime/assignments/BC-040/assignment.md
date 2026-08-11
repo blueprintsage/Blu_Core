@@ -1,6 +1,6 @@
 # BC-040 — One-Blu Portability and Python Runtime Readiness
 
-status: review
+status: done
 owner: Codex
 reviewer: Claude
 project_lead: Blu
@@ -179,3 +179,37 @@ The first contains substantive specifications, schemas, validators, fixtures,
 records, and manifest changes. The second records the exact first SHA. Push the
 branch, move status to `review`, and stop for Claude's independent semantic
 review. Do not begin Python Runtime Phase 1 automatically.
+
+## Final closure amendment — 2026-08-11
+
+Dad, Project Owner, and Blu, Project Lead, authorized administrative final
+closure after the specification and Claude review were integrated. This
+amendment records closure receipts; it does not change the original assignment
+scope or authorize implementation.
+
+- Original authorized base:
+  `66e7ed52f5777bdef2e32c71a5e83b439b0d0ade`
+- Substantive specification:
+  `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`
+- Metadata/review head:
+  `dc5429cabf03aff4ea8b383cbc1290789c370ebb`
+- BC-040 work integration:
+  `a24cffc2fb3b3b7ffe3e0291915d0319a4db3e5f`
+- Claude semantic review:
+  `127ae61e296fe0d07072e1320dec8ca8c4b1dfed`
+- Claude disposition: `approve-with-notes`
+- Claude blocking findings: `0`
+- Final reviewed/integrated base:
+  `8801ae138deb0261deff47d02269c7a16773c892`
+- Closure branch: `bc-040-closure`
+- Closure substantive commit:
+  `d78f58972327434c83d7e79a2cb9372e487a9629`
+- Final assignment status: `done`
+- Final BC-040 readiness result: `not_ready_for_python_phase1`
+
+`BC-040 done` does not mean `Python Phase 1 ready`. BC-040 completed its
+readiness-specification job by establishing that SUR-001 is the sole actual
+Phase 1 blocker. The minimum OPSEC match/redaction condition remains failed,
+`runtime_phase1_packet_may_be_authored_next` remains `false`, and Python Runtime
+Phase 1 remains unauthorized until separately authorized SUR-001 work closes
+and the checklist is deterministically re-evaluated.

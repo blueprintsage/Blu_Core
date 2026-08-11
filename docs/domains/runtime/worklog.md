@@ -4,6 +4,51 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
+## 2026-08-11 — BC-040 final closure
+
+### What changed
+
+- Closed BC-040 administratively from exact reviewed/integrated base
+  `8801ae138deb0261deff47d02269c7a16773c892` on branch
+  `bc-040-closure`.
+- Recorded the complete lineage: original base
+  `66e7ed52f5777bdef2e32c71a5e83b439b0d0ade`, substantive specification
+  `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`, metadata
+  `dc5429cabf03aff4ea8b383cbc1290789c370ebb`, work integration
+  `a24cffc2fb3b3b7ffe3e0291915d0319a4db3e5f`, Claude review
+  `127ae61e296fe0d07072e1320dec8ca8c4b1dfed`, and reviewed integration
+  `8801ae138deb0261deff47d02269c7a16773c892`.
+- Recorded Claude's `approve-with-notes` disposition, zero blocking findings,
+  and all ten nonblocking implementation/hardening notes at their future
+  targets.
+- Regenerated the canonical manifest after the immutable Claude review changed
+  a tracked file.
+- Added no production runtime, LM Studio provider, Local Mirror provider,
+  protected policy value, adapter implementation, or PASS/SkillForge work.
+
+### Final result and next safe step
+
+- BC-040 status: `done`.
+- One-Blu portability/readiness specification: complete.
+- Required deployments: ChatGPT Custom GPT and Python/LM Studio.
+- Optional best-effort deployment: Codex; it remains non-driving and
+  nonblocking for Python.
+- Final readiness: `not_ready_for_python_phase1`.
+- Sole actual blocker: SUR-001, the unavailable minimum OPSEC match/redaction
+  contract for arbitrary natural-language ingress and egress.
+- Next separately authorized assignment: `Protected Security Phase 1 — Minimum
+  OPSEC Match and Redaction Contract`.
+- Python Runtime Phase 1 remains unauthorized. Its conditional future packet is
+  `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary`.
+
+### Validation and receipts
+
+Exact final commands, suite counts, manifest coverage, golden CTS results,
+architecture counts, protected-boundary checks, limitations, and commit
+receipts are recorded in `assignments/BC-040/validation.md` and `handoff.md`.
+Substantive administrative closure commit:
+`d78f58972327434c83d7e79a2cb9372e487a9629`.
+
 ## 2026-08-11 — BC-040 One-Blu portability and readiness
 
 ### What changed

@@ -199,5 +199,6 @@ from exact reviewed and integrated `main` base
 - Claude notes N1-N8 and the instance-level schema-conformance gap remain
   future implementation-readiness inputs rather than BC-030 blockers. N9 and
   N10 are addressed by this closure; N11 remains an audit note.
-- The substantive closure commit is recorded by the authorized metadata-only
-  follow-up and is not embedded in its own tree.
+- Substantive closure commit:
+  `a77393d6fc63e644f57a70992af6fec050a2e802`, recorded by this authorized
+  metadata-only follow-up rather than embedded in its own tree.

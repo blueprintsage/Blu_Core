@@ -33,7 +33,9 @@ last_reviewed: 2026-08-11
   historical protected-path finding for the explicitly authorized SUR-007
   register edit. Their contract-content checks pass on the identical staged
   tree without Git-history scope enforcement; the validators were not changed.
-- Substantive closure commit: recorded by the metadata-only follow-up.
+- Substantive closure commit:
+  `a77393d6fc63e644f57a70992af6fec050a2e802`, recorded by the metadata-only
+  follow-up.
 
 ## 2026-08-10 — BC-030 Local Mirror continuity specification
 

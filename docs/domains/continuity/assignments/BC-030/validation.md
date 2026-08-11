@@ -241,5 +241,7 @@ These checks establish specification consistency and closure bookkeeping only.
 They do not prove live durability, provider availability, a durable write,
 crash consistency, protected durable authorization, or runtime behavior.
 
-The substantive closure commit is recorded by the metadata-only follow-up; the
-metadata commit cannot record its own final identity.
+The substantive closure commit is
+`a77393d6fc63e644f57a70992af6fec050a2e802`. This metadata-only follow-up
+records that immutable identity; the metadata commit cannot record its own
+final identity.

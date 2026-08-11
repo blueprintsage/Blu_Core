@@ -116,6 +116,7 @@ MANIFEST.sha256
   `resolved_at_generic_continuity_contract_level`; this does not claim a
   continuity provider or protected-authorization capability.
 - SUR-011 remains unresolved.
-- Substantive closure commit: recorded by the metadata-only follow-up.
+- Substantive closure commit:
+  `a77393d6fc63e644f57a70992af6fec050a2e802`.
 - The closure introduces no provider, successor Python runtime, LM Studio
   adapter, Chat/Codex adapter implementation, or PASS/SkillForge work.

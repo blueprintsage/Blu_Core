@@ -37,6 +37,12 @@ recorded in `assignments/BC-041/validation.md` and `handoff.md` at handoff.
 Claude performs the independent semantic review; Dad/Blu decide integration and
 any later Python Runtime Phase 1 authorization.
 
+### Commit identity
+
+- Substantive security-contract work:
+  `9ccd17d75955db4b64e5df27a5751d36b6964330`
+- Metadata receipt: reported externally after creation.
+
 ## 2026-08-11 — BC-040 final closure
 
 ### What changed

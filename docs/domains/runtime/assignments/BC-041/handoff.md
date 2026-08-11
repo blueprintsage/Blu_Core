@@ -9,10 +9,11 @@ last_reviewed: 2026-08-11
 - Assignment: BC-041
 - Base commit: `699ee1485cef39ffbe70c3b8e848763af02596e0`
 - Work branch: `bc-041-protected-opsec-phase1`
-- Substantive work commit: recorded by the required metadata-only follow-up
+- Substantive work commit: `9ccd17d75955db4b64e5df27a5751d36b6964330`
 - Metadata commit: reported externally because it cannot contain its own SHA
 - Push status: pending
-- Working-tree status: staged for substantive commit at handoff preparation
+- Working-tree status: substantive commit completed cleanly before this
+  metadata receipt; final post-metadata status is reported externally
 
 ## Result
 

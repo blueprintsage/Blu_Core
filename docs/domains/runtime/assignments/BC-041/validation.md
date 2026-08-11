@@ -125,3 +125,10 @@ repository boundaries remain intact. They do not prove production policy
 completeness, arbitrary semantic leakage detection, live model behavior, Auth,
 protected continuation, or production runtime security. No real protected
 policy was loaded or tested.
+
+## Commit identity
+
+- Substantive work commit:
+  `9ccd17d75955db4b64e5df27a5751d36b6964330`
+- Metadata method: this follow-up records the substantive SHA. Its own final SHA
+  is reported externally rather than embedded in its tree.

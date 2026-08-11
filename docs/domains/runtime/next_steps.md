@@ -2,7 +2,37 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
+
+## BC-040 current gate
+
+BC-040 is active on exact base
+`66e7ed52f5777bdef2e32c71a5e83b439b0d0ade`. It has frozen the One-Blu canon,
+required ChatGPT and Python/LM Studio targets, provider/configuration contracts,
+package layout, finite ordinary-turn slice, all 28 current-gap dispositions,
+and all successor blocker dispositions without adding runtime code.
+
+The result is `not_ready_for_python_phase1`. The only actual blocker is
+SUR-001: a separately authorized minimum OPSEC match/redaction contract is
+required before arbitrary natural-language ingress and egress can safely reach
+a local model. SUR-002, SUR-011, and SUR-012 block protected features only;
+SUR-003 and SUR-010 are resolved for the finite slice.
+
+The next safe assignment, after BC-040 validation and independent review, is:
+
+```text
+Protected Security Phase 1 Minimum OPSEC Match and Redaction Contract
+```
+
+Only after that closes may Dad/Blu consider authorizing:
+
+```text
+Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary
+```
+
+Do not start either assignment automatically. Do not implement Python Blu, LM
+Studio access, Local Mirror, Chat/Codex support, protected authorization, or
+PASS/SkillForge under BC-040.
 
 ## Closed lineage
 

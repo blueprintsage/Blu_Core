@@ -1,0 +1,83 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "slice_id": "python_phase1_boot_ordinary_turn_lm_studio",
+  "implementation_authorized": false,
+  "purpose": "Smallest useful real Blu turn centered on ordinary conversation.",
+  "boot_sequence": [
+    "load_and_validate_portable_configuration",
+    "load_and_digest_check_canonical_sources",
+    "construct_seven_boundary_runtime_graph",
+    "observe_lm_studio_endpoint_and_model_inventory",
+    "match_configured_model_to_loaded_instance",
+    "verify_context_capacity_and_required_chat_capability",
+    "report_continuity_unavailable_without_claiming_persistence",
+    "accept_terminal_host_ingress"
+  ],
+  "route_catalog": [
+    {
+      "route_id": "ordinary_conversation",
+      "match": "no supported command or protected operation selected",
+      "owner": "model_execution_boundary",
+      "requires": ["SecurityDecision PASS", "loaded canonical projection", "verified model instance", "verified context capacity"],
+      "side_effects": false,
+      "durable_continuity_required": false,
+      "terminal_statuses": ["PASS", "BLOCK", "ASK", "UNAVAILABLE", "INVALID", "ERROR"]
+    }
+  ],
+  "unsupported_routes": [
+    "all slash commands",
+    "protected source access or reproduction",
+    "authentication and protected authorization",
+    "tools and side effects",
+    "source retrieval",
+    "artifacts",
+    "durable continuity mutations",
+    "reminders and scheduling",
+    "Memory Program",
+    "SimCode",
+    "MMU and StateTree",
+    "Mood services",
+    "School Engine",
+    "SkillForge or PASS"
+  ],
+  "turn_sequence": [
+    "terminal_raw_host_event",
+    "host_adapter_raw_host_input",
+    "pre_ingress_security_restraint",
+    "SecurityDecision_PASS_required",
+    "turn_controller_constructs_TurnRequest",
+    "turn_controller_locks_ordinary_conversation_owner_and_ScopeLock",
+    "model_execution_request_through_IF_MODEL_EXECUTION",
+    "lm_studio_non_streaming_response",
+    "normalize_model_output_or_nonexecuting_tool_candidate",
+    "validation_and_egress",
+    "one_TerminalPacket",
+    "terminal_user_visible_reply"
+  ],
+  "failure_catalog": [
+    {"condition": "configuration invalid", "status": "INVALID", "model_invoked": false},
+    {"condition": "canonical source missing or digest mismatch", "status": "BLOCK", "model_invoked": false},
+    {"condition": "protected policy required but unavailable", "status": "UNAVAILABLE", "model_invoked": false},
+    {"condition": "LM Studio endpoint unavailable", "status": "UNAVAILABLE", "model_invoked": false},
+    {"condition": "configured model absent or not loaded", "status": "UNAVAILABLE", "model_invoked": false},
+    {"condition": "required context capacity unknown or insufficient", "status": "UNAVAILABLE", "model_invoked": false},
+    {"condition": "provider timeout", "status": "UNAVAILABLE", "partial_output_public": false},
+    {"condition": "malformed or identity-mismatched response", "status": "INVALID", "candidate_output_public": false},
+    {"condition": "tool-call candidate emitted", "status": "UNAVAILABLE", "tool_executed": false},
+    {"condition": "continuity unavailable", "status": "PASS_if_route_otherwise_independent", "durability_claimed": false}
+  ],
+  "success_receipt_requires": [
+    "request_id",
+    "provider_id",
+    "model_instance_id",
+    "canon_projection_digest",
+    "turn_request_ref",
+    "control_decision_ref",
+    "validation_result_ref",
+    "terminal_packet_ref",
+    "provider_completion_evidence_ref"
+  ],
+  "sur003_disposition": "route_catalog_frozen_for_phase1",
+  "security_gate": "A real ordinary turn remains unauthorized until the missing minimum OPSEC match/redaction contract can deterministically separate safe ingress and egress from protected-source requests without publishing protected values."
+}

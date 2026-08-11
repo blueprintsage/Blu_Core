@@ -1,0 +1,40 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "result": "not_ready_for_python_phase1",
+  "full_successor_feature_complete": false,
+  "checks": [
+    {"id": "one_blu_canon_mapping_complete", "status": "pass"},
+    {"id": "custom_gpt_target_mapped", "status": "pass"},
+    {"id": "python_lm_studio_target_mapped", "status": "pass"},
+    {"id": "codex_optional", "status": "pass"},
+    {"id": "architecture_7_components_8_packets_9_interfaces", "status": "pass"},
+    {"id": "python_package_layout_frozen", "status": "pass"},
+    {"id": "first_executable_route_catalog_frozen", "status": "pass"},
+    {"id": "model_execution_provider_contract_frozen", "status": "pass"},
+    {"id": "lm_studio_required_target_contract_frozen", "status": "pass"},
+    {"id": "portable_configuration_contract_frozen", "status": "pass"},
+    {"id": "SUR_003_resolved_for_phase1", "status": "pass"},
+    {"id": "SUR_010_mapped_for_phase1", "status": "pass"},
+    {"id": "all_implementation_blockers_dispositioned", "status": "pass"},
+    {"id": "protected_policy_not_invented", "status": "pass"},
+    {"id": "protected_unsupported_paths_fail_closed", "status": "pass"},
+    {"id": "BC_030_N1_through_N8_handled", "status": "pass"},
+    {"id": "instance_level_schema_validation_active", "status": "pass"},
+    {"id": "manifest_validator_digest_and_scope_guards_strengthened", "status": "pass"},
+    {"id": "golden_CTS_unchanged", "status": "pass"},
+    {"id": "no_runtime_code_introduced", "status": "pass"},
+    {"id": "independent_Claude_review_required", "status": "pass"},
+    {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "fail", "blocking_item": "SUR-001"}
+  ],
+  "actual_blockers": [
+    {
+      "id": "SUR-001",
+      "reason": "The exact minimum OPSEC match/redaction contract needed to distinguish safe natural-language ingress and egress from protected-source reproduction is unavailable. Allowing a real local-model turn without it would weaken current security semantics; inventing it is prohibited.",
+      "smallest_next_assignment": "Protected Security Phase 1 Minimum OPSEC Match and Redaction Contract"
+    }
+  ],
+  "runtime_phase1_packet_may_be_authored_next": false,
+  "conditional_runtime_packet_after_blocker": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
+  "automatic_start_prohibited": true
+}

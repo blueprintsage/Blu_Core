@@ -1,0 +1,39 @@
+{
+  "spec_version": "1.0.0",
+  "assignment": "BC-040",
+  "layout_type": "src",
+  "production_root": "src/blu_runtime",
+  "implementation_present": false,
+  "paths": [
+    {"path": "src/blu_runtime/__main__.py", "owner": "runtime_entrypoint", "phase1": true},
+    {"path": "src/blu_runtime/config.py", "owner": "configuration", "phase1": true},
+    {"path": "src/blu_runtime/canon/loader.py", "owner": "canonical_source_loader", "phase1": true},
+    {"path": "src/blu_runtime/contracts/models.py", "owner": "typed_contract_model_layer", "phase1": true},
+    {"path": "src/blu_runtime/core/security_restraint.py", "owner": "security_restraint", "phase1": true},
+    {"path": "src/blu_runtime/core/authorization.py", "owner": "authorization_evaluator", "phase1": false},
+    {"path": "src/blu_runtime/core/turn_controller.py", "owner": "turn_controller", "phase1": true},
+    {"path": "src/blu_runtime/core/validation_egress.py", "owner": "validation_egress", "phase1": true},
+    {"path": "src/blu_runtime/providers/model/base.py", "owner": "model_execution_provider_abstraction", "phase1": true},
+    {"path": "src/blu_runtime/providers/model/lm_studio.py", "owner": "lm_studio_provider_binding", "phase1": true},
+    {"path": "src/blu_runtime/adapters/host/base.py", "owner": "host_adapter_abstraction", "phase1": true},
+    {"path": "src/blu_runtime/adapters/host/terminal.py", "owner": "terminal_host_adapter", "phase1": true},
+    {"path": "src/blu_runtime/providers/continuity/base.py", "owner": "continuity_provider_abstraction", "phase1": true},
+    {"path": "tests/runtime_phase1", "owner": "phase1_tests", "phase1": true},
+    {"path": "tests/runtime_phase1/fixtures", "owner": "phase1_fixtures", "phase1": true}
+  ],
+  "architecture_mapping": {
+    "security_restraint": ["core/security_restraint.py"],
+    "authorization_evaluator": ["core/authorization.py"],
+    "turn_controller": ["core/turn_controller.py"],
+    "validation_egress": ["core/validation_egress.py"],
+    "model_execution_boundary": ["providers/model/base.py", "providers/model/lm_studio.py"],
+    "host_adapter_boundary": ["adapters/host/base.py", "adapters/host/terminal.py"],
+    "continuity_provider_boundary": ["providers/continuity/base.py"]
+  },
+  "module_rules": [
+    "No mega-module or mega-Exec object.",
+    "No Exec Library architecture.",
+    "No class-per-Markdown-heading mechanical port.",
+    "Internal modules map beneath exactly one approved component or boundary and add no architectural authority."
+  ]
+}

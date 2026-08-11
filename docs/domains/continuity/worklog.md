@@ -4,6 +4,18 @@ status: active
 owner: docs/domains/continuity
 last_reviewed: 2026-08-11
 
+## 2026-08-11 — BC-040 schema and validator hardening
+
+- Added the mutation-request schema and expected-version receipt binding.
+- Tightened retrieval, action equality, portable references, and non-completed
+  mutation outcomes; documented receipt-only availability probing.
+- Added valid/invalid Draft 2020-12 instances for all six schemas, including
+  conflict, not-found, availability, path, and supersession conditionals.
+- Made Git-scope and manifest guards reachable in isolated Git tests and added
+  canonical staged-blob digest comparison.
+- Preserved `host_session != durable_external`, SUR-011, and the absence of a
+  Local Mirror provider or production Python runtime.
+
 ## 2026-08-11 — BC-030 final closure
 
 - Dad and Blu authorized administrative closure from exact reviewed and

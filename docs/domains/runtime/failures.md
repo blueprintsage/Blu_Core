@@ -2,7 +2,22 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-08
+last_reviewed: 2026-08-11
+
+## 2026-08-11 — Explicit route exclusion is not a complete OPSEC boundary
+
+- **Observed:** a Phase 1 catalog can remove commands, tools, Auth, source
+  retrieval, mutations, and all side effects, yet the remaining ordinary
+  natural-language lane can still contain a request to reproduce protected Blu
+  source.
+- **Unsafe shortcut:** declaring protected operations unsupported while sending
+  every other text input to the model would treat route absence as a complete
+  pre-ingress and egress policy. It is not.
+- **Prevention:** do not authorize a real ordinary local-model turn until a
+  separately security-authorized minimum OPSEC match/redaction contract makes
+  that boundary checkable. Test-only downstream fixtures may proceed; real
+  ingress remains blocked. Never invent or publish protected values to clear
+  the gate.
 
 ## 2026-08-05 — BC-010 safe extraction limits
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -24,6 +26,7 @@ class ContinuityContractValidationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
+        self.original_base_commit = validator.BASE_COMMIT
         golden_manifest = ROOT / "kernel/golden/v0.22.0/SHA256SUMS"
         golden_paths = {
             Path("kernel/golden/v0.22.0/SHA256SUMS"),
@@ -40,7 +43,43 @@ class ContinuityContractValidationTests(unittest.TestCase):
             shutil.copy2(source, target)
 
     def tearDown(self) -> None:
+        validator.BASE_COMMIT = self.original_base_commit
         self.temp.cleanup()
+
+    def git(self, *args: str) -> str:
+        result = subprocess.run(
+            ["git", "-C", str(self.root), *args],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return result.stdout.strip()
+
+    def init_git_scope_fixture(self) -> None:
+        self.git("init")
+        self.git("config", "user.email", "bc040-fixture@example.invalid")
+        self.git("config", "user.name", "BC-040 Fixture")
+        self.git("add", ".")
+        paths = [
+            path for path in self.git("ls-files").splitlines()
+            if path and path != "MANIFEST.sha256"
+        ]
+        lines = []
+        for path in paths:
+            blob = subprocess.run(
+                ["git", "-C", str(self.root), "show", f":{path}"],
+                check=True,
+                capture_output=True,
+            ).stdout
+            lines.append(f"{hashlib.sha256(blob).hexdigest()}  {path}")
+        (self.root / "MANIFEST.sha256").write_text(
+            "\n".join(lines) + "\n", encoding="utf-8"
+        )
+        self.git("add", "MANIFEST.sha256")
+        self.git("commit", "-m", "fixture baseline")
+        validator.BASE_COMMIT = self.git("rev-parse", "HEAD")
+        self.assertEqual([], validator._validate_git_scope(self.root))
+        self.assertEqual([], validator._validate_manifest_coverage(self.root))
 
     def load(self, relative: str) -> dict:
         return json.loads((self.root / relative).read_text(encoding="utf-8"))
@@ -292,6 +331,77 @@ class ContinuityContractValidationTests(unittest.TestCase):
         path = self.root / "continuity/provider.py"
         path.write_text("pass\n", encoding="utf-8")
         self.assert_has("executable continuity implementation exists")
+
+    def test_schema_instance_matrix_exercises_required_conditionals(self) -> None:
+        matrix = self.load("tests/continuity/fixtures/schema_instances.json")
+        case_ids = {case["case_id"] for case in matrix["cases"]}
+        required = {
+            "receipt_completed_create_valid",
+            "receipt_failed_valid",
+            "receipt_stale_expected_version_conflict_valid",
+            "receipt_mismatched_action_invalid",
+            "mutation_expected_version_update_valid",
+            "retrieval_not_found_valid",
+            "retrieval_not_found_with_records_invalid",
+            "retrieval_noncompleted_with_completed_receipt_invalid",
+            "availability_unavailable_valid",
+            "availability_degraded_valid",
+            "record_invalid_drive_absolute_ref",
+            "receipt_supersession_reciprocity_valid",
+            "receipt_supersession_reciprocity_invalid",
+            "receipt_noncompleted_success_fields_invalid",
+        }
+        self.assertTrue(required.issubset(case_ids), required - case_ids)
+        self.assertEqual([], self.errors())
+
+    def test_git_scope_guard_rejects_protected_path_change(self) -> None:
+        self.init_git_scope_fixture()
+        path = "contracts/successor/component_registry.json"
+        data = self.load(path)
+        data["fixture_mutation"] = True
+        self.save(path, data)
+        self.assert_has("protected path changed")
+
+    def test_git_scope_guard_rejects_disallowed_python(self) -> None:
+        self.init_git_scope_fixture()
+        path = self.root / "tools/unauthorized_runtime.py"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("pass\n", encoding="utf-8")
+        self.git("add", "tools/unauthorized_runtime.py")
+        self.assert_has("runtime or provider Python implementation changed")
+
+    def test_git_scope_guard_rejects_pass_skillforge_bleed(self) -> None:
+        self.init_git_scope_fixture()
+        path = self.root / "pass/README.md"
+        path.parent.mkdir(parents=True)
+        path.write_text("not allowed\n", encoding="utf-8")
+        self.git("add", "pass/README.md")
+        self.assert_has("PASS/SkillForge scope bleed")
+
+    def test_git_scope_guard_rejects_lm_studio_runtime_bleed(self) -> None:
+        self.init_git_scope_fixture()
+        path = self.root / "lm_studio/client.txt"
+        path.parent.mkdir(parents=True)
+        path.write_text("not allowed\n", encoding="utf-8")
+        self.git("add", "lm_studio/client.txt")
+        self.assert_has("LM Studio adapter implementation path changed")
+
+    def test_manifest_coverage_guard_is_regression_protected(self) -> None:
+        self.init_git_scope_fixture()
+        path = self.root / "readiness/new-contract.json"
+        path.parent.mkdir(parents=True)
+        path.write_text("{}\n", encoding="utf-8")
+        self.git("add", "readiness/new-contract.json")
+        self.assert_has("missing from MANIFEST.sha256")
+
+    def test_manifest_digest_guard_uses_index_blob_bytes(self) -> None:
+        self.init_git_scope_fixture()
+        path = "continuity/lifecycle.json"
+        data = self.load(path)
+        data["fixture_digest_mutation"] = True
+        self.save(path, data)
+        self.git("add", path)
+        self.assert_has("MANIFEST.sha256 digest mismatch")
 
 
 if __name__ == "__main__":

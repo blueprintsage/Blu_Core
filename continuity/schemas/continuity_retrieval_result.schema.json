@@ -39,8 +39,20 @@
       "then": {"properties": {"receipt": {"properties": {"status": {"const": "completed"}}}}}
     },
     {
-      "if": {"properties": {"status": {"enum": ["unavailable", "forbidden", "invalid", "integrity_failure", "failed"]}}},
+      "if": {"properties": {"status": {"enum": ["not_found", "unavailable", "forbidden", "invalid", "integrity_failure", "failed"]}}},
       "then": {"properties": {"records": {"maxItems": 0}}}
+    },
+    {
+      "if": {"properties": {"status": {"not": {"const": "completed"}}}, "required": ["status"]},
+      "then": {
+        "properties": {
+          "receipt": {
+            "properties": {
+              "status": {"enum": ["conflict", "not_found", "unavailable", "degraded", "forbidden", "invalid", "integrity_failure", "failed"]}
+            }
+          }
+        }
+      }
     }
   ],
   "x-blu-staging-rule": "Records may enter bounded turn context only after identity, scope, status, version, provenance, authorization, and integrity validation.",

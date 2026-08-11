@@ -18,6 +18,10 @@ last_reviewed: 2026-08-11
   binding and absolute-path prohibition; regression-protect Git-scope and
   manifest guards; and validate manifest digests. Add instance-level schema
   conformance fixtures and select the consuming schema runtime.
+- BC-040 addresses N1-N8 at the contract/readiness boundary with a mutation
+  request, tightened conditionals, portable-reference patterns, action binding,
+  `jsonschema==4.26.0` instance fixtures, Git-backed scope tests, and canonical
+  manifest digest validation. No provider was implemented.
 - The next successor assignment is the separately authorized
   implementation-readiness / One-Blu portability contract. Do not begin it from
   this closure.

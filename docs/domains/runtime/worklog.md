@@ -2,7 +2,43 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-10
+last_reviewed: 2026-08-11
+
+## 2026-08-11 — BC-040 One-Blu portability and readiness
+
+### What changed
+
+- Defined one canonical behavioral source mapping across required ChatGPT and
+  Python/LM Studio deployments; Codex remains optional best effort.
+- Recorded official LM Studio v1 model inventory and chat evidence and froze a
+  non-streaming, `store=false`, operator-loaded-model Phase 1 profile.
+- Froze a normal `src/blu_runtime/` layout contract, portable configuration,
+  provider-neutral model boundary, one-route ordinary-turn slice, parity
+  scenarios, all 28 implementation-gap dispositions, and all successor blocker
+  dispositions.
+- Tightened continuity schemas for mutation requests, action/expected-version
+  binding, `not_found`, portable references, non-completed outcomes, and
+  receipt-only availability probes.
+- Selected `jsonschema==4.26.0` Draft 2020-12 validation and added real instance
+  fixtures plus Git-backed scope/manifest regression tests.
+- Added no production runtime, LM Studio client, Local Mirror provider, tool
+  execution, CLI, daemon, UI, or PASS/SkillForge integration.
+
+### Result and next step
+
+- Preliminary result: `not_ready_for_python_phase1`.
+- SUR-001 is the only actual blocker. Explicit protected routes can be absent,
+  but an arbitrary ordinary-language turn can still request protected source;
+  a real local-model turn therefore requires a separately authorized minimum
+  OPSEC match/redaction contract.
+- After full validation, commit and push the BC-040 specification for Claude
+  review. Do not begin Python Runtime Phase 1.
+
+### Commit identity
+
+- Substantive specification:
+  `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`
+- Metadata receipt: this follow-up; reported externally after creation.
 
 ## 2026-08-05 — Bootstrap
 

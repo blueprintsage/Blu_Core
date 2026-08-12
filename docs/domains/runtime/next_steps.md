@@ -2,14 +2,15 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 
 ## BC-041-C1 correction review gate
 
-BC-041-C1 corrects the single blocking finding in Claude's immutable BC-041
-review. The minimum matcher now evaluates both deterministic Unicode
-general-category `Cf` candidate views at ingress and egress. Its bounded state
-is:
+BC-041-C1 is in bounded handoff after correcting Claude's B-1' finding. The
+minimum matcher now removes all general-category `Cf` code points into one
+candidate and uses separator-tolerant rule matching to cover arbitrary mixtures
+of boundary and inside-token insertion without placement enumeration. Its
+bounded state is:
 
 ```text
 SUR-001: resolved_at_minimum_phase1_contract_level
@@ -25,11 +26,15 @@ or general Unicode confusable/homoglyph coverage. Auth and protected
 continuation remain unavailable, and SUR-002, SUR-011, and SUR-012 retain their
 prior dispositions.
 
-The next safe step is Claude's independent review of the exact BC-041-C1
-substantive/metadata head on a separate branch, modifying only the C1 review
-record. Dad/Blu then decide integration, closure, and whether to issue the
-separate `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model
-Boundary` packet. Do not begin that implementation automatically.
+The expanded proof covers six code points across boundary, inside-token, and
+mixed placement at ingress and egress, cross-code-point mixing, repeated
+arbitrary insertions, the five negative fixtures, redaction rescan/fail-closed
+paths, and content-safe evidence. The next safe step is a fresh Claude review
+of the exact BC-041-C1 substantive/metadata head on a separate branch,
+modifying only the C1 review record. Dad/Blu then decide integration, closure,
+and whether to issue the separate `Python Runtime Phase 1 — Boot + Ordinary
+Turn + LM Studio Model Boundary` packet. Do not begin that implementation
+automatically.
 
 ## Prior BC-040 closed gate
 

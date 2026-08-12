@@ -43,15 +43,23 @@ loaded, schema-valid, integrity-valid, or usable.
 
 ## Minimum matcher
 
-The matcher accepts text only. It deterministically derives exactly two
-candidate views. In
-`cf_to_ascii_space`, every Unicode general-category `Cf` code point becomes an
-ASCII space. In `cf_removed`, every `Cf` code point is removed. Each view then
-continues independently through the full existing normalization pipeline:
-Unicode NFKC, line-break and whitespace normalization, bounded common-separator
-mapping, repeated-space collapse, trim, and per-rule case folding. The matcher
-evaluates both views, and a match in either view is a protected match. This
-applies symmetrically to ingress and candidate egress output.
+The matcher accepts text only. It deterministically removes every Unicode
+general-category `Cf` code point, producing one candidate regardless of how
+many format characters were inserted or where they were placed. That candidate
+continues through the existing normalization pipeline: Unicode NFKC, line-break
+and whitespace normalization, bounded common-separator mapping, repeated-space
+collapse, trim, and per-rule case folding.
+
+For matching only, every normalized inter-word space in a protected rule may
+match zero or more normalized ASCII spaces in the candidate. Zero spaces
+recovers a word boundary that disappeared when a boundary-position `Cf` was
+removed; ordinary spaces recover unchanged boundaries, while removal also
+repairs insertions inside tokens. Unicode word-token guards still bound the
+complete phrase. The matcher therefore covers arbitrary mixtures and counts of
+boundary and inside-token `Cf` insertions with one linear candidate. It does not
+enumerate placement combinations or generate a candidate set that grows with
+insertion count. These semantics apply symmetrically to ingress and candidate
+egress output.
 
 The matcher supports only token-bounded `normalized_phrase` rules. It does not
 call a model, infer intent, assign confidence, or authenticate. It does not
@@ -65,12 +73,12 @@ new case that maps a protected match to `ASK`.
 Candidate model output is evaluated before terminal print. A nonmatch is
 `CLEAR`. A matched rule may require whole-output `BLOCKED` or may permit
 `REDACTED`. Redaction emits the canonicalized candidate with every matched span
-replaced by `[protected content omitted]`, then re-runs the full matcher. Empty
-residual content, a remaining match, an overlapping/invalid span, or any rule
-requiring block makes the whole output non-printable. If divergent candidate
-views contain protected matches that cannot be represented by one safe span
-set, redaction fails closed to whole-output `BLOCKED`. Raw protected candidate
-text is never used as a diagnostic.
+replaced by `[protected content omitted]`, then re-runs the same `Cf`-removed,
+separator-tolerant matcher. Empty residual content, a remaining match, an
+overlapping/invalid span, or any rule requiring block makes the whole output
+non-printable. If matching spans cannot be represented by one non-overlapping
+safe span set, redaction fails closed to whole-output `BLOCKED`. Raw protected
+candidate text is never used as a diagnostic.
 
 ## Evidence and diagnostics
 

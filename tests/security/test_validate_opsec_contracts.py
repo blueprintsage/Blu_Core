@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import hmac
 import importlib.util
 import inspect
 import json
@@ -34,26 +35,28 @@ class OpsecContractValidationTests(unittest.TestCase):
         self.assertEqual([], validator.validate(ROOT))
 
     def test_normalization_is_deterministic_and_bounded(self) -> None:
-        self.assertEqual("Cerulean Comet Charter", validator.normalize_text("  Cerulean---Comet\r\nCharter  "))
-        self.assertEqual("zircon café protocol", validator.normalize_text("zircon café protocol"))
+        self.assertEqual("Cerulean Comet Charter", validator.normalize_rule_text("  Cerulean---Comet\r\nCharter  "))
+        self.assertEqual("zircon café protocol", validator.normalize_rule_text("zircon café protocol"))
 
-    def test_cf_candidate_views_are_distinct_and_both_match(self) -> None:
-        boundary = validator.normalized_candidate_views("cerulean\u200bcomet charter")
-        inside = validator.normalized_candidate_views("cerulean co\u200bmet charter")
-        self.assertEqual(validator.CF_VIEW_NAMES, [item["name"] for item in boundary])
-        self.assertEqual("cerulean comet charter", boundary[0]["normalized"])
-        self.assertEqual("ceruleancomet charter", boundary[1]["normalized"])
-        self.assertEqual("cerulean co met charter", inside[0]["normalized"])
-        self.assertEqual("cerulean comet charter", inside[1]["normalized"])
-        for views in (boundary, inside):
-            evaluated = validator._matches_by_candidate_view(views, self.policy, "ingress")
-            self.assertTrue(any(item["matches"] for item in evaluated))
+    def test_single_cf_removed_candidate_matches_all_placement_classes(self) -> None:
+        candidates = [
+            validator.normalized_match_candidate("cerulean\u200bcomet charter"),
+            validator.normalized_match_candidate("cerulean co\u200bmet charter"),
+            validator.normalized_match_candidate("cerulean\u200bco\ufeffmet charter"),
+        ]
+        self.assertEqual([validator.CF_MATCH_VIEW_NAME] * 3, [item["name"] for item in candidates])
+        self.assertEqual(
+            ["ceruleancomet charter", "cerulean comet charter", "ceruleancomet charter"],
+            [item["normalized"] for item in candidates],
+        )
+        for candidate in candidates:
+            self.assertTrue(validator._matches(candidate["normalized"], self.policy, "ingress"))
 
     def test_cf_fixture_matrix_is_complete_and_category_correct(self) -> None:
         expected = {
             (code_point, position)
             for code_point in validator.REQUIRED_CF_CODE_POINTS
-            for position in ("boundary", "inside_token")
+            for position in validator.REQUIRED_CF_POSITIONS
         }
         for phase in ("ingress", "egress"):
             cases = [item for item in self.cases[phase] if item.get("cf_code_point")]
@@ -61,6 +64,12 @@ class OpsecContractValidationTests(unittest.TestCase):
             for item in cases:
                 code_point = int(item["cf_code_point"][2:], 16)
                 self.assertEqual("Cf", unicodedata.category(chr(code_point)))
+            cross = [item for item in self.cases[phase] if len(item.get("cf_code_points", [])) > 1]
+            self.assertTrue(cross)
+            for item in cross:
+                self.assertEqual("mixed", item["cf_position"])
+                for code_point in item["cf_code_points"]:
+                    self.assertEqual("Cf", unicodedata.category(chr(int(code_point[2:], 16))))
 
     def test_ingress_matrix(self) -> None:
         for case in self.cases["ingress"]:
@@ -76,7 +85,7 @@ class OpsecContractValidationTests(unittest.TestCase):
         self.assertIsNone(blocked["public_output"])
 
     def test_all_cf_ingress_probes_block_before_turn_controller(self) -> None:
-        for case in (item for item in self.cases["ingress"] if item.get("cf_code_point")):
+        for case in (item for item in self.cases["ingress"] if item.get("cf_code_point") or item.get("cf_code_points")):
             with self.subTest(case=case["id"]):
                 result = validator.evaluate_ingress(case["text"], self.policy)
                 self.assertEqual("BLOCK", result["security_decision"])
@@ -90,25 +99,69 @@ class OpsecContractValidationTests(unittest.TestCase):
                 self.assertEqual(case["printable"], result["eligible_for_print"])
 
     def test_all_cf_egress_probes_are_safely_redacted(self) -> None:
-        for case in (item for item in self.cases["egress"] if item.get("cf_code_point")):
+        for case in (item for item in self.cases["egress"] if item.get("cf_code_point") or item.get("cf_code_points")):
             with self.subTest(case=case["id"]):
                 result = validator.evaluate_egress(case["text"], self.policy)
                 self.assertEqual("REDACTED", result["egress_result"])
                 self.assertTrue(result["eligible_for_print"])
                 self.assertIn(validator.REDACTION_REPLACEMENT, result["public_output"])
-                rescanned = validator._matches_by_candidate_view(
-                    validator.normalized_candidate_views(result["public_output"]), self.policy, "egress"
+                rescanned = validator._matches(
+                    validator.normalized_match_candidate(result["public_output"])["normalized"],
+                    self.policy,
+                    "egress",
                 )
-                self.assertFalse(any(item["matches"] for item in rescanned))
+                self.assertFalse(rescanned)
 
-    def test_egress_matches_split_across_cf_views_fail_closed(self) -> None:
+    def test_boundary_and_inside_cf_matches_share_one_safe_redaction_view(self) -> None:
         result = validator.evaluate_egress(
             "Before cerulean\u200bcomet charter and cerulean co\u200bmet charter after.",
             self.policy,
         )
+        self.assertEqual("REDACTED", result["egress_result"])
+        self.assertTrue(result["eligible_for_print"])
+        self.assertEqual(2, result["public_output"].count(validator.REDACTION_REPLACEMENT))
+
+    def test_repeated_arbitrary_cf_insertions_do_not_reopen_bypass(self) -> None:
+        phrase = "cerulean comet charter"
+        code_points = [chr(int(item[2:], 16)) for item in validator.REQUIRED_CF_CODE_POINTS]
+        for repeat in (1, 2, 4):
+            for cf in code_points:
+                inserted = "".join(cf * repeat if char == " " else char + cf * repeat for char in phrase)
+                with self.subTest(repeat=repeat, code_point=f"U+{ord(cf):04X}"):
+                    ingress = validator.evaluate_ingress(inserted, self.policy)
+                    self.assertEqual("BLOCK", ingress["security_decision"])
+                    self.assertFalse(ingress["eligible_for_turn_controller"])
+                    egress = validator.evaluate_egress(f"Before {inserted} after.", self.policy)
+                    self.assertIn(egress["egress_result"], {"REDACTED", "BLOCKED"})
+                    if egress["eligible_for_print"]:
+                        self.assertIn(validator.REDACTION_REPLACEMENT, egress["public_output"])
+
+        cross_inserted = "".join(
+            code_points[index % len(code_points)] * 3 if char == " "
+            else char + code_points[index % len(code_points)] * 2
+            for index, char in enumerate(phrase)
+        )
+        self.assertEqual("BLOCK", validator.evaluate_ingress(cross_inserted, self.policy)["security_decision"])
+        cross_egress = validator.evaluate_egress(f"Before {cross_inserted} after.", self.policy)
+        self.assertIn(cross_egress["egress_result"], {"REDACTED", "BLOCKED"})
+        self.assertNotEqual("CLEAR", cross_egress["egress_result"])
+
+    def test_mixed_cf_block_action_withholds_entire_output(self) -> None:
+        result = validator.evaluate_egress("prefix zircon\u200bcaf\ufeffé protocol suffix", self.policy)
         self.assertEqual("BLOCKED", result["egress_result"])
         self.assertFalse(result["eligible_for_print"])
         self.assertIsNone(result["public_output"])
+
+    def test_overlapping_redaction_spans_fail_closed(self) -> None:
+        policy = copy.deepcopy(self.policy)
+        overlapping = copy.deepcopy(policy["rules"][0])
+        overlapping["rule_ref"] = "SYNTH-RULE-0099"
+        overlapping["value"] = "comet charter"
+        policy["rules"].append(overlapping)
+        result = validator.evaluate_egress("Before cerulean comet charter after.", policy)
+        self.assertEqual("BLOCKED", result["egress_result"])
+        self.assertEqual("EGRESS_REDACTION_INVALID", result["safe_error_code"])
+        self.assertFalse(result["eligible_for_print"])
 
     def test_existing_negative_ingress_fixtures_remain_pass(self) -> None:
         expected_negative_ids = {
@@ -159,7 +212,7 @@ class OpsecContractValidationTests(unittest.TestCase):
             ("ingress", validator.evaluate_ingress),
             ("egress", validator.evaluate_egress),
         ):
-            for case in (item for item in self.cases[phase] if item.get("cf_code_point")):
+            for case in (item for item in self.cases[phase] if item.get("cf_code_point") or item.get("cf_code_points")):
                 with self.subTest(phase=phase, case=case["id"]):
                     serialized = json.dumps(evaluate(case["text"], self.policy), ensure_ascii=False).casefold()
                     for rule in self.policy["rules"]:
@@ -174,6 +227,17 @@ class OpsecContractValidationTests(unittest.TestCase):
         third = validator.evaluate_ingress("ordinary words", changed)
         self.assertEqual(first["evidence"]["candidate_hmac_sha256"], second["evidence"]["candidate_hmac_sha256"])
         self.assertNotEqual(first["evidence"]["candidate_hmac_sha256"], third["evidence"]["candidate_hmac_sha256"])
+
+    def test_cf_evidence_digest_uses_the_single_decision_candidate(self) -> None:
+        text = "cerulean\u200bco\ufeffmet charter"
+        result = validator.evaluate_ingress(text, self.policy)
+        normalized = validator.normalized_match_candidate(text)["normalized"]
+        digest = hmac.new(
+            self.policy["evidence_hmac_key"].encode("utf-8"),
+            normalized.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+        self.assertEqual(digest, result["evidence"]["candidate_hmac_sha256"])
 
     def test_missing_policy_is_unavailable_and_not_model_eligible(self) -> None:
         result = validator.evaluate_ingress("ordinary words", None, "POLICY_REF_MISSING")

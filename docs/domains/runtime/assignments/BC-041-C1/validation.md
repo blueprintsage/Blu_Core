@@ -2,17 +2,23 @@
 
 status: complete
 owner: Codex
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 
-## Environment
+## Environment and lineage
 
 - Host: Windows, PowerShell
 - Python: 3.12.10
 - Schema runtime: `jsonschema==4.26.0`, Draft 2020-12
-- Exact base: `33b44608cb634d1fedeed7f5f70d405c3999ed02`
-- Branch: `bc-041-c1-unicode-format-correction`
+- Original authorized base: `33b44608cb634d1fedeed7f5f70d405c3999ed02`
+- Correction starting point: `54519493189a332e984409504c45210e759f18fc`
+- Branch: `bc-041-c1-mixed-cf-correction`
+- Claude review evidence only:
+  `874852c1b548ba4a2539d796d23ab9d803a966c8`
 
-## Commands and results
+The correction branch was created directly from `5451949`. Claude's review
+branch was not merged or cherry-picked.
+
+## Full validation commands
 
 ```text
 git diff --cached --check
@@ -36,7 +42,7 @@ python tools/validate_opsec_contracts.py
 python -m unittest discover -s tests/security -p "test_*.py"
 ```
 
-Observed results before the final metadata-only receipt:
+## Full suite results
 
 ```text
 cached diff check: passed
@@ -45,10 +51,10 @@ viability audit: validator passed; 9 tests OK
 historical archives: validator passed; 12 tests OK
 historical archaeology: validator passed; 18 tests OK
 successor kernel: validator passed; 40 tests OK
-host adapters: 34 tests OK; standalone validator retained one fixed-base protected-path finding
+host adapters: standalone validator retained one fixed-base finding; 34 tests OK
 continuity: validator passed; 42 tests OK
-Python readiness: validator passed; 15 tests OK
-BC-041-C1 OPSEC: validator passed; 29 tests OK
+Python readiness: validator passed; 16 tests OK
+BC-041-C1 OPSEC: validator passed; 33 tests OK
 ```
 
 The preserved host-adapter output is:
@@ -58,96 +64,121 @@ ERROR: protected path changed from BC-020 base: contracts/successor/unresolved_r
 host adapter contract validation failed: 1 error(s)
 ```
 
-This compares against the historical BC-020 base and is the same finding
-recorded by the immutable BC-041 review. C1 does not change the named path. The
-finding was not suppressed or reported as a pass.
+This is the known BC-020 fixed-base protected-path finding already recorded by
+BC-041/C1. The correction does not change that path. It was not suppressed and
+is not reported as a pass.
 
-## Focused C1 behavior
+## B-1' expanded proof
+
+The corrected mechanism uses one candidate: remove every Unicode
+general-category `Cf` code point, run the existing normalization pipeline, then
+match each normalized inter-word rule separator against zero-or-more normalized
+ASCII spaces under whole-phrase Unicode token guards. Candidate count remains
+one regardless of insertion count.
 
 ```text
-Cf ingress matrix: 6 code points x 2 positions = 12/12 BLOCK
-Cf ingress Turn Controller eligibility: 0/12
-Cf egress matrix: 6 code points x 2 positions = 12/12 safely REDACTED
-Cf egress dual-view rescan: 12/12 clean
-mixed divergent-view egress: BLOCKED, not printable
+required code points: U+200B, U+00AD, U+200D, U+200C, U+FEFF, U+2060
+same-code-point ingress: 6 x 3 positions = 18/18 BLOCK; model eligible 0/18
+same-code-point egress: 6 x 3 positions = 18/18 REDACTED; CLEAR 0/18
+cross-code-point mixed fixtures: ingress 1/1 BLOCK; egress 1/1 REDACTED
+fixture Cf total: 38/38 safe
+mutation matrix: 6 code points x repeat counts 1, 2, 4 at arbitrary positions
+mutation ingress: 18/18 BLOCK; model eligible 0/18
+mutation egress: 18/18 REDACTED or BLOCKED; CLEAR 0/18
+repeated cross-code-point arbitrary placement: ingress BLOCK; egress not CLEAR
 existing negative ingress fixtures: 5/5 PASS
-Cf result/log/evidence leak checks: 24/24 clean
 ```
 
-The six tested general-category `Cf` code points are U+200B, U+00AD, U+200D,
-U+200C, U+FEFF, and U+2060. Each was tested where a protected word boundary
-belongs and inside a protected token for both ingress and egress.
+The five pinned negative fixtures are `ordinary`, `near_match`, `shared_words`,
+`partial_fragment`, and `punctuation_adjacent_nonmatch`. The validator requires
+the exact boundary/inside-token/mixed same-code-point matrix and a distinct
+cross-code-point mixed case at both ingress and egress.
 
-## Golden, manifest, architecture, and protected boundaries
+Redaction proof includes multi-span redaction, mixed placements, post-redaction
+rescan using the same matcher, redaction-only output blocking, policy `BLOCK`
+action, and overlapping-span fail-closed behavior. Protected ingress never
+reaches Turn Controller/model eligibility. Protected egress never returns
+`CLEAR` or printable raw protected content.
+
+## Readiness coupling
+
+During active correction, the checklist was set to
+`not_ready_for_python_phase1`, the OPSEC gate was `fail`, B-1' was listed as an
+actual blocker, and packet authoring was false. It returned to
+`ready_for_python_phase1` only after the corrected mechanism and expanded proof
+passed.
+
+`validate_python_readiness.py` loads and executes the OPSEC validator against
+the same root. The readiness mutation test deletes the entire mixed ingress
+fixture class while leaving the readiness record green; validation then fails
+for both incomplete Cf matrix and missing cross-code-point mixed proof. Green
+readiness therefore cannot survive removal of the expanded B-1' proof.
+
+Independent Claude re-review remains `required_pending` and incomplete;
+`implementation_authorized` remains false; automatic start remains prohibited;
+Dad/Blu closure remains required.
+
+## Evidence, policy, and negative behavior
+
+- Synthetic policy references are opaque numeric identifiers; the usability
+  validator rejects a reference that reconstructs its protected rule value.
+- Evidence HMAC uses the sole candidate that produced the decision.
+- Rule and candidate normalization are separately named; protected policy rule
+  values containing `Cf` are unusable.
+- Ingress and non-clear egress results are scanned for both synthetic protected
+  values and the synthetic evidence key. The 38 fixture Cf results and mutation
+  paths remain content-safe.
+- Missing, unavailable, malformed, schema-invalid, integrity-mismatched, and
+  unusable policies continue to fail closed.
+- SecurityDecision remains exactly `PASS | BLOCK | ASK`; only `PASS` is model
+  eligible.
+- General Unicode confusable/homoglyph substitution remains explicitly outside
+  this minimum matcher and distinct from semantic paraphrase.
+
+## Golden, manifest, architecture, and repository boundaries
 
 ```text
-golden CTS checksums: 8/8 passed before edits and after correction
-golden exact-base changed paths: 0
+golden CTS checksums: 8/8 passed
+golden changed paths from correction start: 0
 successor components / packets / interfaces: 7 / 8 / 9
 canonical manifest entries: 278
 manifest missing / extra / duplicate / digest mismatch: 0 / 0 / 0 / 0
-changed files: 19
-changed Python files: 4, all validators/tests
-production src/blu_runtime root present: false
-architecture registry changes: 0
-contracts/successor/unresolved_register.json changes: 0
-readiness/implementation_blocker_dispositions.json changes: 0
-BC-041 immutable review blob unchanged: true
+BC-041 immutable review changed: false
+BC-041-C1 Claude review changed: false
 SUR-002 / SUR-011 / SUR-012 changed: false
+architecture registries changed: 0
+production src/blu_runtime roots present: false
 ```
 
-The manifest was generated and verified from canonical staged Git blobs rather
-than Windows working-tree bytes. Successor, continuity, and readiness validators
-all independently accepted its complete path set and digests.
+Manifest validation uses canonical staged Git blob bytes, not CRLF working-tree
+bytes. Changed Python files are the two nonproduction validators and their two
+test modules only. Changed-path and added-line inspection found no production
+protected value, production policy location/digest, credential, private key,
+runtime/provider/Auth path, continuity mutation, tool, or PASS/SkillForge
+crossover.
 
-Changed-line and changed-path review found only explicitly synthetic protected
-phrases in the synthetic fixtures. No production protected value, private key,
-credential, machine-local policy binding, production policy digest, or
-production policy location was introduced. No production runtime/provider/Auth
-path was added.
+## Failed attempts and limitations
 
-## Negative and mutation tests
+- The first branch-creation attempt could not write `.git/index.lock` inside
+  the restricted filesystem. The exact authorized operation succeeded after
+  repository metadata permission was granted; no edit preceded the successful
+  exact-base checkout.
+- The first focused security test run produced 32 passing tests plus one
+  expected canonical validation failure while readiness was deliberately red
+  during correction. After the corrected mechanism and expanded proof passed,
+  readiness was truthfully restored and the complete focused suite passed.
+- The prior two-static-view design is preserved only as superseded history. It
+  must not be reused as proof for arbitrary placement combinations.
 
-- Both candidate views are exposed in deterministic order and produce the
-  expected boundary/inside-token contrast.
-- Either matching view blocks ingress; no non-PASS ingress becomes model
-  eligible.
-- Egress redaction rescans both views; divergent matching views fail closed.
-- The five existing ordinary/common-word/partial/punctuation/near-match
-  negatives remain PASS.
-- A readiness review state changed to `pass`/`complete` is rejected, and a
-  pending review cannot set implementation authorization true.
-- Policy-loader missing, unavailable, malformed, schema-invalid, integrity-
-  mismatched, and unusable cases continue to fail closed.
-- Evidence/log serialization excludes synthetic policy values and the
-  synthetic HMAC key for all 24 C1 probes.
-
-## Failed attempts
-
-- The initial branch-creation attempt inside the restricted filesystem could
-  not create `.git/index.lock`. The exact authorized operation succeeded after
-  repository metadata permission was granted. No file edit preceded the
-  successful exact-base checkout.
-- A pre-manifest readiness run correctly reported the four new C1 assignment
-  files missing from `MANIFEST.sha256`. The manifest was then regenerated from
-  the complete staged Git path set and validated.
-
-Two one-line diagnostic probes were mistyped at the shell quoting boundary and
-did not execute Python. They changed no file or repository state and were
-superseded by the focused validator and unit tests above.
-
-## Validation boundary
-
-These checks prove the bounded public contract, synthetic dual-view mechanism,
-required `Cf` matrices, prior negative behavior, content-safe results, readiness
-state semantics, repository integrity, and protected boundaries. They do not
-prove production policy completeness/classification, general Unicode
-confusable/homoglyph resistance, semantic paraphrase detection, live model or
-LM Studio behavior, Auth, protected continuation, or production runtime
-security. No real protected policy was loaded or tested.
+These checks establish only the bounded public contract and synthetic
+conformance proof. They do not prove production policy completeness or
+classification, general confusable/homoglyph resistance, semantic paraphrase
+detection, live model/LM Studio behavior, Auth, protected continuation, or a
+production runtime. No real protected policy was loaded or tested.
 
 ## Commit identity
 
-- Substantive correction commit: `80e5b8554639c274f7baa69155ea9b83910f604c`.
-- Metadata method: the follow-up records the substantive SHA; its own final SHA
-  is reported externally rather than embedded in its tree.
+- Substantive mixed-placement correction:
+  `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`.
+- Metadata method: the follow-up receipt records the substantive SHA; its own
+  final SHA is reported externally rather than embedded in its tree.

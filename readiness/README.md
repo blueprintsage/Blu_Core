@@ -62,8 +62,12 @@ phrase matching does not claim arbitrary paraphrase or semantic-equivalence
 detection. It also does not claim general Unicode confusable/homoglyph
 substitution protection.
 
-The `ready_for_python_phase1` result is technical only. The finite independent
-correction-review state is `required_pending`, not `complete`. Claude must
-independently review C1, and Dad/Blu must complete integration and closure
-authorization before implementation can be authorized. The runtime packet may
-be considered next, but implementation does not start automatically.
+The `ready_for_python_phase1` result is technical only. Its OPSEC gate invokes
+the expanded B-1' proof: all six required `Cf` code points must pass boundary,
+inside-token, and mixed ingress/egress probes; cross-code-point and repeated
+insertion behavior must fail safely; and removing that proof must make
+readiness validation fail. The finite independent correction-review state is
+`required_pending`, not `complete`. Claude must independently re-review C1, and
+Dad/Blu must complete integration and closure authorization before
+implementation can be authorized. The runtime packet may be considered next,
+but implementation does not start automatically.

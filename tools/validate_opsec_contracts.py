@@ -55,8 +55,9 @@ REDACTION_REPLACEMENT = "[protected content omitted]"
 SEPARATORS = frozenset(".,:;-_/\\|")
 SECURITY_DECISIONS = ["PASS", "BLOCK", "ASK"]
 EGRESS_RESULTS = ["CLEAR", "REDACTED", "BLOCKED", "UNAVAILABLE", "INVALID"]
-CF_VIEW_NAMES = ["cf_to_ascii_space", "cf_removed"]
+CF_MATCH_VIEW_NAME = "cf_removed_separator_tolerant"
 REQUIRED_CF_CODE_POINTS = ["U+200B", "U+00AD", "U+200D", "U+200C", "U+FEFF", "U+2060"]
+REQUIRED_CF_POSITIONS = ["boundary", "inside_token", "mixed"]
 SAFE_ERROR_CODES = {
     "POLICY_REF_MISSING",
     "POLICY_TARGET_UNAVAILABLE",
@@ -82,21 +83,19 @@ def _normalize_existing_pipeline(value: str) -> str:
     return " ".join(separated.split())
 
 
-def normalized_candidate_views(value: str) -> list[dict[str, str]]:
-    """Return both deterministic Cf-neutralized candidate views."""
+def normalized_match_candidate(value: str) -> dict[str, str]:
+    """Return the single deterministic Cf-removed matching candidate."""
     if not isinstance(value, str):
         raise TypeError("OPSEC candidate must be Unicode text")
-    cf_to_space = "".join(" " if unicodedata.category(char) == "Cf" else char for char in value)
     cf_removed = "".join(char for char in value if unicodedata.category(char) != "Cf")
-    return [
-        {"name": "cf_to_ascii_space", "normalized": _normalize_existing_pipeline(cf_to_space)},
-        {"name": "cf_removed", "normalized": _normalize_existing_pipeline(cf_removed)},
-    ]
+    return {"name": CF_MATCH_VIEW_NAME, "normalized": _normalize_existing_pipeline(cf_removed)}
 
 
-def normalize_text(value: str) -> str:
-    """Return the primary public normalization view for rule canonicalization."""
-    return normalized_candidate_views(value)[0]["normalized"]
+def normalize_rule_text(value: str) -> str:
+    """Canonicalize a Cf-free policy rule through the bounded text pipeline."""
+    if not isinstance(value, str):
+        raise TypeError("OPSEC rule value must be Unicode text")
+    return _normalize_existing_pipeline(value)
 
 
 def _comparison_view(normalized: str, case_sensitive: bool) -> tuple[str, list[int]]:
@@ -117,23 +116,15 @@ def _matches(normalized: str, policy: dict[str, Any], phase: str) -> list[dict[s
         if phase not in rule["applies_to"]:
             continue
         candidate_view, candidate_map = _comparison_view(normalized, rule["case_sensitive"])
-        phrase = normalize_text(rule["value"])
+        phrase = normalize_rule_text(rule["value"])
         phrase_view, _ = _comparison_view(phrase, rule["case_sensitive"])
-        pattern = re.compile(rf"(?<!\w){re.escape(phrase_view)}(?!\w)", re.UNICODE)
+        separator_tolerant_phrase = r" *".join(re.escape(token) for token in phrase_view.split(" "))
+        pattern = re.compile(rf"(?<!\w){separator_tolerant_phrase}(?!\w)", re.UNICODE)
         for match in pattern.finditer(candidate_view):
             start = candidate_map[match.start()]
             end = candidate_map[match.end() - 1] + 1
             found.append({"rule": rule, "start": start, "end": end})
     return sorted(found, key=lambda item: (item["start"], item["end"], item["rule"]["rule_ref"]))
-
-
-def _matches_by_candidate_view(
-    views: list[dict[str, str]], policy: dict[str, Any], phase: str
-) -> list[dict[str, Any]]:
-    return [
-        {"name": view["name"], "normalized": view["normalized"], "matches": _matches(view["normalized"], policy, phase)}
-        for view in views
-    ]
 
 
 def validate_policy_usability(policy: dict[str, Any]) -> list[str]:
@@ -142,16 +133,23 @@ def validate_policy_usability(policy: dict[str, Any]) -> list[str]:
     if len(refs) != len(set(refs)):
         errors.append("policy rule_ref values are not unique")
     seen: set[tuple[str, bool, str]] = set()
-    replacement = normalize_text(REDACTION_REPLACEMENT).casefold()
+    replacement = normalize_rule_text(REDACTION_REPLACEMENT).casefold()
     for rule in policy.get("rules", []):
+        raw_value = rule.get("value")
+        if isinstance(raw_value, str) and any(unicodedata.category(char) == "Cf" for char in raw_value):
+            errors.append(f"policy rule contains a forbidden Cf code point: {rule.get('rule_ref')}")
         try:
-            value = normalize_text(rule.get("value"))
+            value = normalize_rule_text(raw_value)
         except TypeError:
             continue
         if not value or not any(char.isalnum() for char in value):
             errors.append(f"policy rule is not usable: {rule.get('rule_ref')}")
             continue
         comparison, _ = _comparison_view(value, bool(rule.get("case_sensitive")))
+        compact_value = "".join(char for char in comparison.casefold() if char.isalnum())
+        compact_ref = "".join(char for char in str(rule.get("rule_ref", "")).casefold() if char.isalnum())
+        if compact_value and compact_value in compact_ref:
+            errors.append(f"policy rule_ref is not opaque: {rule.get('rule_ref')}")
         if comparison.casefold() == replacement:
             errors.append(f"policy rule conflicts with redaction replacement: {rule.get('rule_ref')}")
         for phase in rule.get("applies_to", []):
@@ -254,12 +252,11 @@ def evaluate_ingress(text: Any, policy: dict[str, Any] | None, policy_error: str
     if policy is None:
         return _failure_evaluation("ingress", policy_error or "POLICY_UNUSABLE")
     try:
-        views = normalized_candidate_views(text)
+        candidate = normalized_match_candidate(text)
     except TypeError:
         return _failure_evaluation("ingress", "INPUT_INVALID", "INVALID")
-    evaluated_views = _matches_by_candidate_view(views, policy, "ingress")
-    matches = [match for view in evaluated_views for match in view["matches"]]
-    normalized = views[0]["normalized"]
+    normalized = candidate["normalized"]
+    matches = _matches(normalized, policy, "ingress")
     refs = [item["rule"]["rule_ref"] for item in matches]
     if matches:
         return {
@@ -296,12 +293,11 @@ def evaluate_egress(text: Any, policy: dict[str, Any] | None, policy_error: str 
     if policy is None:
         return _failure_evaluation("egress", policy_error or "POLICY_UNUSABLE")
     try:
-        views = normalized_candidate_views(text)
+        candidate = normalized_match_candidate(text)
     except TypeError:
         return _failure_evaluation("egress", "INPUT_INVALID", "INVALID")
-    evaluated_views = _matches_by_candidate_view(views, policy, "egress")
-    matches = [match for view in evaluated_views for match in view["matches"]]
-    normalized = views[0]["normalized"]
+    normalized = candidate["normalized"]
+    matches = _matches(normalized, policy, "egress")
     refs = [item["rule"]["rule_ref"] for item in matches]
     base = {
         "phase": "egress",
@@ -329,33 +325,17 @@ def evaluate_egress(text: Any, policy: dict[str, Any] | None, policy_error: str 
             "evidence": _evidence("egress", "BLOCKED", policy, normalized, refs),
             "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "evaluation", "code": "EGRESS_PROTECTED_MATCH"}],
         }
-    matching_views = [view for view in evaluated_views if view["matches"]]
-    if len(matching_views) > 1 and len({view["normalized"] for view in matching_views}) > 1:
-        return {
-            **base,
-            "egress_result": "BLOCKED",
-            "eligible_for_print": False,
-            "public_output": None,
-            "safe_error_code": "EGRESS_REDACTION_INVALID",
-            "evidence": _evidence("egress", "BLOCKED", policy, normalized, refs),
-            "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "redaction", "code": "EGRESS_REDACTION_INVALID"}],
-        }
-    for view in evaluated_views:
-        view_matches = view["matches"]
-        if not view_matches or _has_overlapping_spans(view_matches):
-            continue
+    if matches and not _has_overlapping_spans(matches):
         pieces: list[str] = []
         cursor = 0
-        for item in view_matches:
-            pieces.extend((view["normalized"][cursor:item["start"]], REDACTION_REPLACEMENT))
+        for item in matches:
+            pieces.extend((normalized[cursor:item["start"]], REDACTION_REPLACEMENT))
             cursor = item["end"]
-        pieces.append(view["normalized"][cursor:])
+        pieces.append(normalized[cursor:])
         redacted = " ".join("".join(pieces).split())
         residual = redacted.replace(REDACTION_REPLACEMENT, "")
-        rescanned = _matches_by_candidate_view(normalized_candidate_views(redacted), policy, "egress")
-        redaction_valid = any(char.isalnum() for char in residual) and not any(
-            item["matches"] for item in rescanned
-        )
+        rescanned = _matches(normalized_match_candidate(redacted)["normalized"], policy, "egress")
+        redaction_valid = any(char.isalnum() for char in residual) and not rescanned
         if redaction_valid:
             return {
                 **base,
@@ -439,7 +419,11 @@ def validate(root: Path) -> list[str]:
 
     if fixture.get("fixture_notice") != SYNTHETIC_NOTICE or cases.get("fixture_notice") != SYNTHETIC_NOTICE:
         errors.append("synthetic fixture production-separation notice is missing")
-    expected_cf_matrix = {(code_point, position) for code_point in REQUIRED_CF_CODE_POINTS for position in ("boundary", "inside_token")}
+    expected_cf_matrix = {
+        (code_point, position)
+        for code_point in REQUIRED_CF_CODE_POINTS
+        for position in REQUIRED_CF_POSITIONS
+    }
     for phase in ("ingress", "egress"):
         actual_cf_matrix = {
             (item.get("cf_code_point"), item.get("cf_position"))
@@ -448,6 +432,13 @@ def validate(root: Path) -> list[str]:
         }
         if actual_cf_matrix != expected_cf_matrix:
             errors.append(f"{phase} Cf probe matrix is incomplete")
+        cross_code_point = [
+            item for item in cases.get(phase, [])
+            if item.get("cf_position") == "mixed"
+            and len(item.get("cf_code_points", [])) > 1
+        ]
+        if not cross_code_point:
+            errors.append(f"{phase} cross-code-point mixed Cf probe is missing")
     policy = fixture.get("policy")
     schema_errors = list(Draft202012Validator(policy_schema).iter_errors(policy)) if isinstance(policy, dict) else ["missing"]
     if schema_errors:
@@ -455,6 +446,7 @@ def validate(root: Path) -> list[str]:
     else:
         errors.extend(validate_policy_usability(policy))
         result_validator = Draft202012Validator(evaluation_schema)
+        protected_values = [rule["value"] for rule in policy["rules"]]
         for item in cases.get("ingress", []):
             result = evaluate_ingress(item.get("text"), policy)
             if result.get("security_decision") != item.get("expected"):
@@ -463,9 +455,13 @@ def validate(root: Path) -> list[str]:
                 errors.append(f"ingress result schema failed: {item.get('id')}")
             if result.get("security_decision") != "PASS" and result.get("eligible_for_turn_controller"):
                 errors.append(f"non-PASS ingress became model-eligible: {item.get('id')}")
-            if item.get("cf_code_point") and result.get("security_decision") != "BLOCK":
+            if (item.get("cf_code_point") or item.get("cf_code_points")) and result.get("security_decision") != "BLOCK":
                 errors.append(f"Cf ingress probe did not block: {item.get('id')}")
-        protected_values = [rule["value"] for rule in policy["rules"]]
+            serialized = json.dumps(result, ensure_ascii=False).casefold()
+            if any(normalize_rule_text(value).casefold() in normalized_match_candidate(serialized)["normalized"].casefold() for value in protected_values):
+                errors.append(f"protected fixture value leaked through ingress result: {item.get('id')}")
+            if policy["evidence_hmac_key"].casefold() in serialized:
+                errors.append(f"synthetic evidence key leaked through ingress result: {item.get('id')}")
         for item in cases.get("egress", []):
             result = evaluate_egress(item.get("text"), policy)
             if result.get("egress_result") != item.get("expected") or result.get("eligible_for_print") is not item.get("printable"):
@@ -474,9 +470,11 @@ def validate(root: Path) -> list[str]:
                 errors.append(f"egress result schema failed: {item.get('id')}")
             if result.get("egress_result") != "CLEAR":
                 serialized = json.dumps(result, ensure_ascii=False).casefold()
-                if any(normalize_text(value).casefold() in normalize_text(serialized).casefold() for value in protected_values):
+                if any(normalize_rule_text(value).casefold() in normalized_match_candidate(serialized)["normalized"].casefold() for value in protected_values):
                     errors.append(f"protected fixture value leaked through result: {item.get('id')}")
-            if item.get("cf_code_point") and (
+                if policy["evidence_hmac_key"].casefold() in serialized:
+                    errors.append(f"synthetic evidence key leaked through egress result: {item.get('id')}")
+            if (item.get("cf_code_point") or item.get("cf_code_points")) and (
                 result.get("egress_result") not in {"REDACTED", "BLOCKED"}
                 or (result.get("eligible_for_print") and REDACTION_REPLACEMENT not in (result.get("public_output") or ""))
             ):
@@ -492,14 +490,17 @@ def validate(root: Path) -> list[str]:
     if contract.get("normalization", {}).get("semantic_paraphrase_detection") is not False:
         errors.append("minimum matcher overclaims semantic paraphrase detection")
     normalization = contract.get("normalization", {})
-    if [item.get("id") for item in normalization.get("candidate_views", [])] != CF_VIEW_NAMES:
-        errors.append("normalization does not define both required Cf candidate views")
+    if normalization.get("candidate_view", {}).get("id") != CF_MATCH_VIEW_NAME:
+        errors.append("normalization does not define the single Cf-removed match candidate")
     if normalization.get("candidate_view_generation_applies_to") != ["ingress", "egress"]:
-        errors.append("Cf candidate views do not apply symmetrically to ingress and egress")
-    if normalization.get("both_views_continue_through_remaining_ordered_steps") is not True:
-        errors.append("both Cf candidate views do not traverse the remaining normalization pipeline")
-    if normalization.get("match_in_either_view_is_protected_match") is not True:
-        errors.append("a match in either Cf candidate view is not sufficient")
+        errors.append("Cf match candidate does not apply symmetrically to ingress and egress")
+    matcher = contract.get("matcher", {})
+    if matcher.get("normalized_rule_inter_word_separator_matches") != "zero_or_more_ASCII_spaces":
+        errors.append("matcher is not separator-tolerant after deterministic Cf removal")
+    if matcher.get("Cf_placement_combination_enumeration_allowed") is not False:
+        errors.append("matcher permits enumerating Cf placement combinations")
+    if matcher.get("candidate_count_growth_with_Cf_insertions") != "constant_one":
+        errors.append("matcher candidate count can grow with Cf insertion count")
     exclusion_text = " ".join(contract.get("scope_exclusions", [])).casefold()
     if "confusable" not in exclusion_text or "homoglyph" not in exclusion_text:
         errors.append("general Unicode confusable/homoglyph substitution is not explicitly excluded")

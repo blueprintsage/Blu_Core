@@ -2,7 +2,47 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
+
+## 2026-08-12 - BC-041-C1 B-1' mixed-placement correction
+
+### What changed
+
+- Started from the required first C1 metadata receipt
+  `54519493189a332e984409504c45210e759f18fc`; Claude review commit
+  `874852c1b548ba4a2539d796d23ab9d803a966c8` was used as evidence only and was
+  not merged or cherry-picked.
+- Superseded the incomplete exactly-two-static-views claim. The matcher now
+  removes all general-category `Cf` characters into one normalized candidate
+  and lets protected-rule inter-word separators match zero-or-more normalized
+  spaces under Unicode word-token guards. Candidate count remains one for any
+  insertion count.
+- Expanded the synthetic matrix from two to three same-code-point position
+  classes for all six required code points at both ingress and egress, and added
+  cross-code-point mixed probes plus repeated/arbitrary placement mutations.
+- Bound green technical readiness to the expanded OPSEC validator. The
+  repository was marked not ready during active correction and returned to
+  `ready_for_python_phase1` only after the corrected mechanism and expanded
+  proof passed.
+- Addressed Claude N-1 with opaque synthetic rule references, N-2 by digesting
+  the sole candidate that produced the decision, and N-3 by separating
+  `normalize_rule_text` from candidate normalization.
+- Added no production protected value, runtime/provider/Auth implementation,
+  architecture change, continuity mutation, tool, or PASS/SkillForge path.
+
+### Validation and next step
+
+Focused OPSEC and readiness validation passed. Complete suite, manifest,
+golden, publication-safety, repository-boundary, commit, and push receipts are
+recorded in `assignments/BC-041-C1/validation.md` and `handoff.md` at handoff.
+The next action is a fresh independent Claude C1 review, not Python runtime
+implementation.
+
+### Commit identity
+
+- Substantive mixed-placement correction:
+  `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`.
+- Metadata receipt: pending creation.
 
 ## 2026-08-11 - BC-041-C1 Unicode format-character correction
 

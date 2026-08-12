@@ -7,7 +7,7 @@ project_lead: Blu
 project_owner: Dad
 domain: runtime
 parent: BC-041
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 
 ## Authorization and identity
 
@@ -117,4 +117,37 @@ Use `handoff.md` and `validation.md` in this folder. Claude modifies only
 
 ## Approved amendments
 
-No amendments.
+### 2026-08-12 - B-1' mixed-placement return for correction
+
+- **Approved by:** Dad and Blu, by explicit instruction supplied to Codex on
+  2026-08-12.
+- **Correction starting point:**
+  `54519493189a332e984409504c45210e759f18fc`.
+- **Review authority/evidence:** Claude's independent review commit
+  `874852c1b548ba4a2539d796d23ab9d803a966c8`, which must not be merged or
+  cherry-picked.
+- **Correction branch:** `bc-041-c1-mixed-cf-correction`.
+- **Blocking finding:** B-1' only. The two static candidate views are
+  complementary rather than complete; mixed boundary and inside-token `Cf`
+  insertions can corrupt both views in one protected phrase.
+- **Superseded claim:** the prior completion statement that exactly two static
+  views close B-1 is withdrawn. The corrected deterministic mechanism must
+  cover arbitrary mixtures and counts of general-category `Cf` insertions
+  without enumerating placement combinations or generating an exponential
+  candidate set.
+- **Expanded proof:** preserve all six required code points and both original
+  position classes; add a mixed-placement class for every code point at ingress
+  and egress, cross-code-point mixed probes, repeated/mutation probes, the five
+  existing negative fixtures, safe redaction/rescan behavior, content-safe
+  evidence, and a readiness guard that cannot turn green without this proof.
+- **Readiness during correction:** B-1' is an active technical blocker. The
+  repository must report `not_ready_for_python_phase1` until the corrected
+  mechanism and expanded proof pass. Independent Claude re-review, Dad/Blu
+  closure, `implementation_authorized: false`, and automatic-start prohibition
+  remain separate even after technical readiness is re-earned.
+- **Scope:** the original collision domain and protected/prohibited areas remain
+  authoritative. `BC-041/review.md` and this assignment's Claude-owned
+  `review.md` must not be changed during correction.
+- **Commit method:** one substantive correction commit followed by one metadata
+  receipt recording its SHA; push without merge, then stop for a fresh Claude
+  review.

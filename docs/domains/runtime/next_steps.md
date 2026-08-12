@@ -4,7 +4,28 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
-## BC-040 closed gate
+## BC-041 review gate
+
+BC-041 defines the separately authorized public minimum OPSEC mechanism and is
+being prepared for independent semantic review. Its bounded result is:
+
+```text
+SUR-001: resolved_at_minimum_phase1_contract_level
+Python readiness: ready_for_python_phase1
+runtime_phase1_packet_may_be_authored_next: true
+```
+
+Production policy values remain external; a missing or invalid policy fails
+closed. The deterministic matcher does not claim arbitrary semantic-paraphrase
+coverage. Auth and protected continuation remain unavailable, and SUR-002,
+SUR-011, and SUR-012 retain their prior dispositions.
+
+The next safe step is Claude's independent review of the exact BC-041
+substantive/metadata head. Dad/Blu then decide integration and whether to issue
+the separate `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model
+Boundary` packet. Do not begin that implementation automatically.
+
+## Prior BC-040 closed gate
 
 BC-040 is `done`. The One-Blu portability/readiness specification and Claude's
 independent review are complete. Claude's disposition is

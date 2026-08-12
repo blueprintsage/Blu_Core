@@ -1,0 +1,31 @@
+{
+  "fixture_notice": "synthetic test policy != production protected policy",
+  "policy": {
+    "schema_version": "1.0.0",
+    "policy_id": "synthetic-fictional-opsec-policy",
+    "revision": "synthetic-r1",
+    "evidence_hmac_key": "synthetic-only-evidence-key-00000000000000000001",
+    "rules": [
+      {
+        "rule_ref": "SYNTH-RULE-CERULEAN-COMET",
+        "matcher": "normalized_phrase",
+        "value": "cerulean comet charter",
+        "case_sensitive": false,
+        "applies_to": ["ingress", "egress"],
+        "ingress_action": "BLOCK",
+        "egress_action": "REDACT",
+        "safe_reason_code": "SYNTH_PROTECTED_MATCH"
+      },
+      {
+        "rule_ref": "SYNTH-RULE-ZIRCON-CAFE",
+        "matcher": "normalized_phrase",
+        "value": "zircon café protocol",
+        "case_sensitive": false,
+        "applies_to": ["ingress", "egress"],
+        "ingress_action": "BLOCK",
+        "egress_action": "BLOCK",
+        "safe_reason_code": "SYNTH_PROTECTED_MATCH"
+      }
+    ]
+  }
+}

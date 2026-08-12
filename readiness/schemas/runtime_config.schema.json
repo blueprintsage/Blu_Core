@@ -50,7 +50,17 @@
       "properties": {
         "mode": {"const": "phase1_ordinary_conversation"},
         "logging": {"enum": ["safe", "diagnostic_no_content"]},
-        "protected_policy_ref": {"type": "null"}
+        "protected_policy_ref": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "locator_env", "sha256_env"],
+          "properties": {
+            "kind": {"const": "environment_file"},
+            "locator_env": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+            "sha256_env": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+          },
+          "description": "Portable opaque binding. Configuration stores environment-variable names only; the environment supplies the machine-local protected policy location and expected SHA-256 digest. Reference presence is not policy usability evidence."
+        }
       }
     },
     "development": {
@@ -68,6 +78,7 @@
     "No canonical identity, Persona, behavioral law, or protected value appears in configuration.",
     "No machine-specific filesystem path is a portable default.",
     "Endpoint and selected model configuration do not prove availability or capability.",
-    "Secrets are environment references, never embedded values."
+    "Secrets and protected policy locations or digests are environment bindings, never embedded values.",
+    "A protected-policy reference is not usable until its target is located, loaded, schema-valid, integrity-valid, and policy-usable."
   ]
 }

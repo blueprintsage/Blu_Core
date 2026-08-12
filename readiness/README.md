@@ -3,7 +3,7 @@
 status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
-assignment: BC-040
+assignment: BC-041
 
 ## Purpose
 
@@ -42,11 +42,22 @@ seven components, eight packets, and nine interfaces.
   full successor feature completeness.
 - `schema_runtime.json`: selected Python JSON Schema runtime and validation
   policy.
+- `../contracts/security/opsec/`: BC-041's public minimum OPSEC mechanism,
+  protected-policy and result schemas, normalization/matching rules, redaction
+  postconditions, and safe evidence contract.
 
 ## Interpretation boundary
 
-Configuration is not capability evidence. A visible or loaded model name is
+Configuration is not capability evidence. A configured protected-policy
+reference is not a located, loaded, schema-valid, integrity-valid, or usable
+policy. A visible or loaded model name is
 not completed inference. A submitted request is not a completed response. A
 model tool-call candidate is not authorization, host approval, attempted
-execution, completion, or a verified receipt. Missing protected policy never
-receives a permissive fallback.
+execution, completion, or a verified receipt. Missing or invalid protected
+policy is terminal `UNAVAILABLE`, never `PASS`, and never reaches the model.
+
+BC-041 resolves SUR-001 only at the minimum Phase 1 contract level. Production
+policy values remain outside the repository, and deterministic normalized-
+phrase matching does not claim arbitrary paraphrase or semantic-equivalence
+detection. The readiness result now permits Dad/Blu to consider authoring the
+named runtime packet; implementation does not start automatically.

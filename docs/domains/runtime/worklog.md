@@ -39,7 +39,8 @@ implementation.
 
 ### Commit identity
 
-- Substantive outer-edge correction: pending creation.
+- Substantive outer-edge correction:
+  `85e18f56f88ab113646cc3aab477687eda8b85af`.
 - Metadata receipt: pending creation.
 
 ## 2026-08-12 - BC-041-C1 B-1' mixed-placement correction

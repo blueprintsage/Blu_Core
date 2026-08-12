@@ -16,9 +16,10 @@ last_reviewed: 2026-08-12
 - Mixed-placement metadata: `c6a447679c0ca07fb38a1e35eeb00231b0cb91e1`
 - Second Claude review: `f87588d0fa094c203fde3b847ab9bc3c28d1b3fe`
 - Work branch: `bc-041-c1-outer-edge-cf-correction`
-- Substantive outer-edge correction: pending creation
+- Substantive outer-edge correction:
+  `85e18f56f88ab113646cc3aab477687eda8b85af`
 - Metadata receipt: pending creation
-- Push status: pending final two-commit push
+- Push status: pending metadata receipt and final two-commit push
 
 Claude's review branch was not merged or cherry-picked. Its commit was used
 only as review authority/evidence. B-1' was independently verified closed; this

@@ -170,6 +170,7 @@ Studio behavior, Auth, protected continuation, or a production runtime.
 
 ## Commit identity
 
-- Substantive outer-edge correction: pending creation.
+- Substantive outer-edge correction:
+  `85e18f56f88ab113646cc3aab477687eda8b85af`.
 - Metadata method: the follow-up receipt records the substantive SHA; its own
   final SHA is reported externally rather than embedded in its tree.

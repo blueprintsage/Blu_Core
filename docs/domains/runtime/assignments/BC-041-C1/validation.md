@@ -178,6 +178,7 @@ production runtime. No real protected policy was loaded or tested.
 
 ## Commit identity
 
-- Substantive mixed-placement correction: pending creation.
+- Substantive mixed-placement correction:
+  `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`.
 - Metadata method: the follow-up receipt records the substantive SHA; its own
   final SHA is reported externally rather than embedded in its tree.

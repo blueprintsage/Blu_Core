@@ -40,7 +40,8 @@ implementation.
 
 ### Commit identity
 
-- Substantive mixed-placement correction: pending creation.
+- Substantive mixed-placement correction:
+  `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`.
 - Metadata receipt: pending creation.
 
 ## 2026-08-11 - BC-041-C1 Unicode format-character correction

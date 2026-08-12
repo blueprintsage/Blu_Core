@@ -13,7 +13,8 @@ last_reviewed: 2026-08-12
 - First C1 metadata receipt: `54519493189a332e984409504c45210e759f18fc`
 - Claude review evidence: `874852c1b548ba4a2539d796d23ab9d803a966c8`
 - Work branch: `bc-041-c1-mixed-cf-correction`
-- Substantive mixed-placement correction: pending creation
+- Substantive mixed-placement correction:
+  `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`
 - Metadata receipt: pending creation
 - Push status: pending final two-commit push
 - Working-tree status: reported externally after the metadata receipt

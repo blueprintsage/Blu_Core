@@ -4,6 +4,21 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
+## 2026-08-11 - Unicode format characters require dual candidate views
+
+- **Observed:** Unicode general-category `Cf` code points survive the prior
+  NFKC/whitespace/separator pipeline. One invisible insertion at a protected
+  word boundary or inside a protected token made the minimum matcher pass.
+- **Unsafe shortcut:** use only `Cf -> space` or only `Cf -> removed`. The first
+  misses inside-token insertion; the second can join text where the format
+  character substitutes for a legitimate word boundary.
+- **Prevention:** deterministically evaluate both transformed views through the
+  complete existing normalization pipeline, treat either match as protected,
+  and fail egress redaction closed if divergent view spans cannot be represented
+  safely. Keep general confusable/homoglyph substitution as a separately named
+  limitation rather than claiming it is solved or calling it semantic
+  paraphrase.
+
 ## 2026-08-11 — Deterministic phrase matching is not semantic authorization
 
 - **Observed:** normalization and token-bounded phrase rules can close specified

@@ -4,25 +4,31 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
-## BC-041 review gate
+## BC-041-C1 correction review gate
 
-BC-041 defines the separately authorized public minimum OPSEC mechanism and is
-being prepared for independent semantic review. Its bounded result is:
+BC-041-C1 corrects the single blocking finding in Claude's immutable BC-041
+review. The minimum matcher now evaluates both deterministic Unicode
+general-category `Cf` candidate views at ingress and egress. Its bounded state
+is:
 
 ```text
 SUR-001: resolved_at_minimum_phase1_contract_level
-Python readiness: ready_for_python_phase1
+Python technical readiness: ready_for_python_phase1
+independent correction review: required_pending
+implementation authorized: false
 runtime_phase1_packet_may_be_authored_next: true
 ```
 
 Production policy values remain external; a missing or invalid policy fails
 closed. The deterministic matcher does not claim arbitrary semantic-paraphrase
-coverage. Auth and protected continuation remain unavailable, and SUR-002,
-SUR-011, and SUR-012 retain their prior dispositions.
+or general Unicode confusable/homoglyph coverage. Auth and protected
+continuation remain unavailable, and SUR-002, SUR-011, and SUR-012 retain their
+prior dispositions.
 
-The next safe step is Claude's independent review of the exact BC-041
-substantive/metadata head. Dad/Blu then decide integration and whether to issue
-the separate `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model
+The next safe step is Claude's independent review of the exact BC-041-C1
+substantive/metadata head on a separate branch, modifying only the C1 review
+record. Dad/Blu then decide integration, closure, and whether to issue the
+separate `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model
 Boundary` packet. Do not begin that implementation automatically.
 
 ## Prior BC-040 closed gate

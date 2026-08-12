@@ -4,6 +4,35 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 
+## 2026-08-11 - BC-041-C1 Unicode format-character correction
+
+### What changed
+
+- Closed BC-041 B-1 in the public minimum matcher by deriving exactly two
+  deterministic candidate views for every ingress and egress candidate:
+  Unicode general-category `Cf` mapped to ASCII space and `Cf` removed.
+- Required both views to traverse the existing normalization pipeline and made
+  a match in either view sufficient. Egress redaction rescans both views and
+  fails closed when divergent matching views cannot share one safe span set.
+- Added the required 24-case synthetic matrix: six approved `Cf` code points,
+  two positions, and both ingress and egress. The five existing negative
+  ingress fixtures remain explicit regression cases.
+- Named general Unicode confusable/homoglyph substitution as outside the
+  minimum matcher instead of misclassifying it as semantic paraphrase.
+- Replaced the ambiguous passing review-required check with a finite
+  `required_pending` correction-review state, while preserving technical
+  readiness and explicitly keeping implementation unauthorized.
+- Added no production protected value, runtime, provider, Auth, architecture,
+  continuation, tool, continuity, or PASS/SkillForge implementation.
+
+### Validation and next step
+
+Focused OPSEC and readiness validation passed during implementation. Complete
+suite, manifest, golden, publication-safety, commit, and push receipts are
+recorded in `assignments/BC-041-C1/validation.md` and `handoff.md` at handoff.
+Claude next performs the independent C1 review; Dad/Blu decide integration and
+closure. Python Runtime Phase 1 remains unauthorized.
+
 ## 2026-08-11 — BC-041 minimum OPSEC contract
 
 ### What changed

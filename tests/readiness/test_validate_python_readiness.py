@@ -145,6 +145,24 @@ class PythonReadinessValidationTests(unittest.TestCase):
         self.assert_has("retains stale blockers")
         self.assert_has("may not be authored")
 
+    def test_independent_review_pending_is_not_completion(self) -> None:
+        path = "readiness/python_phase1_readiness_checklist.json"
+        data = self.load(path)
+        checks = {item["id"]: item for item in data["checks"]}
+        checks["independent_Claude_correction_review"]["status"] = "pass"
+        data["independent_correction_review"]["state"] = "complete"
+        data["independent_correction_review"]["completed"] = True
+        self.save(path, data)
+        self.assert_has("not required_pending")
+        self.assert_has("mistaken for completion")
+
+    def test_pending_review_cannot_authorize_implementation(self) -> None:
+        path = "readiness/python_phase1_readiness_checklist.json"
+        data = self.load(path)
+        data["implementation_authorized"] = True
+        self.save(path, data)
+        self.assert_has("authorizes implementation before independent review")
+
     def test_projection_guard_detects_missing_stale_and_redefinition(self) -> None:
         manifest = self.load("readiness/one_blu_canon_manifest.json")
         first = manifest["mappings"][0]

@@ -50,7 +50,16 @@ class OpsecContractValidationTests(unittest.TestCase):
             [item["normalized"] for item in candidates],
         )
         for candidate in candidates:
-            self.assertTrue(validator._matches(candidate["normalized"], self.policy, "ingress"))
+            self.assertTrue(validator._matches(candidate, self.policy, "ingress"))
+
+    def test_outer_edge_cf_provenance_survives_normalization(self) -> None:
+        candidate = validator.normalized_match_candidate(
+            "foo\u200b\u00adcerulean comet charter\u2060bar"
+        )
+        self.assertEqual("foocerulean comet charterbar", candidate["normalized"])
+        self.assertEqual([3, 25], candidate["removed_cf_boundaries"])
+        matches = validator._matches(candidate, self.policy, "ingress")
+        self.assertEqual([(3, 25)], [(item["start"], item["end"]) for item in matches])
 
     def test_cf_fixture_matrix_is_complete_and_category_correct(self) -> None:
         expected = {
@@ -64,12 +73,21 @@ class OpsecContractValidationTests(unittest.TestCase):
             for item in cases:
                 code_point = int(item["cf_code_point"][2:], 16)
                 self.assertEqual("Cf", unicodedata.category(chr(code_point)))
-            cross = [item for item in self.cases[phase] if len(item.get("cf_code_points", [])) > 1]
+            cross = [
+                item for item in self.cases[phase]
+                if item.get("cf_position") == "mixed" and len(item.get("cf_code_points", [])) > 1
+            ]
             self.assertTrue(cross)
             for item in cross:
                 self.assertEqual("mixed", item["cf_position"])
                 for code_point in item["cf_code_points"]:
                     self.assertEqual("Cf", unicodedata.category(chr(int(code_point[2:], 16))))
+            attack_classes = {
+                item.get("attack_class")
+                for item in self.cases[phase]
+                if item.get("attack_class")
+            }
+            self.assertEqual(validator.REQUIRED_CF_ATTACK_CLASSES, attack_classes)
 
     def test_ingress_matrix(self) -> None:
         for case in self.cases["ingress"]:
@@ -175,6 +193,32 @@ class OpsecContractValidationTests(unittest.TestCase):
         self.assertEqual(expected_negative_ids, actual)
         for case in (item for item in self.cases["ingress"] if item["id"] in expected_negative_ids):
             self.assertEqual("PASS", validator.evaluate_ingress(case["text"], self.policy)["security_decision"])
+
+    def test_ordinary_outer_word_adjacency_without_cf_remains_nonmatch(self) -> None:
+        for text in (
+            "foocerulean comet charter",
+            "cerulean comet charterfoo",
+            "foobarcerulean comet charterbaz",
+            "caf\u00e9cerulean comet charter",
+            "cerulean comet charter\u6f22\u5b57",
+            "\u03b1cerulean comet charter\u03b2",
+        ):
+            with self.subTest(text=text):
+                result = validator.evaluate_ingress(text, self.policy)
+                self.assertEqual("PASS", result["security_decision"])
+                self.assertTrue(result["eligible_for_turn_controller"])
+                egress = validator.evaluate_egress(text, self.policy)
+                self.assertEqual("CLEAR", egress["egress_result"])
+                self.assertTrue(egress["eligible_for_print"])
+
+    def test_unseparated_self_repetition_fails_safely_without_weakening_guards(self) -> None:
+        repeated = "cerulean\u200bcomet chartercerulean co\u200dmet charter"
+        ingress = validator.evaluate_ingress(repeated, self.policy)
+        self.assertEqual("BLOCK", ingress["security_decision"])
+        self.assertFalse(ingress["eligible_for_turn_controller"])
+        egress = validator.evaluate_egress(f"Before {repeated} after.", self.policy)
+        self.assertEqual("REDACTED", egress["egress_result"])
+        self.assertEqual(2, egress["public_output"].count(validator.REDACTION_REPLACEMENT))
 
     def test_repetition_is_fully_redacted(self) -> None:
         result = validator.evaluate_egress(

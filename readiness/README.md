@@ -63,11 +63,14 @@ detection. It also does not claim general Unicode confusable/homoglyph
 substitution protection.
 
 The `ready_for_python_phase1` result is technical only. Its OPSEC gate invokes
-the expanded B-1' proof: all six required `Cf` code points must pass boundary,
-inside-token, and mixed ingress/egress probes; cross-code-point and repeated
-insertion behavior must fail safely; and removing that proof must make
-readiness validation fail. The finite independent correction-review state is
-`required_pending`, not `complete`. Claude must independently re-review C1, and
-Dad/Blu must complete integration and closure authorization before
-implementation can be authorized. The runtime packet may be considered next,
-but implementation does not start automatically.
+the expanded B-1'/B-1â€³ proof: all six required `Cf` code points must pass
+boundary, inside-token, mixed, leading-outer-edge, trailing-outer-edge, and
+both-outer-edge ingress/egress probes. Cross-code-point, repeated, outer plus
+interior, and unseparated self-repetition behavior must fail safely; ordinary
+word adjacency without removed-`Cf` provenance must remain a nonmatch; and
+removing either the mixed or outer-edge proof must make readiness validation
+fail. The finite independent correction-review state is `required_pending`,
+not `complete`. Claude must independently re-review C1, and Dad/Blu must
+complete integration and closure authorization before implementation can be
+authorized. The runtime packet may be considered next, but implementation does
+not start automatically.

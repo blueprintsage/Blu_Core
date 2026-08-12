@@ -3,7 +3,7 @@
   "assignment": "BC-041-C1",
   "result": "ready_for_python_phase1",
   "result_semantics": "technical_conditions_satisfied_pending_independent_correction_review_and_Dad_Blu_closure",
-  "correction_state": "b1_prime_closed_pending_independent_rereview",
+  "correction_state": "b1_prime_and_b1_double_prime_closed_pending_independent_rereview",
   "full_successor_feature_complete": false,
   "checks": [
     {"id": "one_blu_canon_mapping_complete", "status": "pass"},

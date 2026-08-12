@@ -400,8 +400,8 @@ def validate(root: Path) -> list[str]:
         errors.append("runtime packet may not be authored despite resolved SUR-001")
     if checklist.get("result_semantics") != "technical_conditions_satisfied_pending_independent_correction_review_and_Dad_Blu_closure":
         errors.append("readiness result does not distinguish technical status from review and authorization")
-    if checklist.get("correction_state") != "b1_prime_closed_pending_independent_rereview":
-        errors.append("readiness does not record B-1 prime closure pending re-review")
+    if checklist.get("correction_state") != "b1_prime_and_b1_double_prime_closed_pending_independent_rereview":
+        errors.append("readiness does not record B-1 prime and B-1 double-prime closure pending re-review")
     review_check = checks.get("independent_Claude_correction_review", {})
     review = checklist.get("independent_correction_review", {})
     if review_check.get("status") != "required_pending":

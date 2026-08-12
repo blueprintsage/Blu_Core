@@ -18,8 +18,10 @@ last_reviewed: 2026-08-12
 - Work branch: `bc-041-c1-outer-edge-cf-correction`
 - Substantive outer-edge correction:
   `85e18f56f88ab113646cc3aab477687eda8b85af`
-- Metadata receipt: pending creation
-- Push status: pending metadata receipt and final two-commit push
+- Metadata receipt: `d1c283ab21681f8a0550da32c2ec87e08eb2852d`
+- Push status: the substantive outer-edge correction and metadata receipt pair
+  has been pushed; this bookkeeping cleanup is reported externally after
+  creation
 
 Claude's review branch was not merged or cherry-picked. Its commit was used
 only as review authority/evidence. B-1' was independently verified closed; this
@@ -114,5 +116,6 @@ enumerated.
 
 ## Next action
 
-Fresh independent Claude C1 review of the exact substantive and metadata
+After this bookkeeping cleanup is committed and pushed, the branch is ready for
+fresh independent Claude C1 review of the exact substantive and metadata
 commits. Do not merge this branch and do not start Python Runtime Phase 1.

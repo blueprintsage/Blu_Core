@@ -41,7 +41,7 @@ implementation.
 
 - Substantive outer-edge correction:
   `85e18f56f88ab113646cc3aab477687eda8b85af`.
-- Metadata receipt: pending creation.
+- Metadata receipt: `d1c283ab21681f8a0550da32c2ec87e08eb2852d`.
 
 ## 2026-08-12 - BC-041-C1 B-1' mixed-placement correction
 
@@ -81,7 +81,7 @@ implementation.
 
 - Substantive mixed-placement correction:
   `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`.
-- Metadata receipt: pending creation.
+- Metadata receipt: `c6a447679c0ca07fb38a1e35eeb00231b0cb91e1`.
 
 ## 2026-08-11 - BC-041-C1 Unicode format-character correction
 

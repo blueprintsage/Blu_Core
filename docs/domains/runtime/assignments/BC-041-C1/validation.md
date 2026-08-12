@@ -279,5 +279,5 @@ has not started. Closure adds no production runtime, LM Studio provider, Local
 Mirror provider, Auth implementation, protected policy value, architecture
 change, continuity mutation, or PASS/SkillForge work.
 
-The closure substantive commit is recorded by the metadata-only closure
-receipt after creation.
+Closure substantive commit:
+`1eb33e898b91c5e0de88985ca44530498b255c32`.

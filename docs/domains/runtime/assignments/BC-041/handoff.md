@@ -108,7 +108,8 @@ separation, bounded semantic claims, unchanged Auth/SUR-011/SUR-012 semantics,
   `3e77111b6d86879f591c7ab8c52a571c51e7c48e`
 - Final review disposition: `approve-with-notes`; blocking findings: `0`
 - Final status: `done`
-- Closure substantive commit: recorded by the metadata-only closure receipt
+- Closure substantive commit:
+  `1eb33e898b91c5e0de88985ca44530498b255c32`
 
 The original BC-041 review remains immutable `return-for-correction` history.
 B-1 is resolved through BC-041-C1. The final technical result is

@@ -137,7 +137,8 @@ must not start without separate authorization.
 - B-1': `resolved`
 - B-1″: `resolved`
 - Final status: `done`
-- Closure substantive commit: recorded by the metadata-only closure receipt
+- Closure substantive commit:
+  `1eb33e898b91c5e0de88985ca44530498b255c32`
 
 Claude N-1 and N-2 carry into the future Python Runtime Phase 1 packet as
 implementation guidance. N-3 remains pre-existing contract behavior. Technical

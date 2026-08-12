@@ -206,6 +206,8 @@ blocking findings.
   `3e77111b6d86879f591c7ab8c52a571c51e7c48e`
 - Final disposition: `approve-with-notes`
 - Blocking findings: `0`
+- Closure substantive commit:
+  `1eb33e898b91c5e0de88985ca44530498b255c32`
 - B-1': `resolved`
 - B-1″: `resolved`
 - Final assignment status: `done`

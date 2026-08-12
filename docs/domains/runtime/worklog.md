@@ -48,6 +48,9 @@ Exact closure validation and commit receipts are recorded in the BC-041-C1
 validation and handoff records. The next safe action is a separate Dad/Blu
 runtime-packet decision; implementation must not start automatically.
 
+Closure substantive commit:
+`1eb33e898b91c5e0de88985ca44530498b255c32`.
+
 ## 2026-08-12 - BC-041-C1 B-1â€³ outer-edge correction
 
 ### What changed

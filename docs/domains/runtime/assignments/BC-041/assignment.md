@@ -162,6 +162,8 @@ rewriting the immutable original BC-041 `return-for-correction` review.
   `f0998f78aaada899a16d4413170ef3689f04fe28`
 - Final disposition: `approve-with-notes`
 - Blocking findings: `0`
+- Closure substantive commit:
+  `1eb33e898b91c5e0de88985ca44530498b255c32`
 - Final assignment status: `done`
 
 B-1 is resolved through BC-041-C1. SUR-001 is

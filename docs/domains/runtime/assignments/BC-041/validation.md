@@ -157,3 +157,6 @@ The original review blob remains exactly
 `ade01082a7bf4ebe389af6deafc68ea207d989d9`. Closure changed no golden CTS,
 architecture registry, production policy value, runtime/provider/Auth path, or
 PASS/SkillForge surface.
+
+Closure substantive commit:
+`1eb33e898b91c5e0de88985ca44530498b255c32`.

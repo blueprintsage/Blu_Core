@@ -163,6 +163,14 @@ class PythonReadinessValidationTests(unittest.TestCase):
         self.save(path, data)
         self.assert_has("authorizes implementation before independent review")
 
+    def test_readiness_cannot_turn_green_without_expanded_mixed_cf_proof(self) -> None:
+        path = "tests/security/fixtures/synthetic_cases.json"
+        data = self.load(path)
+        data["ingress"] = [item for item in data["ingress"] if item.get("cf_position") != "mixed"]
+        self.save(path, data)
+        self.assert_has("expanded OPSEC proof failed: ingress Cf probe matrix is incomplete")
+        self.assert_has("expanded OPSEC proof failed: ingress cross-code-point mixed Cf probe is missing")
+
     def test_projection_guard_detects_missing_stale_and_redefinition(self) -> None:
         manifest = self.load("readiness/one_blu_canon_manifest.json")
         first = manifest["mappings"][0]

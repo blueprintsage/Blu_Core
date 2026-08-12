@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.metadata
+import importlib.util
 import json
 import re
 import subprocess
@@ -45,6 +46,11 @@ REQUIRED = {
     Path("contracts/security/opsec/schemas/security_evaluation.schema.json"),
     Path("tests/security/fixtures/synthetic_policy.json"),
     Path("tests/security/fixtures/synthetic_cases.json"),
+    Path("tools/validate_opsec_contracts.py"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/assignment.md"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/handoff.md"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/validation.md"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/review.md"),
     Path("continuity/schemas/continuity_mutation_request.schema.json"),
     Path("tests/continuity/fixtures/schema_instances.json"),
     Path("docs/domains/runtime/one_blu_python_readiness.md"),
@@ -208,6 +214,20 @@ def validate(root: Path) -> list[str]:
             errors.append(f"invalid JSON: {path}: {exc}")
     if errors:
         return errors
+
+    opsec_spec = importlib.util.spec_from_file_location(
+        "validate_opsec_contracts_for_readiness",
+        root / "tools/validate_opsec_contracts.py",
+    )
+    if opsec_spec is None or opsec_spec.loader is None:
+        errors.append("unable to load expanded OPSEC proof validator")
+    else:
+        opsec_validator = importlib.util.module_from_spec(opsec_spec)
+        opsec_spec.loader.exec_module(opsec_validator)
+        errors.extend(
+            f"expanded OPSEC proof failed: {item}"
+            for item in opsec_validator.validate(root)
+        )
 
     components = data[Path("contracts/successor/component_registry.json")]
     packets = data[Path("contracts/successor/packet_registry.json")]
@@ -380,6 +400,8 @@ def validate(root: Path) -> list[str]:
         errors.append("runtime packet may not be authored despite resolved SUR-001")
     if checklist.get("result_semantics") != "technical_conditions_satisfied_pending_independent_correction_review_and_Dad_Blu_closure":
         errors.append("readiness result does not distinguish technical status from review and authorization")
+    if checklist.get("correction_state") != "b1_prime_closed_pending_independent_rereview":
+        errors.append("readiness does not record B-1 prime closure pending re-review")
     review_check = checks.get("independent_Claude_correction_review", {})
     review = checklist.get("independent_correction_review", {})
     if review_check.get("status") != "required_pending":

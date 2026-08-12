@@ -2,9 +2,26 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 
-## 2026-08-11 - Unicode format characters require dual candidate views
+## 2026-08-12 - Static Cf views do not compose across placement classes
+
+- **Observed:** the `Cf -> space` and `Cf -> removed` views each repaired one
+  insertion-position class, but neither was a superset. One boundary insertion
+  plus one inside-token insertion corrupted both views, allowing protected
+  ingress to reach the model and protected egress to print.
+- **Unsafe shortcut:** treating independently green single-position probes as
+  proof for arbitrary combinations, or adding a candidate view for every
+  placement combination. The first misses composition; the second grows
+  exponentially with insertion count.
+- **Prevention:** remove every `Cf` code point once, then let each normalized
+  inter-word separator in the protected rule match zero-or-more normalized
+  spaces under whole-phrase token guards. This uses one candidate independent
+  of insertion count. Require explicit boundary, inside-token, mixed,
+  cross-code-point, and repeated-insertion proof at ingress and egress, and bind
+  technical readiness to that expanded proof.
+
+## 2026-08-11 - Unicode format characters exposed complementary transforms
 
 - **Observed:** Unicode general-category `Cf` code points survive the prior
   NFKC/whitespace/separator pipeline. One invisible insertion at a protected
@@ -12,10 +29,10 @@ last_reviewed: 2026-08-11
 - **Unsafe shortcut:** use only `Cf -> space` or only `Cf -> removed`. The first
   misses inside-token insertion; the second can join text where the format
   character substitutes for a legitimate word boundary.
-- **Prevention:** deterministically evaluate both transformed views through the
-  complete existing normalization pipeline, treat either match as protected,
-  and fail egress redaction closed if divergent view spans cannot be represented
-  safely. Keep general confusable/homoglyph substitution as a separately named
+- **Superseded prevention:** the first correction evaluated both transformed
+  views, but the 2026-08-12 B-1' review proved that law incomplete for mixed
+  placements. Use the single-candidate separator-tolerant prevention above.
+  Keep general confusable/homoglyph substitution as a separately named
   limitation rather than claiming it is solved or calling it semantic
   paraphrase.
 

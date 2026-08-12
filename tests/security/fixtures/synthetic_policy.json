@@ -7,7 +7,7 @@
     "evidence_hmac_key": "synthetic-only-evidence-key-00000000000000000001",
     "rules": [
       {
-        "rule_ref": "SYNTH-RULE-CERULEAN-COMET",
+        "rule_ref": "SYNTH-RULE-0001",
         "matcher": "normalized_phrase",
         "value": "cerulean comet charter",
         "case_sensitive": false,
@@ -17,7 +17,7 @@
         "safe_reason_code": "SYNTH_PROTECTED_MATCH"
       },
       {
-        "rule_ref": "SYNTH-RULE-ZIRCON-CAFE",
+        "rule_ref": "SYNTH-RULE-0002",
         "matcher": "normalized_phrase",
         "value": "zircon café protocol",
         "case_sensitive": false,

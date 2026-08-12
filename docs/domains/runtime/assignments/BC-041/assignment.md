@@ -1,12 +1,12 @@
 # BC-041 — Protected Security Phase 1
 
-status: review
+status: done
 owner: Codex
 reviewer: Claude
 project_lead: Blu
 project_owner: Dad
 domain: runtime
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 
 ## Assignment identity
 
@@ -140,3 +140,34 @@ independent semantic review.
 ## Approved amendments
 
 No amendments.
+
+## Final closure amendment — 2026-08-12
+
+Dad and Blu authorized final integration and administrative closure of BC-041
+together with BC-041-C1. This amendment records the final disposition without
+rewriting the immutable original BC-041 `return-for-correction` review.
+
+- Original substantive work:
+  `9ccd17d75955db4b64e5df27a5751d36b6964330`
+- Original metadata:
+  `9849c60138940068a0fd900eb49ce7444531109d`
+- Original Claude review:
+  `ade01082a7bf4ebe389af6deafc68ea207d989d9`
+- Original disposition: `return-for-correction`
+- Governing correction tip:
+  `204a229e2c01b255f1a940129cb724fa33fb4755`
+- Correction integration on current `main`:
+  `131a527a8fef1f42df327443c9966c9e2f66f528`
+- Final Claude correction review:
+  `f0998f78aaada899a16d4413170ef3689f04fe28`
+- Final disposition: `approve-with-notes`
+- Blocking findings: `0`
+- Closure substantive commit:
+  `1eb33e898b91c5e0de88985ca44530498b255c32`
+- Final assignment status: `done`
+
+B-1 is resolved through BC-041-C1. SUR-001 is
+`resolved_at_minimum_phase1_contract_level`; technical readiness is
+`ready_for_python_phase1`; actual blockers are empty; and the runtime Phase 1
+packet may be authored next. Python Runtime Phase 1 implementation is not
+started or authorized, and automatic start remains prohibited.

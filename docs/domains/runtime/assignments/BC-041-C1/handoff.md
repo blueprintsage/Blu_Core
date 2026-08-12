@@ -1,6 +1,6 @@
 # BC-041-C1 - Implementation Handoff
 
-status: ready-for-review
+status: closed
 owner: Codex
 last_reviewed: 2026-08-12
 
@@ -114,8 +114,33 @@ enumerated.
 - The known BC-020 fixed-base host-adapter validator finding remains preserved,
   unsuppressed, and is not reported as a pass.
 
-## Next action
+## Review-handoff state (superseded by closure)
 
-After this bookkeeping cleanup is committed and pushed, the branch is ready for
-fresh independent Claude C1 review of the exact substantive and metadata
-commits. Do not merge this branch and do not start Python Runtime Phase 1.
+The correction branch was handed off for fresh independent Claude review.
+That review is now complete at
+`f0998f78aaada899a16d4413170ef3689f04fe28`; the final closure receipt below
+supersedes the earlier next-action instruction. Python Runtime Phase 1 still
+must not start without separate authorization.
+
+## Final closure receipt
+
+- Closure branch: `bc-041-c1-closure`
+- Current `origin/main` integration base:
+  `131a527a8fef1f42df327443c9966c9e2f66f528`
+- Reviewed correction tip:
+  `204a229e2c01b255f1a940129cb724fa33fb4755`
+- Final Claude review source:
+  `f0998f78aaada899a16d4413170ef3689f04fe28`
+- Imported-review integration commit:
+  `3e77111b6d86879f591c7ab8c52a571c51e7c48e`
+- Review disposition: `approve-with-notes`; blocking findings: `0`
+- B-1': `resolved`
+- B-1″: `resolved`
+- Final status: `done`
+- Closure substantive commit:
+  `1eb33e898b91c5e0de88985ca44530498b255c32`
+
+Claude N-1 and N-2 carry into the future Python Runtime Phase 1 packet as
+implementation guidance. N-3 remains pre-existing contract behavior. Technical
+readiness is satisfied, but Python implementation remains unauthorized,
+unstarted, and prohibited from automatic start.

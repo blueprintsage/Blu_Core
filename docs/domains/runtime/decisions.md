@@ -170,3 +170,22 @@ Approved specification decisions, pending independent semantic review:
 - Contract-level readiness is `ready_for_python_phase1`, with no actual
   blockers and `runtime_phase1_packet_may_be_authored_next: true`. Runtime
   implementation remains unstarted and requires a separate Dad/Blu packet.
+
+### Final BC-041 / BC-041-C1 closure disposition — 2026-08-12
+
+- Current `main` integrates the correction lineage through
+  `204a229e2c01b255f1a940129cb724fa33fb4755` at merge
+  `131a527a8fef1f42df327443c9966c9e2f66f528`.
+- Claude's final independent review at
+  `f0998f78aaada899a16d4413170ef3689f04fe28` is
+  `approve-with-notes` with zero blocking findings. The original BC-041
+  `return-for-correction` review remains immutable history.
+- B-1 is resolved through BC-041-C1; B-1' and B-1″ are resolved. SUR-001 remains
+  `resolved_at_minimum_phase1_contract_level`.
+- Technical readiness is `ready_for_python_phase1`; `actual_blockers` is empty;
+  and the named runtime Phase 1 packet may be authored next.
+- Claude N-1 and N-2 are future Python Runtime Phase 1 packet inputs. N-3 is
+  pre-existing separator-set/word-character behavior, not a C1 defect.
+- BC-041 and BC-041-C1 are `done`. Closure does not authorize implementation:
+  `implementation_authorized` remains `false`, automatic start remains
+  prohibited, and Python Runtime Phase 1 has not started.

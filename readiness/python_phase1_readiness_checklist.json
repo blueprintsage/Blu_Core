@@ -1,9 +1,9 @@
 {
-  "spec_version": "1.2.0",
+  "spec_version": "1.3.0",
   "assignment": "BC-041-C1",
   "result": "ready_for_python_phase1",
-  "result_semantics": "technical_conditions_satisfied_pending_independent_correction_review_and_Dad_Blu_closure",
-  "correction_state": "b1_prime_and_b1_double_prime_closed_pending_independent_rereview",
+  "result_semantics": "technical_conditions_satisfied_independent_correction_review_and_Dad_Blu_closure_complete_implementation_authorization_pending",
+  "correction_state": "b1_prime_and_b1_double_prime_closed_independent_review_complete",
   "full_successor_feature_complete": false,
   "checks": [
     {"id": "one_blu_canon_mapping_complete", "status": "pass"},
@@ -26,19 +26,31 @@
     {"id": "manifest_validator_digest_and_scope_guards_strengthened", "status": "pass"},
     {"id": "golden_CTS_unchanged", "status": "pass"},
     {"id": "no_runtime_code_introduced", "status": "pass"},
-    {"id": "independent_Claude_correction_review", "status": "required_pending"},
+    {"id": "independent_Claude_correction_review", "status": "pass"},
+    {"id": "BC_041_and_BC_041_C1_Dad_Blu_closure", "status": "pass"},
     {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "pass", "resolution": "B-1_double_prime_closed_by_Cf_removal_separator_tolerance_and_outer_boundary_provenance_with_expanded_proof"}
   ],
   "actual_blockers": [],
   "runtime_phase1_packet_may_be_authored_next": true,
   "independent_correction_review": {
     "reviewer": "Claude",
-    "state": "required_pending",
-    "completed": false,
+    "state": "complete",
+    "completed": true,
+    "review_commit": "f0998f78aaada899a16d4413170ef3689f04fe28",
+    "disposition": "approve-with-notes",
+    "blocking_findings": 0,
     "required_before_implementation_authorization": true
+  },
+  "dad_blu_closure": {
+    "state": "complete",
+    "assignments": ["BC-041", "BC-041-C1"],
+    "correction_tip": "204a229e2c01b255f1a940129cb724fa33fb4755",
+    "correction_main_integration": "131a527a8fef1f42df327443c9966c9e2f66f528",
+    "review_source_commit": "f0998f78aaada899a16d4413170ef3689f04fe28",
+    "review_import_commit": "3e77111b6d86879f591c7ab8c52a571c51e7c48e"
   },
   "implementation_authorized": false,
   "conditional_runtime_packet_after_blocker": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
   "automatic_start_prohibited": true,
-  "authorization_boundary": "This is a technical readiness result only, earned after the expanded B-1 double-prime outer-edge and preserved B-1 prime mixed-placement proofs passed. Independent Claude re-review is required and pending; Dad/Blu integration and closure authorization are also required before implementation. This result does not authorize implementation, merge, release, or automatic start."
+  "authorization_boundary": "Technical readiness, independent Claude correction review, and BC-041/BC-041-C1 Dad/Blu closure are complete. Python Runtime Phase 1 implementation remains separately unauthorized, has not started, and cannot begin automatically. A later Dad/Blu action must explicitly authorize the named runtime packet."
 }

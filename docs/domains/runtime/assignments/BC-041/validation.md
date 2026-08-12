@@ -2,7 +2,7 @@
 
 status: complete
 owner: Codex
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 
 ## Environment
 
@@ -132,3 +132,31 @@ policy was loaded or tested.
   `9ccd17d75955db4b64e5df27a5751d36b6964330`
 - Metadata method: this follow-up records the substantive SHA. Its own final SHA
   is reported externally rather than embedded in its tree.
+
+## Final closure validation — 2026-08-12
+
+BC-041 closes through BC-041-C1. The complete final closure validation is
+recorded in `../BC-041-C1/validation.md`; this parent receipt records the
+governing outcome:
+
+```text
+original BC-041 review: return-for-correction, preserved unchanged
+final Claude correction review: approve-with-notes
+final blocking findings: 0
+B-1: resolved through BC-041-C1
+SUR-001: resolved_at_minimum_phase1_contract_level
+technical readiness: ready_for_python_phase1
+actual blockers: []
+implementation_authorized: false
+automatic_start_prohibited: true
+Python Runtime Phase 1: not started
+```
+
+The original review blob remains exactly
+`3a6770f872a990d39ee42ef5f15823e53c6b39ed`, matching
+`ade01082a7bf4ebe389af6deafc68ea207d989d9`. Closure changed no golden CTS,
+architecture registry, production policy value, runtime/provider/Auth path, or
+PASS/SkillForge surface.
+
+Closure substantive commit:
+`1eb33e898b91c5e0de88985ca44530498b255c32`.

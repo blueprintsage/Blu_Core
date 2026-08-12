@@ -1,6 +1,6 @@
 # One-Blu Python Runtime Readiness Contracts
 
-status: review
+status: done
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 assignment: BC-041-C1
@@ -62,15 +62,17 @@ phrase matching does not claim arbitrary paraphrase or semantic-equivalence
 detection. It also does not claim general Unicode confusable/homoglyph
 substitution protection.
 
-The `ready_for_python_phase1` result is technical only. Its OPSEC gate invokes
+The `ready_for_python_phase1` result remains technical only. Its OPSEC gate invokes
 the expanded B-1'/B-1â€³ proof: all six required `Cf` code points must pass
 boundary, inside-token, mixed, leading-outer-edge, trailing-outer-edge, and
 both-outer-edge ingress/egress probes. Cross-code-point, repeated, outer plus
 interior, and unseparated self-repetition behavior must fail safely; ordinary
 word adjacency without removed-`Cf` provenance must remain a nonmatch; and
 removing either the mixed or outer-edge proof must make readiness validation
-fail. The finite independent correction-review state is `required_pending`,
-not `complete`. Claude must independently re-review C1, and Dad/Blu must
-complete integration and closure authorization before implementation can be
-authorized. The runtime packet may be considered next, but implementation does
-not start automatically.
+fail. Claude's independent correction review is complete at
+`f0998f78aaada899a16d4413170ef3689f04fe28` with `approve-with-notes` and zero
+blocking findings. Dad/Blu closure of BC-041 and BC-041-C1 is also complete.
+These completed gates do not authorize implementation: `implementation_authorized`
+remains `false`, automatic start remains prohibited, and Python Runtime Phase 1
+has not started. The named runtime packet may be authored next only under a
+separate Dad/Blu action.

@@ -1,6 +1,6 @@
 # BC-041-C1 - Unicode Format-Character OPSEC Correction
 
-status: review
+status: done
 owner: Codex
 reviewer: Claude
 project_lead: Blu
@@ -189,3 +189,30 @@ Use `handoff.md` and `validation.md` in this folder. Claude modifies only
 - **Scope and commit method:** the existing collision domain and prohibitions
   remain authoritative. Create one substantive correction commit and one
   metadata receipt, push without merge, and stop for another Claude review.
+
+## Final closure amendment — 2026-08-12
+
+Dad and Blu authorized final integration and administrative closure after
+Claude's third independent review returned `approve-with-notes` with zero
+blocking findings.
+
+- Reviewed correction tip:
+  `204a229e2c01b255f1a940129cb724fa33fb4755`
+- Correction integration on current `main`:
+  `131a527a8fef1f42df327443c9966c9e2f66f528`
+- Final Claude review source:
+  `f0998f78aaada899a16d4413170ef3689f04fe28`
+- Exact imported-review integration:
+  `3e77111b6d86879f591c7ab8c52a571c51e7c48e`
+- Final disposition: `approve-with-notes`
+- Blocking findings: `0`
+- Closure substantive commit:
+  `1eb33e898b91c5e0de88985ca44530498b255c32`
+- B-1': `resolved`
+- B-1″: `resolved`
+- Final assignment status: `done`
+
+Claude's N-1 and N-2 are carried into the future Python Runtime Phase 1 packet.
+N-3 remains recorded as pre-existing separator-set/Unicode-word-character
+behavior and requires no C1 repair. All three remain advisory. Closure does not
+authorize or start Python implementation.

@@ -33,6 +33,12 @@ recorded in `assignments/BC-041-C1/validation.md` and `handoff.md` at handoff.
 Claude next performs the independent C1 review; Dad/Blu decide integration and
 closure. Python Runtime Phase 1 remains unauthorized.
 
+### Commit identity
+
+- Substantive correction:
+  `80e5b8554639c274f7baa69155ea9b83910f604c`
+- Metadata receipt: reported externally after creation.
+
 ## 2026-08-11 — BC-041 minimum OPSEC contract
 
 ### What changed

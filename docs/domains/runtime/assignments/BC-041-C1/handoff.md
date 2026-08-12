@@ -9,7 +9,7 @@ last_reviewed: 2026-08-11
 - Assignment: BC-041-C1
 - Base commit: `33b44608cb634d1fedeed7f5f70d405c3999ed02`
 - Work branch: `bc-041-c1-unicode-format-correction`
-- Substantive correction commit: recorded by the metadata receipt after creation
+- Substantive correction commit: `80e5b8554639c274f7baa69155ea9b83910f604c`
 - Metadata receipt commit: reported externally because it cannot contain its own SHA
 - Push status: pending final two-commit push
 - Working-tree status: final post-metadata state reported externally

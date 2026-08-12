@@ -148,6 +148,6 @@ security. No real protected policy was loaded or tested.
 
 ## Commit identity
 
-- Substantive correction commit: recorded by the metadata-only follow-up.
+- Substantive correction commit: `80e5b8554639c274f7baa69155ea9b83910f604c`.
 - Metadata method: the follow-up records the substantive SHA; its own final SHA
   is reported externally rather than embedded in its tree.

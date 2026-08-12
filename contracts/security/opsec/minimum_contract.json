@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.2.0",
+  "contract_version": "1.3.0",
   "assignment": "BC-041-C1",
   "disposition": "resolved_at_minimum_phase1_contract_level",
   "authority": {
@@ -45,7 +45,7 @@
     "input_type": "unicode_text",
     "ordered_steps": [
       "reject_non_string_input",
-      "remove_every_Unicode_general_category_Cf_code_point_to_produce_one_match_candidate",
+      "remove_every_Unicode_general_category_Cf_code_point_to_produce_one_match_candidate_and_record_each_normalized_removal_boundary",
       "apply_unicode_NFKC_to_the_Cf_removed_match_candidate",
       "normalize_CRLF_CR_and_all_unicode_whitespace_to_ASCII_space",
       "map_bounded_common_separators_dot_comma_colon_semicolon_hyphen_underscore_slash_backslash_pipe_to_ASCII_space",
@@ -55,7 +55,8 @@
     ],
     "candidate_view": {
       "id": "cf_removed_separator_tolerant",
-      "transformation": "every Unicode general-category Cf code point is removed before the remaining ordered normalization steps"
+      "transformation": "every Unicode general-category Cf code point is removed before the remaining ordered normalization steps",
+      "boundary_provenance": "normalized offsets where one or more Cf code points were removed are retained as metadata on the single candidate"
     },
     "candidate_view_generation_applies_to": ["ingress", "egress"],
     "separator_set": [".", ",", ":", ";", "-", "_", "/", "\\", "|"],
@@ -66,7 +67,10 @@
     "rule_type": "normalized_phrase",
     "match_boundary": "unicode_word_token",
     "normalized_rule_inter_word_separator_matches": "zero_or_more_ASCII_spaces",
-    "separator_tolerance_purpose": "recover protected rule word boundaries whether inserted Cf code points replaced a boundary or occurred inside tokens",
+    "separator_tolerance_purpose": "intentionally permit normalized protected-rule word separators to match zero spaces so rule words remain recoverable when Cf removal destroyed their separation; unseparated concatenation of the rule words is therefore deliberately fail-safe matched rather than treated as accidental fuzzy matching",
+    "removed_Cf_outer_boundary_provenance": "normalized_candidate_boundary_offsets",
+    "ordinary_word_adjacency_without_removed_Cf_matches": false,
+    "unseparated_self_repetition_matches": true,
     "Cf_placement_combination_enumeration_allowed": false,
     "candidate_count_growth_with_Cf_insertions": "constant_one",
     "rule_order": "ascending_opaque_rule_ref",
@@ -107,7 +111,7 @@
     "public_form": "canonicalized candidate only; raw candidate is never reconstructed for public print",
     "required_postconditions": [
       "every matched span replaced",
-      "redaction and post-redaction rescan use the same Cf-removed separator-tolerant match semantics",
+      "redaction and post-redaction rescan use the same Cf-removed separator-tolerant and outer-boundary-provenance match semantics",
       "no protected rule matches the redacted result",
       "residual contains at least one alphanumeric character outside replacement tokens",
       "no invalid or overlapping span",
@@ -156,7 +160,8 @@
     "continuity mutation",
     "production runtime implementation",
     "arbitrary semantic paraphrase or obfuscation detection",
-    "general Unicode confusable or homoglyph substitution detection"
+    "general Unicode confusable or homoglyph substitution detection",
+    "non-Cf default-ignorable or invisible Unicode characters outside the Phase-1 general-category Cf contract"
   ],
   "synthetic_fixture_statement": "synthetic test policy != production protected policy"
 }

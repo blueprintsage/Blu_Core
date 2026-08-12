@@ -45,21 +45,29 @@ loaded, schema-valid, integrity-valid, or usable.
 
 The matcher accepts text only. It deterministically removes every Unicode
 general-category `Cf` code point, producing one candidate regardless of how
-many format characters were inserted or where they were placed. That candidate
-continues through the existing normalization pipeline: Unicode NFKC, line-break
-and whitespace normalization, bounded common-separator mapping, repeated-space
-collapse, trim, and per-rule case folding.
+many format characters were inserted or where they were placed. Alongside that
+candidate it retains normalized boundary offsets showing where one or more
+`Cf` code points were removed. This is provenance metadata on the same
+candidate, not another candidate view. The candidate continues through the
+existing normalization pipeline: Unicode NFKC, line-break and whitespace
+normalization, bounded common-separator mapping, repeated-space collapse, trim,
+and per-rule case folding.
 
 For matching only, every normalized inter-word space in a protected rule may
-match zero or more normalized ASCII spaces in the candidate. Zero spaces
-recovers a word boundary that disappeared when a boundary-position `Cf` was
-removed; ordinary spaces recover unchanged boundaries, while removal also
-repairs insertions inside tokens. Unicode word-token guards still bound the
-complete phrase. The matcher therefore covers arbitrary mixtures and counts of
-boundary and inside-token `Cf` insertions with one linear candidate. It does not
-enumerate placement combinations or generate a candidate set that grows with
-insertion count. These semantics apply symmetrically to ingress and candidate
-egress output.
+match zero or more normalized ASCII spaces in the candidate. Zero spaces are
+intentional: they recover rule words whose separation was destroyed by `Cf`
+removal, so an unseparated concatenation of a rule's words is deliberately a
+fail-safe match rather than accidental fuzzy matching. At the phrase's outer
+edges, a guard is satisfied only by a genuine non-word neighbour or a retained
+offset where `Cf` removal created the apparent word adjacency. Ordinary
+prefix/suffix word adjacency with no such provenance remains a nonmatch.
+Contiguous unseparated repetition of the same protected rule is also collected
+as one protected run; this does not admit an unrelated prefix or suffix token.
+The matcher therefore covers arbitrary mixtures and counts of boundary,
+inside-token, and outer-edge `Cf` insertions with one linear candidate. It does
+not enumerate placement combinations or generate a candidate set that grows
+with insertion count. These semantics apply symmetrically to ingress and
+candidate egress output.
 
 The matcher supports only token-bounded `normalized_phrase` rules. It does not
 call a model, infer intent, assign confidence, or authenticate. It does not
@@ -97,10 +105,11 @@ paraphrase and obfuscation.
 
 ## Limitations
 
-The bounded `Cf` correction closes invisible Unicode format-character insertion
-for the specified deterministic matcher. It does not claim general protection
-against Unicode confusable or homoglyph substitution, including characters from
-another script that visually resemble Latin letters. That character-level
-evasion class is explicitly outside this minimum matcher unless a future
-security assignment authorizes a bounded confusable policy; it is not being
-classified as semantic paraphrase.
+The bounded `Cf` correction closes Unicode general-category `Cf` insertion for
+the specified deterministic matcher. It does not claim comprehensive handling
+of every non-`Cf` default-ignorable or invisible Unicode character, nor general
+protection against Unicode confusable or homoglyph substitution, including
+characters from another script that visually resemble Latin letters. Those
+character-level evasion classes are explicitly outside this minimum Phase-1
+matcher unless a future security assignment authorizes a bounded policy; they
+are not being classified as semantic paraphrase.

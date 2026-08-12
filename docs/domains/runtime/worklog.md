@@ -4,6 +4,44 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-12
 
+## 2026-08-12 - BC-041-C1 B-1â€³ outer-edge correction
+
+### What changed
+
+- Started from the required B-1' metadata receipt
+  `c6a447679c0ca07fb38a1e35eeb00231b0cb91e1`; Claude review commit
+  `f87588d0fa094c203fde3b847ab9bc3c28d1b3fe` was used as evidence only and was
+  not merged or cherry-picked.
+- Preserved the one `Cf`-removed normalized candidate and added normalized
+  boundary-offset metadata for every representable removed-`Cf` run. Whole
+  phrase guards accept a real non-word boundary or such a retained offset;
+  ordinary word adjacency without `Cf` provenance remains a nonmatch.
+- Added bounded contiguous-run handling so unseparated repetition of the same
+  protected rule fails safely without admitting unrelated prefix/suffix words.
+- Expanded the synthetic matrix for all six code points at leading, trailing,
+  and both outer edges at ingress and egress, plus outer/interior mixtures,
+  mixed code points, repeated outer/interior insertions, and self-repetition.
+- Documented intentional zero-space separator tolerance and the Phase-1
+  exclusion for non-`Cf` default-ignorable/invisible characters.
+- Added no production protected value, runtime/provider/Auth implementation,
+  architecture change, continuity mutation, tool, or PASS/SkillForge path.
+
+### Validation and next step
+
+Focused OPSEC/readiness validation passed with 53 tests. A deterministic 54,740
+probe adversarial run covering preserved interior combinations and new outer
+edges had zero ingress/egress failures; six ordinary ASCII/Unicode adjacency
+controls had zero false matches. Complete suite, manifest, golden,
+publication-safety, repository-boundary, commit, and push receipts are recorded
+in `assignments/BC-041-C1/validation.md` and `handoff.md` at handoff. The next
+action is another independent Claude C1 review, not Python runtime
+implementation.
+
+### Commit identity
+
+- Substantive outer-edge correction: pending creation.
+- Metadata receipt: pending creation.
+
 ## 2026-08-12 - BC-041-C1 B-1' mixed-placement correction
 
 ### What changed

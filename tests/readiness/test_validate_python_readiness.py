@@ -171,6 +171,18 @@ class PythonReadinessValidationTests(unittest.TestCase):
         self.assert_has("expanded OPSEC proof failed: ingress Cf probe matrix is incomplete")
         self.assert_has("expanded OPSEC proof failed: ingress cross-code-point mixed Cf probe is missing")
 
+    def test_readiness_cannot_turn_green_without_outer_edge_cf_proof(self) -> None:
+        path = "tests/security/fixtures/synthetic_cases.json"
+        data = self.load(path)
+        data["egress"] = [
+            item for item in data["egress"]
+            if item.get("cf_position") not in {"leading_outer_edge", "trailing_outer_edge", "both_outer_edges"}
+            and item.get("attack_class") is None
+        ]
+        self.save(path, data)
+        self.assert_has("expanded OPSEC proof failed: egress Cf probe matrix is incomplete")
+        self.assert_has("expanded OPSEC proof failed: egress outer-edge attack classes are incomplete")
+
     def test_projection_guard_detects_missing_stale_and_redefinition(self) -> None:
         manifest = self.load("readiness/one_blu_canon_manifest.json")
         first = manifest["mappings"][0]

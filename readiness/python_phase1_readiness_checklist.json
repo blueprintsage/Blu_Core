@@ -27,7 +27,7 @@
     {"id": "golden_CTS_unchanged", "status": "pass"},
     {"id": "no_runtime_code_introduced", "status": "pass"},
     {"id": "independent_Claude_correction_review", "status": "required_pending"},
-    {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "pass", "resolution": "B-1_prime_closed_by_Cf_removal_and_separator_tolerant_matching_with_expanded_proof"}
+    {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "pass", "resolution": "B-1_double_prime_closed_by_Cf_removal_separator_tolerance_and_outer_boundary_provenance_with_expanded_proof"}
   ],
   "actual_blockers": [],
   "runtime_phase1_packet_may_be_authored_next": true,
@@ -40,5 +40,5 @@
   "implementation_authorized": false,
   "conditional_runtime_packet_after_blocker": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
   "automatic_start_prohibited": true,
-  "authorization_boundary": "This is a technical readiness result only, earned after the expanded B-1 prime mixed-placement proof passed. Independent Claude re-review is required and pending; Dad/Blu integration and closure authorization are also required before implementation. This result does not authorize implementation, merge, release, or automatic start."
+  "authorization_boundary": "This is a technical readiness result only, earned after the expanded B-1 double-prime outer-edge and preserved B-1 prime mixed-placement proofs passed. Independent Claude re-review is required and pending; Dad/Blu integration and closure authorization are also required before implementation. This result does not authorize implementation, merge, release, or automatic start."
 }

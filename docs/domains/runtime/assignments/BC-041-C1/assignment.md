@@ -151,3 +151,41 @@ Use `handoff.md` and `validation.md` in this folder. Claude modifies only
 - **Commit method:** one substantive correction commit followed by one metadata
   receipt recording its SHA; push without merge, then stop for a fresh Claude
   review.
+
+### 2026-08-12 - B-1â€³ outer-edge return for correction
+
+- **Approved by:** Dad and Blu, by explicit instruction supplied to Codex on
+  2026-08-12.
+- **Correction starting point:**
+  `c6a447679c0ca07fb38a1e35eeb00231b0cb91e1`.
+- **Review authority/evidence:** Claude's second independent review commit
+  `f87588d0fa094c203fde3b847ab9bc3c28d1b3fe`, which must not be merged or
+  cherry-picked.
+- **Correction branch:** `bc-041-c1-outer-edge-cf-correction`.
+- **Blocking finding:** B-1â€³ only. B-1' is independently verified closed. The
+  single `Cf`-removed candidate loses evidence that a removed outer-edge `Cf`
+  separated the protected phrase from an adjacent Unicode word token, so the
+  outer token guard can reject a protected match.
+- **Corrected property:** retain normalized boundary provenance for removed
+  `Cf` runs on the same single candidate. An outer guard may pass at a genuine
+  non-word boundary or a retained removed-`Cf` boundary, while ordinary word
+  adjacency without such provenance remains a nonmatch. Unseparated repeated
+  instances of the same protected rule must also fail safely.
+- **Expanded proof:** for all six required code points at ingress and egress,
+  add explicit leading, trailing, and both-outer-edge fixtures, plus outer and
+  interior mixing, mixed code points, repeated outer insertions, repeated
+  interior insertions, unseparated self-repetition, Unicode adjacency negative
+  controls, preserved B-1' adversarial coverage, redaction rescan, content-safe
+  evidence, and readiness coupling.
+- **Documentation notes:** disclose non-`Cf` default-ignorable/invisible
+  characters as outside the bounded Phase-1 claim, and state that zero-space
+  protected-rule separators are intentional fail-safe recovery rather than
+  accidental fuzzy matching. Record `_has_overlapping_spans` disposition
+  without redesign unless a defect is found.
+- **Readiness:** B-1â€³ is a technical blocker until the expanded matrix passes.
+  Technical readiness may then return to `ready_for_python_phase1`, but Claude
+  re-review remains pending, `implementation_authorized` remains false,
+  automatic startup remains prohibited, and Dad/Blu closure remains required.
+- **Scope and commit method:** the existing collision domain and prohibitions
+  remain authoritative. Create one substantive correction commit and one
+  metadata receipt, push without merge, and stop for another Claude review.

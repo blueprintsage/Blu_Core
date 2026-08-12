@@ -195,13 +195,15 @@ the bounded minimum Phase 1 contract level and re-evaluates readiness to
 runtime packet may be authored next but is not automatically authorized or
 started.
 
-BC-041-C1 closes the returned B-1/B-1' Unicode general-category `Cf` insertion
-bypass with one deterministic `Cf`-removed candidate plus separator-tolerant
-phrase matching. Its explicit proof covers boundary, inside-token, mixed,
-cross-code-point, and repeated insertion classes without enumerating placement
-combinations. General Unicode confusable/homoglyph substitution remains
-excluded, and independent correction re-review remains `required_pending`.
-Technical readiness remains distinct from review completion and implementation
+BC-041-C1 closes the returned B-1/B-1'/B-1â€³ Unicode general-category `Cf`
+insertion bypass with one deterministic `Cf`-removed candidate,
+separator-tolerant phrase matching, and normalized provenance for removed outer
+boundaries. Its explicit proof covers boundary, inside-token, mixed, outer-edge,
+cross-code-point, repeated, and self-repetition classes without enumerating
+placement combinations. Non-`Cf` default-ignorable/invisible characters and
+general Unicode confusable/homoglyph substitution remain excluded, and
+independent correction re-review remains `required_pending`. Technical
+readiness remains distinct from review completion and implementation
 authorization.
 
 ## Historical archive source map

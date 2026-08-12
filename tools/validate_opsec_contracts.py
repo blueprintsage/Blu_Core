@@ -57,7 +57,16 @@ SECURITY_DECISIONS = ["PASS", "BLOCK", "ASK"]
 EGRESS_RESULTS = ["CLEAR", "REDACTED", "BLOCKED", "UNAVAILABLE", "INVALID"]
 CF_MATCH_VIEW_NAME = "cf_removed_separator_tolerant"
 REQUIRED_CF_CODE_POINTS = ["U+200B", "U+00AD", "U+200D", "U+200C", "U+FEFF", "U+2060"]
-REQUIRED_CF_POSITIONS = ["boundary", "inside_token", "mixed"]
+REQUIRED_CF_INTERIOR_POSITIONS = ["boundary", "inside_token", "mixed"]
+REQUIRED_CF_OUTER_EDGE_POSITIONS = ["leading_outer_edge", "trailing_outer_edge", "both_outer_edges"]
+REQUIRED_CF_POSITIONS = REQUIRED_CF_INTERIOR_POSITIONS + REQUIRED_CF_OUTER_EDGE_POSITIONS
+REQUIRED_CF_ATTACK_CLASSES = {
+    "outer_edge_plus_interior_mixed",
+    "mixed_code_point_outer_edge",
+    "repeated_outer_edge",
+    "outer_edge_plus_repeated_interior",
+    "unseparated_self_repetition",
+}
 SAFE_ERROR_CODES = {
     "POLICY_REF_MISSING",
     "POLICY_TARGET_UNAVAILABLE",
@@ -83,12 +92,36 @@ def _normalize_existing_pipeline(value: str) -> str:
     return " ".join(separated.split())
 
 
-def normalized_match_candidate(value: str) -> dict[str, str]:
-    """Return the single deterministic Cf-removed matching candidate."""
+def normalized_match_candidate(value: str) -> dict[str, Any]:
+    """Return one Cf-removed candidate plus its removed-boundary provenance."""
     if not isinstance(value, str):
         raise TypeError("OPSEC candidate must be Unicode text")
-    cf_removed = "".join(char for char in value if unicodedata.category(char) != "Cf")
-    return {"name": CF_MATCH_VIEW_NAME, "normalized": _normalize_existing_pipeline(cf_removed)}
+    characters: list[str] = []
+    raw_cf_boundaries: set[int] = set()
+    for char in value:
+        if unicodedata.category(char) == "Cf":
+            raw_cf_boundaries.add(len(characters))
+        else:
+            characters.append(char)
+    cf_removed = "".join(characters)
+    normalized = _normalize_existing_pipeline(cf_removed)
+    normalized_cf_boundaries: set[int] = set()
+    for boundary in raw_cf_boundaries:
+        left = _normalize_existing_pipeline(cf_removed[:boundary])
+        right = _normalize_existing_pipeline(cf_removed[boundary:])
+        left_position = len(left) if normalized.startswith(left) else None
+        right_position = len(normalized) - len(right) if normalized.endswith(right) else None
+        if left_position is not None and left_position == right_position:
+            normalized_cf_boundaries.add(left_position)
+        elif boundary == 0:
+            normalized_cf_boundaries.add(0)
+        elif boundary == len(cf_removed):
+            normalized_cf_boundaries.add(len(normalized))
+    return {
+        "name": CF_MATCH_VIEW_NAME,
+        "normalized": normalized,
+        "removed_cf_boundaries": sorted(normalized_cf_boundaries),
+    }
 
 
 def normalize_rule_text(value: str) -> str:
@@ -110,7 +143,23 @@ def _comparison_view(normalized: str, case_sensitive: bool) -> tuple[str, list[i
     return "".join(characters), source_indexes
 
 
-def _matches(normalized: str, policy: dict[str, Any], phase: str) -> list[dict[str, Any]]:
+def _matches(candidate: str | dict[str, Any], policy: dict[str, Any], phase: str) -> list[dict[str, Any]]:
+    if isinstance(candidate, dict):
+        normalized = candidate["normalized"]
+        removed_cf_boundaries = set(candidate.get("removed_cf_boundaries", []))
+    else:
+        normalized = candidate
+        removed_cf_boundaries = set()
+
+    def is_word(character: str) -> bool:
+        return bool(re.match(r"\w", character, re.UNICODE))
+
+    def leading_boundary(start: int) -> bool:
+        return start == 0 or not is_word(normalized[start - 1]) or start in removed_cf_boundaries
+
+    def trailing_boundary(end: int) -> bool:
+        return end == len(normalized) or not is_word(normalized[end]) or end in removed_cf_boundaries
+
     found: list[dict[str, Any]] = []
     for rule in sorted(policy["rules"], key=lambda item: item["rule_ref"]):
         if phase not in rule["applies_to"]:
@@ -119,11 +168,28 @@ def _matches(normalized: str, policy: dict[str, Any], phase: str) -> list[dict[s
         phrase = normalize_rule_text(rule["value"])
         phrase_view, _ = _comparison_view(phrase, rule["case_sensitive"])
         separator_tolerant_phrase = r" *".join(re.escape(token) for token in phrase_view.split(" "))
-        pattern = re.compile(rf"(?<!\w){separator_tolerant_phrase}(?!\w)", re.UNICODE)
+        pattern = re.compile(separator_tolerant_phrase, re.UNICODE)
+        rule_matches: list[dict[str, Any]] = []
         for match in pattern.finditer(candidate_view):
             start = candidate_map[match.start()]
             end = candidate_map[match.end() - 1] + 1
-            found.append({"rule": rule, "start": start, "end": end})
+            rule_matches.append({"rule": rule, "start": start, "end": end})
+
+        accepted: set[tuple[int, int]] = {
+            (item["start"], item["end"])
+            for item in rule_matches
+            if leading_boundary(item["start"]) and trailing_boundary(item["end"])
+        }
+        run_start = 0
+        while run_start < len(rule_matches):
+            run_end = run_start + 1
+            while run_end < len(rule_matches) and rule_matches[run_end - 1]["end"] == rule_matches[run_end]["start"]:
+                run_end += 1
+            run = rule_matches[run_start:run_end]
+            if len(run) > 1 and leading_boundary(run[0]["start"]) and trailing_boundary(run[-1]["end"]):
+                accepted.update((item["start"], item["end"]) for item in run)
+            run_start = run_end
+        found.extend(item for item in rule_matches if (item["start"], item["end"]) in accepted)
     return sorted(found, key=lambda item: (item["start"], item["end"], item["rule"]["rule_ref"]))
 
 
@@ -256,7 +322,7 @@ def evaluate_ingress(text: Any, policy: dict[str, Any] | None, policy_error: str
     except TypeError:
         return _failure_evaluation("ingress", "INPUT_INVALID", "INVALID")
     normalized = candidate["normalized"]
-    matches = _matches(normalized, policy, "ingress")
+    matches = _matches(candidate, policy, "ingress")
     refs = [item["rule"]["rule_ref"] for item in matches]
     if matches:
         return {
@@ -297,7 +363,7 @@ def evaluate_egress(text: Any, policy: dict[str, Any] | None, policy_error: str 
     except TypeError:
         return _failure_evaluation("egress", "INPUT_INVALID", "INVALID")
     normalized = candidate["normalized"]
-    matches = _matches(normalized, policy, "egress")
+    matches = _matches(candidate, policy, "egress")
     refs = [item["rule"]["rule_ref"] for item in matches]
     base = {
         "phase": "egress",
@@ -334,7 +400,7 @@ def evaluate_egress(text: Any, policy: dict[str, Any] | None, policy_error: str 
         pieces.append(normalized[cursor:])
         redacted = " ".join("".join(pieces).split())
         residual = redacted.replace(REDACTION_REPLACEMENT, "")
-        rescanned = _matches(normalized_match_candidate(redacted)["normalized"], policy, "egress")
+        rescanned = _matches(normalized_match_candidate(redacted), policy, "egress")
         redaction_valid = any(char.isalnum() for char in residual) and not rescanned
         if redaction_valid:
             return {
@@ -439,6 +505,14 @@ def validate(root: Path) -> list[str]:
         ]
         if not cross_code_point:
             errors.append(f"{phase} cross-code-point mixed Cf probe is missing")
+        attack_classes = {
+            item.get("attack_class")
+            for item in cases.get(phase, [])
+            if item.get("attack_class") is not None
+        }
+        missing_attack_classes = REQUIRED_CF_ATTACK_CLASSES - attack_classes
+        if missing_attack_classes:
+            errors.append(f"{phase} outer-edge attack classes are incomplete")
     policy = fixture.get("policy")
     schema_errors = list(Draft202012Validator(policy_schema).iter_errors(policy)) if isinstance(policy, dict) else ["missing"]
     if schema_errors:
@@ -497,6 +571,12 @@ def validate(root: Path) -> list[str]:
     matcher = contract.get("matcher", {})
     if matcher.get("normalized_rule_inter_word_separator_matches") != "zero_or_more_ASCII_spaces":
         errors.append("matcher is not separator-tolerant after deterministic Cf removal")
+    if matcher.get("removed_Cf_outer_boundary_provenance") != "normalized_candidate_boundary_offsets":
+        errors.append("matcher does not preserve removed-Cf outer-boundary provenance")
+    if matcher.get("ordinary_word_adjacency_without_removed_Cf_matches") is not False:
+        errors.append("matcher permits ordinary word adjacency without removed-Cf provenance")
+    if matcher.get("unseparated_self_repetition_matches") is not True:
+        errors.append("matcher does not fail safely on unseparated self-repetition")
     if matcher.get("Cf_placement_combination_enumeration_allowed") is not False:
         errors.append("matcher permits enumerating Cf placement combinations")
     if matcher.get("candidate_count_growth_with_Cf_insertions") != "constant_one":
@@ -504,9 +584,13 @@ def validate(root: Path) -> list[str]:
     exclusion_text = " ".join(contract.get("scope_exclusions", [])).casefold()
     if "confusable" not in exclusion_text or "homoglyph" not in exclusion_text:
         errors.append("general Unicode confusable/homoglyph substitution is not explicitly excluded")
+    if "non-cf" not in exclusion_text or "default-ignorable" not in exclusion_text or "invisible" not in exclusion_text:
+        errors.append("non-Cf default-ignorable/invisible limitation is not explicitly excluded")
     readme = (root / CONTRACT_ROOT / "README.md").read_text(encoding="utf-8").casefold()
     if "confusable" not in readme or "homoglyph" not in readme:
         errors.append("OPSEC README does not state the confusable/homoglyph limitation")
+    if "non-`cf`" not in readme or "default-ignorable" not in readme or "invisible" not in readme:
+        errors.append("OPSEC README does not state the non-Cf invisible limitation")
     if set(contract.get("safe_error_codes", [])) != SAFE_ERROR_CODES:
         errors.append("safe error-code vocabulary is incomplete")
     architecture = contract.get("architecture", {})

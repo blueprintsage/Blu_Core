@@ -4,6 +4,22 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-12
 
+## 2026-08-12 - Removed Cf can erase an outer protected-word boundary
+
+- **Observed:** the one-candidate B-1' correction removed all `Cf` code points
+  before evaluating whole-phrase token guards. At a phrase outer edge, that
+  welded the phrase to an adjacent Unicode word token, causing ingress `PASS`
+  and egress `CLEAR` before any downstream redaction guard could run.
+- **Unsafe shortcut:** delete the outer token guards, restore only the retired
+  static space view, or treat green interior-mutation probes as proof of outer
+  boundary behavior. These respectively create ordinary-adjacency false
+  positives, reopen B-1', or omit the failing class.
+- **Prevention:** keep the single `Cf`-removed candidate and retain normalized
+  offsets where `Cf` runs were removed. Accept an outer boundary only for a
+  genuine non-word neighbour or one of those offsets. Pin leading, trailing,
+  both-edge, mixed/repeated, self-repetition, and no-`Cf` Unicode adjacency
+  controls at ingress and egress, and bind readiness to the expanded matrix.
+
 ## 2026-08-12 - Static Cf views do not compose across placement classes
 
 - **Observed:** the `Cf -> space` and `Cf -> removed` views each repaired one

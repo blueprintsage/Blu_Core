@@ -122,6 +122,10 @@ Independent Claude re-review remains `required_pending` and incomplete;
 `implementation_authorized` remains false; automatic start remains prohibited;
 Dad/Blu closure remains required.
 
+The paragraph above records the correction-branch handoff state and is
+superseded by the final closure validation below. It is retained as historical
+evidence rather than rewritten.
+
 The contract and README disclose that non-`Cf` default-ignorable/invisible
 characters and general confusable/homoglyph mechanisms are outside this bounded
 Phase-1 matcher. They also state that zero-space protected-rule separators are
@@ -174,3 +178,106 @@ Studio behavior, Auth, protected continuation, or a production runtime.
   `85e18f56f88ab113646cc3aab477687eda8b85af`.
 - Metadata method: the follow-up receipt records the substantive SHA; its own
   final SHA is reported externally rather than embedded in its tree.
+
+## Final integration and administrative closure validation — 2026-08-12
+
+### Integration and review provenance
+
+```text
+fetched current origin/main: 131a527a8fef1f42df327443c9966c9e2f66f528
+reviewed correction tip: 204a229e2c01b255f1a940129cb724fa33fb4755
+correction tip is ancestor of current main: true
+final Claude review source: f0998f78aaada899a16d4413170ef3689f04fe28
+imported-review integration: 3e77111b6d86879f591c7ab8c52a571c51e7c48e
+review source/imported blob: 25907b4bd76400c6c01238da771c6a62c783b5de
+review blob exact: true
+review changes after import: 0
+```
+
+Claude's final disposition is `approve-with-notes` with zero blocking
+findings. The review branch was not merged. The original BC-041
+`return-for-correction` record remains byte-identical to its original review
+commit.
+
+### Complete validation commands and results
+
+The final staged closure state was validated with:
+
+```text
+git diff --cached --check
+python tools/validate_runtime_contracts.py
+python -m unittest discover -s tests/contracts -p "test_*.py"
+python tools/validate_viability_audit.py
+python -m unittest discover -s tests/viability -p "test_*.py"
+python tools/validate_historical_archive_inventory.py
+python -m unittest discover -s tests/historical_archives -p "test_*.py"
+python tools/validate_historical_behavioral_archaeology.py
+python -m unittest discover -s tests/historical_archaeology -p "test_*.py"
+python tools/validate_successor_kernel_spec.py
+python -m unittest discover -s tests/successor_kernel -p "test_*.py"
+python tools/validate_host_adapter_contracts.py
+python -m unittest discover -s tests/host_adapters -p "test_*.py"
+python tools/validate_continuity_contracts.py
+python -m unittest discover -s tests/continuity -p "test_*.py"
+python tools/validate_opsec_contracts.py
+python -m unittest discover -s tests/security -p "test_*.py"
+python tools/validate_python_readiness.py
+python -m unittest discover -s tests/readiness -p "test_*.py"
+```
+
+Observed final results:
+
+```text
+cached diff check: passed
+runtime contracts: validator passed; 21 tests OK
+viability audit: validator passed; 9 tests OK
+historical archives: validator passed; 12 tests OK
+historical archaeology: validator passed; 18 tests OK
+successor kernel: validator passed; 40 tests OK
+host adapters: standalone validator retained one known fixed-base finding; 34 tests OK
+continuity: validator passed; 42 tests OK
+OPSEC: validator passed; 36 tests OK
+Python readiness: validator passed; 18 tests OK
+```
+
+The host-adapter finding remains exactly:
+
+```text
+ERROR: protected path changed from BC-020 base: contracts/successor/unresolved_register.json
+host adapter contract validation failed: 1 error(s)
+```
+
+It is the established BC-020 fixed-base finding and was neither suppressed nor
+reported as clean. The first closure run also correctly exposed that the OPSEC
+and readiness validators still required the pre-closure `required_pending`
+review state. Their exact state assertions were transitioned to require the
+approved final review and Dad/Blu closure receipts; focused validators and all
+54 OPSEC/readiness tests then passed. The implementation-authorization mutation
+still fails.
+
+### Integrity, scope, and final state
+
+```text
+golden CTS checksums: 8/8 passed
+golden changed paths: 0
+successor components / packets / interfaces: 7 / 8 / 9
+canonical manifest entries: 278
+manifest missing / extra / duplicate / digest mismatch: 0 / 0 / 0 / 0
+original BC-041 review unchanged: true
+final C1 review exact and unchanged after import: true
+production Python outside tools/tests: 0
+production runtime/provider roots present: 0
+SUR-002 / SUR-011 / SUR-012 broadened: false
+real protected-policy values in tracked content: 0
+```
+
+Final readiness is `ready_for_python_phase1`; `actual_blockers` is `[]`;
+`runtime_phase1_packet_may_be_authored_next` is `true`; independent correction
+review and Dad/Blu closure are complete. `implementation_authorized` remains
+`false`, `automatic_start_prohibited` remains `true`, and Python Runtime Phase 1
+has not started. Closure adds no production runtime, LM Studio provider, Local
+Mirror provider, Auth implementation, protected policy value, architecture
+change, continuity mutation, or PASS/SkillForge work.
+
+The closure substantive commit is recorded by the metadata-only closure
+receipt after creation.

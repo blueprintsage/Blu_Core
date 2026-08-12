@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/worklogs
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 canonical_base: 7aed76e
 
 ## Rules
@@ -32,8 +32,8 @@ canonical_base: 7aed76e
 | BC-020-C1 | Scheduling Capability Evidence Correction | Codex | done | `docs/domains/runtime/assignments/BC-020-C1/assignment.md` | `370278cd91fd9ecca2c64cd0953cae7ed63c4d16` | BF-1 correction only; work `b770be849d625e924f7e65cae4efb8894a7e4c23`; metadata `8eb29165d5d59b99ccaa3b06fe6d8613dcaa11e2`; Claude re-review `b51912a655d3f895651eb0bdbbe0c41ba1e7f132`; `approve-with-notes`, BF-1 resolved, zero blockers; integrated closure base `642a5df7340c4f87ac723bffb4d308fef09bf2b2`; closure commit `1e42c5dd2ee049fa5ebe4280692d1caecc0a3533` |
 | BC-030 | Define Local Mirror continuity schema and lifecycle | Codex | done | `docs/domains/continuity/assignments/BC-030/assignment.md` | `a5f149355bd68b2aea1695e5f25ec60a2cb88b0c` | Work `6812513d10eeb69f1e5b477617ffdccc52e5067b`; metadata `4c4ef004aef2d93937de3fdb4bbbdeae4f2d9843`; work integration `d679357426899c660d905326ef345d7229974b0b`; Claude review `adda640c05035d14057a22fb1ac85c19c326fe4f` (`approve-with-notes`, zero blockers); reviewed integration base `c76843e82a42ab091810c110e8c01a4e32ed311e`; SUR-007 resolved at generic contract level; SUR-011 preserved; specification-only, no provider/runtime/LM Studio implementation; closure `a77393d6fc63e644f57a70992af6fec050a2e802` |
 | BC-040 | One-Blu Portability and Python Runtime Readiness | Codex | done | `docs/domains/runtime/assignments/BC-040/assignment.md` | `66e7ed52f5777bdef2e32c71a5e83b439b0d0ade` | Work `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`; metadata `dc5429cabf03aff4ea8b383cbc1290789c370ebb`; work integration `a24cffc2fb3b3b7ffe3e0291915d0319a4db3e5f`; Claude review `127ae61e296fe0d07072e1320dec8ca8c4b1dfed` (`approve-with-notes`, zero blockers); reviewed integration base `8801ae138deb0261deff47d02269c7a16773c892`; closure `d78f58972327434c83d7e79a2cb9372e487a9629`; One-Blu portability complete with required Custom GPT and Python/LM Studio targets and optional Codex; final result `not_ready_for_python_phase1`, SUR-001 sole implementation blocker; no production runtime/provider/security implementation |
-| BC-041 | Protected Security Phase 1 — Minimum OPSEC Match and Redaction Contract | Codex | review | `docs/domains/runtime/assignments/BC-041/assignment.md` | `699ee1485cef39ffbe70c3b8e848763af02596e0` | Work `9ccd17d75955db4b64e5df27a5751d36b6964330`; metadata `9849c60138940068a0fd900eb49ce7444531109d`; Claude review `ade01082a7bf4ebe389af6deafc68ea207d989d9` returned one blocker, B-1; immutable review history preserved; correction continues in BC-041-C1; no production policy values, Auth, runtime, provider, tools, continuity, SUR-011, or PASS/SkillForge work |
-| BC-041-C1 | Unicode Format-Character OPSEC Correction | Codex | review | `docs/domains/runtime/assignments/BC-041-C1/assignment.md` | `33b44608cb634d1fedeed7f5f70d405c3999ed02` | First correction `80e5b8554639c274f7baa69155ea9b83910f604c`; first metadata `54519493189a332e984409504c45210e759f18fc`; first Claude review `874852c1b548ba4a2539d796d23ab9d803a966c8`; mixed correction `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`; mixed metadata `c6a447679c0ca07fb38a1e35eeb00231b0cb91e1`; second Claude review `f87588d0fa094c203fde3b847ab9bc3c28d1b3fe` returned B-1â€³ only; outer-edge correction `85e18f56f88ab113646cc3aab477687eda8b85af`; outer-edge metadata receipt `d1c283ab21681f8a0550da32c2ec87e08eb2852d`; fresh independent Claude review is the next action; technical readiness re-earned but implementation remains unauthorized |
+| BC-041 | Protected Security Phase 1 — Minimum OPSEC Match and Redaction Contract | Codex | done | `docs/domains/runtime/assignments/BC-041/assignment.md` | `699ee1485cef39ffbe70c3b8e848763af02596e0` | Work `9ccd17d75955db4b64e5df27a5751d36b6964330`; metadata `9849c60138940068a0fd900eb49ce7444531109d`; original Claude review `ade01082a7bf4ebe389af6deafc68ea207d989d9` returned B-1 and remains immutable; closed through BC-041-C1 correction tip `204a229e2c01b255f1a940129cb724fa33fb4755`, current-main integration `131a527a8fef1f42df327443c9966c9e2f66f528`, and final Claude correction review `f0998f78aaada899a16d4413170ef3689f04fe28` (`approve-with-notes`, zero blockers); closure commit recorded by metadata receipt; no runtime implementation |
+| BC-041-C1 | Unicode Format-Character OPSEC Correction | Codex | done | `docs/domains/runtime/assignments/BC-041-C1/assignment.md` | `33b44608cb634d1fedeed7f5f70d405c3999ed02` | First correction `80e5b8554639c274f7baa69155ea9b83910f604c`; first metadata `54519493189a332e984409504c45210e759f18fc`; first Claude review `874852c1b548ba4a2539d796d23ab9d803a966c8`; mixed correction `2a9d6a28111ca9576bf6811e67ccca37f4d5dd39`; mixed metadata `c6a447679c0ca07fb38a1e35eeb00231b0cb91e1`; second Claude review `f87588d0fa094c203fde3b847ab9bc3c28d1b3fe`; outer-edge correction `85e18f56f88ab113646cc3aab477687eda8b85af`; outer-edge metadata `d1c283ab21681f8a0550da32c2ec87e08eb2852d`; truth cleanup `204a229e2c01b255f1a940129cb724fa33fb4755`; final review `f0998f78aaada899a16d4413170ef3689f04fe28` (`approve-with-notes`, B-1'/B-1″ resolved, zero blockers); review import `3e77111b6d86879f591c7ab8c52a571c51e7c48e`; closure commit recorded by metadata receipt; implementation unauthorized |
 
 ## Design assignments
 
@@ -45,6 +45,16 @@ canonical_base: 7aed76e
 
 ## Completed
 
+- BC-041 and BC-041-C1 closed together after the correction lineage through
+  `204a229e2c01b255f1a940129cb724fa33fb4755` was integrated on current `main`
+  at `131a527a8fef1f42df327443c9966c9e2f66f528`. Claude's final review
+  `f0998f78aaada899a16d4413170ef3689f04fe28` is `approve-with-notes` with zero
+  blockers; its exact record was imported at
+  `3e77111b6d86879f591c7ab8c52a571c51e7c48e`. The original BC-041
+  `return-for-correction` review remains immutable. B-1, B-1', and B-1″ are
+  resolved; SUR-001 is resolved at the minimum Phase 1 contract level;
+  technical readiness is green with no actual blockers. Python Runtime Phase 1
+  remains unstarted and unauthorized, and automatic start is prohibited.
 - BC-040 — One-Blu Portability and Python Runtime Readiness closed after
   substantive specification `8516bd6845edaa3ef9b18077d91853ccc21e3c3b`,
   metadata `dc5429cabf03aff4ea8b383cbc1290789c370ebb`, work integration

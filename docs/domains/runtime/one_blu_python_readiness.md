@@ -1,6 +1,6 @@
 # One-Blu Portability and Python Runtime Readiness
 
-status: review
+status: done
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
 assignment: BC-041
@@ -133,13 +133,19 @@ manifest coverage, and canonical blob digest validation.
 
 ## Next safe step
 
-Claude performs the independent semantic review of BC-041. Dad/Blu inspect the
-exact result and decide integration and whether to authorize the already named
-runtime packet:
+Independent correction review and Dad/Blu closure of BC-041/BC-041-C1 are
+complete. The next Dad/Blu action may author, and later separately authorize,
+the already named runtime packet:
 
 ```text
 Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary
 ```
 
-Codex must not begin that runtime packet automatically, even though the
-contract-level readiness checklist is green.
+Carry Claude N-1 into that packet as a provenance-invariant test and N-2 as a
+requirement for bounded/single-pass provenance construction. Record N-3 as the
+pre-existing overlap between `_`, the declared separator set, and Unicode/regex
+word-character semantics; it is not C1 rework.
+
+Codex must not begin implementation automatically. The readiness checklist is
+green, but `implementation_authorized` remains `false`, automatic start remains
+prohibited, and Python Runtime Phase 1 has not started.

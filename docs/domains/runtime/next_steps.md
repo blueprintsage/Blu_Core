@@ -4,22 +4,25 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-12
 
-## BC-041-C1 correction review gate
+## BC-041 / BC-041-C1 closed gate
 
-BC-041-C1 is in bounded handoff after correcting Claude's B-1â€³ finding. B-1'
-remains closed. The minimum matcher removes all general-category `Cf` code
-points into one candidate, uses separator-tolerant rule matching for arbitrary
-interior mixtures, and retains normalized removed-boundary offsets so an
-outer-edge `Cf` cannot weld the protected phrase to an adjacent word token.
-Ordinary word adjacency without `Cf` provenance remains a nonmatch. Its bounded
-state is:
+BC-041 and BC-041-C1 are `done`. Current `main` integrates the correction
+lineage through `204a229e2c01b255f1a940129cb724fa33fb4755` at
+`131a527a8fef1f42df327443c9966c9e2f66f528`. Claude's final independent review
+at `f0998f78aaada899a16d4413170ef3689f04fe28` is `approve-with-notes` with zero
+blocking findings. B-1 is resolved through C1; B-1' and B-1″ are resolved.
+
+The final bounded state is:
 
 ```text
 SUR-001: resolved_at_minimum_phase1_contract_level
 Python technical readiness: ready_for_python_phase1
-independent correction review: required_pending
+independent correction review: complete
+Dad/Blu closure: complete
 implementation authorized: false
+automatic_start_prohibited: true
 runtime_phase1_packet_may_be_authored_next: true
+Python Runtime Phase 1: not started
 ```
 
 Production policy values remain external; a missing or invalid policy fails
@@ -28,18 +31,12 @@ or general Unicode confusable/homoglyph coverage. Auth and protected
 continuation remain unavailable, and SUR-002, SUR-011, and SUR-012 retain their
 prior dispositions.
 
-The expanded proof covers six code points across boundary, inside-token, mixed,
-leading-outer-edge, trailing-outer-edge, and both-outer-edge placement at
-ingress and egress; cross-code-point mixing; repeated outer/interior insertion;
-unseparated self-repetition; the five pinned negatives plus ASCII/Unicode word
-adjacency controls; preserved B-1' adversarial combinations; redaction
-rescan/fail-closed paths; and content-safe evidence. The next safe step is a
-fresh Claude review of the exact BC-041-C1 substantive/metadata head on a
-separate branch, modifying only the C1 review record. Dad/Blu then decide
-integration, closure,
-and whether to issue the separate `Python Runtime Phase 1 — Boot + Ordinary
-Turn + LM Studio Model Boundary` packet. Do not begin that implementation
-automatically.
+Claude N-1 and N-2 carry into the future Python Runtime Phase 1 packet as an
+invariant-test requirement and a bounded/single-pass provenance-construction
+requirement. N-3 records pre-existing `_` separator/word-character behavior and
+requires no C1 repair. The next safe action is a separate Dad/Blu decision on
+the `Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary`
+packet. Do not begin implementation automatically.
 
 ## Prior BC-040 closed gate
 
@@ -47,37 +44,28 @@ BC-040 is `done`. The One-Blu portability/readiness specification and Claude's
 independent review are complete. Claude's disposition is
 `approve-with-notes`, with zero blocking findings in BC-040 itself.
 
-The final project result remains `not_ready_for_python_phase1`. SUR-001 is the
-sole actual blocker: arbitrary natural-language ingress and egress cannot
-safely reach a local model until a separately authorized minimum deterministic
-OPSEC match/redaction contract can distinguish safe ordinary text from a
-protected-source reproduction request. SUR-002 blocks protected features only;
-SUR-003 and SUR-010 are sufficiently resolved for the Phase 1 finite route
-catalog; SUR-011 blocks protected continuation behavior only; and SUR-012
-remains resolved only at the generic host-evidence-contract level.
+At BC-040 closure the project was `not_ready_for_python_phase1` because SUR-001
+was the sole actual blocker. BC-041 and BC-041-C1 subsequently resolved SUR-001
+at the bounded minimum Phase 1 contract level and completed independent review
+and closure. The current technical result is now `ready_for_python_phase1` with
+no actual blockers.
 
-The next separately authorized assignment is:
-
-```text
-Protected Security Phase 1 — Minimum OPSEC Match and Redaction Contract
-```
-
-Python Runtime Phase 1 remains unauthorized. Only after SUR-001 closes and the
-readiness checklist is deterministically re-evaluated may Dad/Blu consider the
-conditional coding packet:
+Python Runtime Phase 1 remains separately unauthorized. Dad/Blu may next
+consider the packet:
 
 ```text
 Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary
 ```
 
-Do not start either assignment automatically. BC-040 closure does not implement
-Python Blu, LM Studio access, Local Mirror, Chat/Codex support, protected
-authorization, or PASS/SkillForge.
+Do not start it automatically. No closure implemented Python Blu, LM Studio
+access, Local Mirror, Chat/Codex support, protected authorization, or
+PASS/SkillForge.
 
 ## Closed lineage
 
 BC-010, BC-010-C1, BC-010-C2, BC-015, BC-016, BC-017, BC-017-C1,
-BC-018, BC-018-C1, BC-020, BC-020-C1, BC-030, and BC-040 are complete.
+BC-018, BC-018-C1, BC-020, BC-020-C1, BC-030, BC-040, BC-041, and
+BC-041-C1 are complete.
 
 The runtime-contract extraction records the CTS source faithfully, including
 unresolved declarations. It does not prove behavioral parity or implement a
@@ -85,11 +73,20 @@ Python runtime.
 
 ## Next safe step
 
-Open only the separately authorized `Protected Security Phase 1 — Minimum OPSEC
-Match and Redaction Contract` packet. It must preserve protected-value secrecy,
-may reopen `runtime_config.schema.json#runtime.protected_policy_ref` under its
-own protected authority, and must close with deterministic readiness
-re-evaluation. It must not be folded into BC-040 closure or Python coding.
+Dad/Blu may separately author the `Python Runtime Phase 1 — Boot + Ordinary
+Turn + LM Studio Model Boundary` packet. Authoring the packet is not
+implementation authorization. Until a later explicit Dad/Blu action grants
+that authority, `implementation_authorized` remains `false`, automatic start is
+prohibited, and no runtime code may begin.
+
+Carry the final BC-041-C1 review notes forward:
+
+- N-1: add an invariant test so normalization changes cannot silently lose
+  removed-`Cf` boundary provenance.
+- N-2: compute production provenance offsets in a bounded/single-pass form; do
+  not port the conformance harness's quadratic construction.
+- N-3: retain as a record of pre-existing `_` separator/Unicode-word-character
+  overlap, not as C1 rework.
 
 Claude's ten nonblocking notes remain future inputs, not current blockers:
 

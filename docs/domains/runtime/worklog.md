@@ -4,6 +4,50 @@ status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-12
 
+## 2026-08-12 - BC-041 and BC-041-C1 final closure
+
+### What changed
+
+- Started the dedicated `bc-041-c1-closure` branch from fetched current
+  `origin/main` at `131a527a8fef1f42df327443c9966c9e2f66f528`.
+- Verified that current `main` already preserves and integrates the correction
+  lineage through `204a229e2c01b255f1a940129cb724fa33fb4755`; no duplicate or
+  rewritten correction merge was created.
+- Imported Claude's final `review.md` byte-for-byte from
+  `f0998f78aaada899a16d4413170ef3689f04fe28` in provenance commit
+  `3e77111b6d86879f591c7ab8c52a571c51e7c48e`, without merging the review
+  branch.
+- Closed BC-041 and BC-041-C1 as `done`, preserving the original BC-041
+  `return-for-correction` review and recording the final C1
+  `approve-with-notes` disposition with zero blockers.
+- Transitioned readiness from pending review/closure to independent review and
+  Dad/Blu closure complete while keeping implementation authorization false and
+  automatic start prohibited.
+- Carried Claude N-1 and N-2 into the future runtime packet and recorded N-3 as
+  pre-existing contract behavior. Added no runtime, provider, Auth, protected
+  policy value, architecture change, continuity mutation, or PASS/SkillForge
+  work.
+
+### Final disposition
+
+```text
+B-1: resolved through BC-041-C1
+B-1': resolved
+B-1″: resolved
+SUR-001: resolved_at_minimum_phase1_contract_level
+technical readiness: ready_for_python_phase1
+actual blockers: []
+runtime_phase1_packet_may_be_authored_next: true
+independent correction review: complete
+implementation_authorized: false
+automatic_start_prohibited: true
+Python Runtime Phase 1: not started
+```
+
+Exact closure validation and commit receipts are recorded in the BC-041-C1
+validation and handoff records. The next safe action is a separate Dad/Blu
+runtime-packet decision; implementation must not start automatically.
+
 ## 2026-08-12 - BC-041-C1 B-1â€³ outer-edge correction
 
 ### What changed

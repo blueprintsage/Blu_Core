@@ -398,20 +398,38 @@ def validate(root: Path) -> list[str]:
         errors.append("readiness checklist retains stale blockers")
     if checklist.get("runtime_phase1_packet_may_be_authored_next") is not True:
         errors.append("runtime packet may not be authored despite resolved SUR-001")
-    if checklist.get("result_semantics") != "technical_conditions_satisfied_pending_independent_correction_review_and_Dad_Blu_closure":
+    if checklist.get("result_semantics") != "technical_conditions_satisfied_independent_correction_review_and_Dad_Blu_closure_complete_implementation_authorization_pending":
         errors.append("readiness result does not distinguish technical status from review and authorization")
-    if checklist.get("correction_state") != "b1_prime_and_b1_double_prime_closed_pending_independent_rereview":
-        errors.append("readiness does not record B-1 prime and B-1 double-prime closure pending re-review")
+    if checklist.get("correction_state") != "b1_prime_and_b1_double_prime_closed_independent_review_complete":
+        errors.append("readiness does not record final B-1 prime and B-1 double-prime correction state")
     review_check = checks.get("independent_Claude_correction_review", {})
     review = checklist.get("independent_correction_review", {})
-    if review_check.get("status") != "required_pending":
-        errors.append("independent correction review check is not required_pending")
-    if review.get("state") != "required_pending" or review.get("completed") is not False:
-        errors.append("independent correction review state can be mistaken for completion")
+    if review_check.get("status") != "pass":
+        errors.append("independent correction review check is not complete")
+    if review.get("state") != "complete" or review.get("completed") is not True:
+        errors.append("independent correction review completion is not recorded")
+    if review.get("review_commit") != "f0998f78aaada899a16d4413170ef3689f04fe28":
+        errors.append("independent correction review commit is not the approved final review")
+    if review.get("disposition") != "approve-with-notes" or review.get("blocking_findings") != 0:
+        errors.append("independent correction review disposition is not approve-with-notes with zero blockers")
     if review.get("required_before_implementation_authorization") is not True:
         errors.append("independent correction review is not required before implementation authorization")
+    closure_check = checks.get("BC_041_and_BC_041_C1_Dad_Blu_closure", {})
+    closure = checklist.get("dad_blu_closure", {})
+    if closure_check.get("status") != "pass" or closure.get("state") != "complete":
+        errors.append("BC-041 and BC-041-C1 Dad/Blu closure is not complete")
+    if closure.get("assignments") != ["BC-041", "BC-041-C1"]:
+        errors.append("Dad/Blu closure does not cover both BC-041 assignments")
+    if closure.get("correction_tip") != "204a229e2c01b255f1a940129cb724fa33fb4755":
+        errors.append("Dad/Blu closure does not bind the reviewed correction tip")
+    if closure.get("correction_main_integration") != "131a527a8fef1f42df327443c9966c9e2f66f528":
+        errors.append("Dad/Blu closure does not bind the correction integration on main")
+    if closure.get("review_source_commit") != "f0998f78aaada899a16d4413170ef3689f04fe28":
+        errors.append("Dad/Blu closure does not bind the final Claude review")
+    if closure.get("review_import_commit") != "3e77111b6d86879f591c7ab8c52a571c51e7c48e":
+        errors.append("Dad/Blu closure does not bind the exact imported-review commit")
     if checklist.get("implementation_authorized") is not False:
-        errors.append("readiness checklist authorizes implementation before independent review")
+        errors.append("readiness checklist authorizes implementation without a separate runtime authorization")
     if checklist.get("automatic_start_prohibited") is not True:
         errors.append("readiness automatically starts runtime implementation")
     if checklist.get("full_successor_feature_complete") is not False:

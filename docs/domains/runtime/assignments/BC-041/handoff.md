@@ -1,8 +1,8 @@
 # BC-041 — Implementation Handoff
 
-status: ready-for-review
+status: closed
 owner: Codex
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 
 ## Identity
 
@@ -94,3 +94,24 @@ Confirm fail-closed policy loading, ingress and egress non-bypass, redaction
 postconditions, HMAC evidence safety, fixture syntheticity, portable reference
 separation, bounded semantic claims, unchanged Auth/SUR-011/SUR-012 semantics,
 7/8/9 preservation, and zero production runtime or protected values.
+
+## Final closure receipt
+
+- Closure branch: `bc-041-c1-closure`
+- Current `origin/main` integration base:
+  `131a527a8fef1f42df327443c9966c9e2f66f528`
+- Correction tip integrated through:
+  `204a229e2c01b255f1a940129cb724fa33fb4755`
+- Imported final Claude review source:
+  `f0998f78aaada899a16d4413170ef3689f04fe28`
+- Imported-review integration commit:
+  `3e77111b6d86879f591c7ab8c52a571c51e7c48e`
+- Final review disposition: `approve-with-notes`; blocking findings: `0`
+- Final status: `done`
+- Closure substantive commit: recorded by the metadata-only closure receipt
+
+The original BC-041 review remains immutable `return-for-correction` history.
+B-1 is resolved through BC-041-C1. The final technical result is
+`ready_for_python_phase1` with no actual blockers and permission to author the
+runtime packet next. Implementation remains separately unauthorized and
+unstarted; automatic start remains prohibited.

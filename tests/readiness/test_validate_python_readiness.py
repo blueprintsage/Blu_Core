@@ -145,23 +145,34 @@ class PythonReadinessValidationTests(unittest.TestCase):
         self.assert_has("retains stale blockers")
         self.assert_has("may not be authored")
 
-    def test_independent_review_pending_is_not_completion(self) -> None:
+    def test_independent_review_completion_cannot_regress_to_pending(self) -> None:
         path = "readiness/python_phase1_readiness_checklist.json"
         data = self.load(path)
         checks = {item["id"]: item for item in data["checks"]}
-        checks["independent_Claude_correction_review"]["status"] = "pass"
-        data["independent_correction_review"]["state"] = "complete"
-        data["independent_correction_review"]["completed"] = True
+        checks["independent_Claude_correction_review"]["status"] = "required_pending"
+        data["independent_correction_review"]["state"] = "required_pending"
+        data["independent_correction_review"]["completed"] = False
         self.save(path, data)
-        self.assert_has("not required_pending")
-        self.assert_has("mistaken for completion")
+        self.assert_has("not complete")
+        self.assert_has("completion is not recorded")
 
-    def test_pending_review_cannot_authorize_implementation(self) -> None:
+    def test_completed_review_still_cannot_authorize_implementation(self) -> None:
         path = "readiness/python_phase1_readiness_checklist.json"
         data = self.load(path)
         data["implementation_authorized"] = True
         self.save(path, data)
-        self.assert_has("authorizes implementation before independent review")
+        self.assert_has("without a separate runtime authorization")
+
+    def test_closure_receipts_are_pinned(self) -> None:
+        path = "readiness/python_phase1_readiness_checklist.json"
+        data = self.load(path)
+        checks = {item["id"]: item for item in data["checks"]}
+        checks["BC_041_and_BC_041_C1_Dad_Blu_closure"]["status"] = "required_pending"
+        data["dad_blu_closure"]["state"] = "required_pending"
+        data["dad_blu_closure"]["review_source_commit"] = "0" * 40
+        self.save(path, data)
+        self.assert_has("closure is not complete")
+        self.assert_has("does not bind the final Claude review")
 
     def test_readiness_cannot_turn_green_without_expanded_mixed_cf_proof(self) -> None:
         path = "tests/security/fixtures/synthetic_cases.json"

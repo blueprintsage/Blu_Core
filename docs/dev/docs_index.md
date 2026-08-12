@@ -183,6 +183,7 @@ contracts/security/opsec/README.md
 contracts/security/opsec/minimum_contract.json
 contracts/security/opsec/schemas/
 docs/domains/runtime/assignments/BC-041/
+docs/domains/runtime/assignments/BC-041-C1/
 tools/validate_opsec_contracts.py
 tests/security/
 ```
@@ -193,6 +194,12 @@ the bounded minimum Phase 1 contract level and re-evaluates readiness to
 `ready_for_python_phase1`. It remains specification/validation work only; the
 runtime packet may be authored next but is not automatically authorized or
 started.
+
+BC-041-C1 closes the returned B-1 Unicode general-category `Cf` insertion
+bypass with two deterministic candidate views, explicitly excludes general
+Unicode confusable/homoglyph substitution, and records independent correction
+review as `required_pending`. Technical readiness remains distinct from review
+completion and implementation authorization.
 
 ## Historical archive source map
 

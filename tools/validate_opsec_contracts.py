@@ -45,12 +45,18 @@ REQUIRED = {
     Path("docs/domains/runtime/assignments/BC-041/handoff.md"),
     Path("docs/domains/runtime/assignments/BC-041/validation.md"),
     Path("docs/domains/runtime/assignments/BC-041/review.md"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/assignment.md"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/handoff.md"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/validation.md"),
+    Path("docs/domains/runtime/assignments/BC-041-C1/review.md"),
 }
 SYNTHETIC_NOTICE = "synthetic test policy != production protected policy"
 REDACTION_REPLACEMENT = "[protected content omitted]"
 SEPARATORS = frozenset(".,:;-_/\\|")
 SECURITY_DECISIONS = ["PASS", "BLOCK", "ASK"]
 EGRESS_RESULTS = ["CLEAR", "REDACTED", "BLOCKED", "UNAVAILABLE", "INVALID"]
+CF_VIEW_NAMES = ["cf_to_ascii_space", "cf_removed"]
+REQUIRED_CF_CODE_POINTS = ["U+200B", "U+00AD", "U+200D", "U+200C", "U+FEFF", "U+2060"]
 SAFE_ERROR_CODES = {
     "POLICY_REF_MISSING",
     "POLICY_TARGET_UNAVAILABLE",
@@ -69,13 +75,28 @@ def _load(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def normalize_text(value: str) -> str:
-    """Apply the single deterministic public normalization pipeline."""
-    if not isinstance(value, str):
-        raise TypeError("OPSEC candidate must be Unicode text")
+def _normalize_existing_pipeline(value: str) -> str:
+    """Apply the pre-C1 deterministic normalization pipeline."""
     normalized = unicodedata.normalize("NFKC", value)
     separated = "".join(" " if char.isspace() or char in SEPARATORS else char for char in normalized)
     return " ".join(separated.split())
+
+
+def normalized_candidate_views(value: str) -> list[dict[str, str]]:
+    """Return both deterministic Cf-neutralized candidate views."""
+    if not isinstance(value, str):
+        raise TypeError("OPSEC candidate must be Unicode text")
+    cf_to_space = "".join(" " if unicodedata.category(char) == "Cf" else char for char in value)
+    cf_removed = "".join(char for char in value if unicodedata.category(char) != "Cf")
+    return [
+        {"name": "cf_to_ascii_space", "normalized": _normalize_existing_pipeline(cf_to_space)},
+        {"name": "cf_removed", "normalized": _normalize_existing_pipeline(cf_removed)},
+    ]
+
+
+def normalize_text(value: str) -> str:
+    """Return the primary public normalization view for rule canonicalization."""
+    return normalized_candidate_views(value)[0]["normalized"]
 
 
 def _comparison_view(normalized: str, case_sensitive: bool) -> tuple[str, list[int]]:
@@ -104,6 +125,15 @@ def _matches(normalized: str, policy: dict[str, Any], phase: str) -> list[dict[s
             end = candidate_map[match.end() - 1] + 1
             found.append({"rule": rule, "start": start, "end": end})
     return sorted(found, key=lambda item: (item["start"], item["end"], item["rule"]["rule_ref"]))
+
+
+def _matches_by_candidate_view(
+    views: list[dict[str, str]], policy: dict[str, Any], phase: str
+) -> list[dict[str, Any]]:
+    return [
+        {"name": view["name"], "normalized": view["normalized"], "matches": _matches(view["normalized"], policy, phase)}
+        for view in views
+    ]
 
 
 def validate_policy_usability(policy: dict[str, Any]) -> list[str]:
@@ -224,10 +254,12 @@ def evaluate_ingress(text: Any, policy: dict[str, Any] | None, policy_error: str
     if policy is None:
         return _failure_evaluation("ingress", policy_error or "POLICY_UNUSABLE")
     try:
-        normalized = normalize_text(text)
+        views = normalized_candidate_views(text)
     except TypeError:
         return _failure_evaluation("ingress", "INPUT_INVALID", "INVALID")
-    matches = _matches(normalized, policy, "ingress")
+    evaluated_views = _matches_by_candidate_view(views, policy, "ingress")
+    matches = [match for view in evaluated_views for match in view["matches"]]
+    normalized = views[0]["normalized"]
     refs = [item["rule"]["rule_ref"] for item in matches]
     if matches:
         return {
@@ -264,10 +296,12 @@ def evaluate_egress(text: Any, policy: dict[str, Any] | None, policy_error: str 
     if policy is None:
         return _failure_evaluation("egress", policy_error or "POLICY_UNUSABLE")
     try:
-        normalized = normalize_text(text)
+        views = normalized_candidate_views(text)
     except TypeError:
         return _failure_evaluation("egress", "INPUT_INVALID", "INVALID")
-    matches = _matches(normalized, policy, "egress")
+    evaluated_views = _matches_by_candidate_view(views, policy, "egress")
+    matches = [match for view in evaluated_views for match in view["matches"]]
+    normalized = views[0]["normalized"]
     refs = [item["rule"]["rule_ref"] for item in matches]
     base = {
         "phase": "egress",
@@ -295,7 +329,8 @@ def evaluate_egress(text: Any, policy: dict[str, Any] | None, policy_error: str 
             "evidence": _evidence("egress", "BLOCKED", policy, normalized, refs),
             "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "evaluation", "code": "EGRESS_PROTECTED_MATCH"}],
         }
-    if _has_overlapping_spans(matches):
+    matching_views = [view for view in evaluated_views if view["matches"]]
+    if len(matching_views) > 1 and len({view["normalized"] for view in matching_views}) > 1:
         return {
             **base,
             "egress_result": "BLOCKED",
@@ -305,33 +340,40 @@ def evaluate_egress(text: Any, policy: dict[str, Any] | None, policy_error: str 
             "evidence": _evidence("egress", "BLOCKED", policy, normalized, refs),
             "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "redaction", "code": "EGRESS_REDACTION_INVALID"}],
         }
-    pieces: list[str] = []
-    cursor = 0
-    for item in matches:
-        pieces.extend((normalized[cursor:item["start"]], REDACTION_REPLACEMENT))
-        cursor = item["end"]
-    pieces.append(normalized[cursor:])
-    redacted = " ".join("".join(pieces).split())
-    residual = redacted.replace(REDACTION_REPLACEMENT, "")
-    redaction_valid = any(char.isalnum() for char in residual) and not _matches(normalize_text(redacted), policy, "egress")
-    if not redaction_valid:
-        return {
-            **base,
-            "egress_result": "BLOCKED",
-            "eligible_for_print": False,
-            "public_output": None,
-            "safe_error_code": "EGRESS_REDACTION_INVALID",
-            "evidence": _evidence("egress", "BLOCKED", policy, normalized, refs),
-            "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "redaction", "code": "EGRESS_REDACTION_INVALID"}],
-        }
+    for view in evaluated_views:
+        view_matches = view["matches"]
+        if not view_matches or _has_overlapping_spans(view_matches):
+            continue
+        pieces: list[str] = []
+        cursor = 0
+        for item in view_matches:
+            pieces.extend((view["normalized"][cursor:item["start"]], REDACTION_REPLACEMENT))
+            cursor = item["end"]
+        pieces.append(view["normalized"][cursor:])
+        redacted = " ".join("".join(pieces).split())
+        residual = redacted.replace(REDACTION_REPLACEMENT, "")
+        rescanned = _matches_by_candidate_view(normalized_candidate_views(redacted), policy, "egress")
+        redaction_valid = any(char.isalnum() for char in residual) and not any(
+            item["matches"] for item in rescanned
+        )
+        if redaction_valid:
+            return {
+                **base,
+                "egress_result": "REDACTED",
+                "eligible_for_print": True,
+                "public_output": redacted,
+                "safe_error_code": None,
+                "evidence": _evidence("egress", "REDACTED", policy, normalized, refs),
+                "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "redaction", "code": "EGRESS_REDACTED"}],
+            }
     return {
         **base,
-        "egress_result": "REDACTED",
-        "eligible_for_print": True,
-        "public_output": redacted,
-        "safe_error_code": None,
-        "evidence": _evidence("egress", "REDACTED", policy, normalized, refs),
-        "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "redaction", "code": "EGRESS_REDACTED"}],
+        "egress_result": "BLOCKED",
+        "eligible_for_print": False,
+        "public_output": None,
+        "safe_error_code": "EGRESS_REDACTION_INVALID",
+        "evidence": _evidence("egress", "BLOCKED", policy, normalized, refs),
+        "logs": [{"event": "policy", "code": "POLICY_USABLE"}, {"event": "redaction", "code": "EGRESS_REDACTION_INVALID"}],
     }
 
 
@@ -397,6 +439,15 @@ def validate(root: Path) -> list[str]:
 
     if fixture.get("fixture_notice") != SYNTHETIC_NOTICE or cases.get("fixture_notice") != SYNTHETIC_NOTICE:
         errors.append("synthetic fixture production-separation notice is missing")
+    expected_cf_matrix = {(code_point, position) for code_point in REQUIRED_CF_CODE_POINTS for position in ("boundary", "inside_token")}
+    for phase in ("ingress", "egress"):
+        actual_cf_matrix = {
+            (item.get("cf_code_point"), item.get("cf_position"))
+            for item in cases.get(phase, [])
+            if item.get("cf_code_point") is not None
+        }
+        if actual_cf_matrix != expected_cf_matrix:
+            errors.append(f"{phase} Cf probe matrix is incomplete")
     policy = fixture.get("policy")
     schema_errors = list(Draft202012Validator(policy_schema).iter_errors(policy)) if isinstance(policy, dict) else ["missing"]
     if schema_errors:
@@ -412,6 +463,8 @@ def validate(root: Path) -> list[str]:
                 errors.append(f"ingress result schema failed: {item.get('id')}")
             if result.get("security_decision") != "PASS" and result.get("eligible_for_turn_controller"):
                 errors.append(f"non-PASS ingress became model-eligible: {item.get('id')}")
+            if item.get("cf_code_point") and result.get("security_decision") != "BLOCK":
+                errors.append(f"Cf ingress probe did not block: {item.get('id')}")
         protected_values = [rule["value"] for rule in policy["rules"]]
         for item in cases.get("egress", []):
             result = evaluate_egress(item.get("text"), policy)
@@ -423,6 +476,11 @@ def validate(root: Path) -> list[str]:
                 serialized = json.dumps(result, ensure_ascii=False).casefold()
                 if any(normalize_text(value).casefold() in normalize_text(serialized).casefold() for value in protected_values):
                     errors.append(f"protected fixture value leaked through result: {item.get('id')}")
+            if item.get("cf_code_point") and (
+                result.get("egress_result") not in {"REDACTED", "BLOCKED"}
+                or (result.get("eligible_for_print") and REDACTION_REPLACEMENT not in (result.get("public_output") or ""))
+            ):
+                errors.append(f"Cf egress probe did not fail safely: {item.get('id')}")
         errors.extend(_loader_matrix(policy, policy_schema))
 
     if contract.get("security_decision_values") != SECURITY_DECISIONS:
@@ -433,6 +491,21 @@ def validate(root: Path) -> list[str]:
         errors.append("OPSEC matcher permits model invocation")
     if contract.get("normalization", {}).get("semantic_paraphrase_detection") is not False:
         errors.append("minimum matcher overclaims semantic paraphrase detection")
+    normalization = contract.get("normalization", {})
+    if [item.get("id") for item in normalization.get("candidate_views", [])] != CF_VIEW_NAMES:
+        errors.append("normalization does not define both required Cf candidate views")
+    if normalization.get("candidate_view_generation_applies_to") != ["ingress", "egress"]:
+        errors.append("Cf candidate views do not apply symmetrically to ingress and egress")
+    if normalization.get("both_views_continue_through_remaining_ordered_steps") is not True:
+        errors.append("both Cf candidate views do not traverse the remaining normalization pipeline")
+    if normalization.get("match_in_either_view_is_protected_match") is not True:
+        errors.append("a match in either Cf candidate view is not sufficient")
+    exclusion_text = " ".join(contract.get("scope_exclusions", [])).casefold()
+    if "confusable" not in exclusion_text or "homoglyph" not in exclusion_text:
+        errors.append("general Unicode confusable/homoglyph substitution is not explicitly excluded")
+    readme = (root / CONTRACT_ROOT / "README.md").read_text(encoding="utf-8").casefold()
+    if "confusable" not in readme or "homoglyph" not in readme:
+        errors.append("OPSEC README does not state the confusable/homoglyph limitation")
     if set(contract.get("safe_error_codes", [])) != SAFE_ERROR_CODES:
         errors.append("safe error-code vocabulary is incomplete")
     architecture = contract.get("architecture", {})
@@ -471,6 +544,15 @@ def validate(root: Path) -> list[str]:
         errors.append("readiness result disagrees with resolved SUR-001")
     if checklist.get("runtime_phase1_packet_may_be_authored_next") is not True:
         errors.append("readiness does not permit the next packet to be authored")
+    review = checklist.get("independent_correction_review", {})
+    if checks.get("independent_Claude_correction_review", {}).get("status") != "required_pending":
+        errors.append("independent correction review check is not unambiguously pending")
+    if review.get("state") != "required_pending" or review.get("completed") is not False:
+        errors.append("independent correction review state can be mistaken for completion")
+    if review.get("required_before_implementation_authorization") is not True:
+        errors.append("independent correction review is not required before implementation authorization")
+    if checklist.get("implementation_authorized") is not False:
+        errors.append("readiness checklist authorizes implementation before independent review")
     if checklist.get("automatic_start_prohibited") is not True or phase1.get("implementation_authorized") is not False:
         errors.append("BC-041 improperly starts or authorizes runtime implementation")
     return errors

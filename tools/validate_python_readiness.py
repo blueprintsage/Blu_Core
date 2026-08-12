@@ -378,6 +378,18 @@ def validate(root: Path) -> list[str]:
         errors.append("readiness checklist retains stale blockers")
     if checklist.get("runtime_phase1_packet_may_be_authored_next") is not True:
         errors.append("runtime packet may not be authored despite resolved SUR-001")
+    if checklist.get("result_semantics") != "technical_conditions_satisfied_pending_independent_correction_review_and_Dad_Blu_closure":
+        errors.append("readiness result does not distinguish technical status from review and authorization")
+    review_check = checks.get("independent_Claude_correction_review", {})
+    review = checklist.get("independent_correction_review", {})
+    if review_check.get("status") != "required_pending":
+        errors.append("independent correction review check is not required_pending")
+    if review.get("state") != "required_pending" or review.get("completed") is not False:
+        errors.append("independent correction review state can be mistaken for completion")
+    if review.get("required_before_implementation_authorization") is not True:
+        errors.append("independent correction review is not required before implementation authorization")
+    if checklist.get("implementation_authorized") is not False:
+        errors.append("readiness checklist authorizes implementation before independent review")
     if checklist.get("automatic_start_prohibited") is not True:
         errors.append("readiness automatically starts runtime implementation")
     if checklist.get("full_successor_feature_complete") is not False:

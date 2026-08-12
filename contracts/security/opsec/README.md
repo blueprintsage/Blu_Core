@@ -3,7 +3,7 @@
 status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
-assignment: BC-041
+assignment: BC-041-C1
 
 ## Authority and boundary
 
@@ -43,12 +43,19 @@ loaded, schema-valid, integrity-valid, or usable.
 
 ## Minimum matcher
 
-The matcher accepts text only. It applies the exact pipeline in
-`minimum_contract.json`: Unicode NFKC, line-break and whitespace collapse,
-bounded common-separator collapse, and optional Unicode case folding per rule.
-It supports only token-bounded `normalized_phrase` rules. It does not call a
-model, infer intent, assign confidence, authenticate, or claim arbitrary
-semantic-equivalence detection.
+The matcher accepts text only. It deterministically derives exactly two
+candidate views. In
+`cf_to_ascii_space`, every Unicode general-category `Cf` code point becomes an
+ASCII space. In `cf_removed`, every `Cf` code point is removed. Each view then
+continues independently through the full existing normalization pipeline:
+Unicode NFKC, line-break and whitespace normalization, bounded common-separator
+mapping, repeated-space collapse, trim, and per-rule case folding. The matcher
+evaluates both views, and a match in either view is a protected match. This
+applies symmetrically to ingress and candidate egress output.
+
+The matcher supports only token-bounded `normalized_phrase` rules. It does not
+call a model, infer intent, assign confidence, or authenticate. It does not
+claim arbitrary semantic-equivalence detection.
 
 Ingress is evaluated before Turn Controller. No usable policy means terminal
 `UNAVAILABLE`, no `SecurityDecision`, and no model eligibility. A protected
@@ -60,7 +67,9 @@ Candidate model output is evaluated before terminal print. A nonmatch is
 `REDACTED`. Redaction emits the canonicalized candidate with every matched span
 replaced by `[protected content omitted]`, then re-runs the full matcher. Empty
 residual content, a remaining match, an overlapping/invalid span, or any rule
-requiring block makes the whole output non-printable. Raw protected candidate
+requiring block makes the whole output non-printable. If divergent candidate
+views contain protected matches that cannot be represented by one safe span
+set, redaction fails closed to whole-output `BLOCKED`. Raw protected candidate
 text is never used as a diagnostic.
 
 ## Evidence and diagnostics
@@ -77,3 +86,13 @@ is marked `synthetic test policy != production protected policy`. Passing its
 tests proves only conformance of the public mechanism. It does not prove that a
 production policy is complete, correctly classified, or resistant to arbitrary
 paraphrase and obfuscation.
+
+## Limitations
+
+The bounded `Cf` correction closes invisible Unicode format-character insertion
+for the specified deterministic matcher. It does not claim general protection
+against Unicode confusable or homoglyph substitution, including characters from
+another script that visually resemble Latin letters. That character-level
+evasion class is explicitly outside this minimum matcher unless a future
+security assignment authorizes a bounded confusable policy; it is not being
+classified as semantic paraphrase.

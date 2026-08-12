@@ -1,0 +1,120 @@
+# BC-041-C1 - Unicode Format-Character OPSEC Correction
+
+status: review
+owner: Codex
+reviewer: Claude
+project_lead: Blu
+project_owner: Dad
+domain: runtime
+parent: BC-041
+last_reviewed: 2026-08-11
+
+## Authorization and identity
+
+Dad and Blu authorized this bounded correction in the assignment supplied to
+Codex on 2026-08-11. It corrects only BC-041 B-1 plus the explicitly requested
+N-2 review-state ambiguity and N-7 confusable/homoglyph limitation. It does not
+redesign BC-041, reopen BC-040, or authorize Python Runtime Phase 1.
+
+- Exact base commit: `33b44608cb634d1fedeed7f5f70d405c3999ed02`
+- Starting branch: integrated `main` at the exact base
+- Work branch: `bc-041-c1-unicode-format-correction`
+- Global index row: `docs/worklogs/assignments.md` (`BC-041-C1`)
+- Triggering review: `docs/domains/runtime/assignments/BC-041/review.md`
+- Triggering disposition: `return-for-correction`
+- Blocking finding: B-1 only
+
+The BC-041 review is immutable audit history. C1 records its correction and
+receives an independent review in this assignment folder.
+
+## Objective
+
+Close the deterministic Unicode general-category `Cf` insertion bypass by
+evaluating both `Cf -> ASCII space` and `Cf -> removed` candidate views at
+ingress and egress, while preserving existing negative behavior, explicitly
+excluding general Unicode confusable/homoglyph substitution, and making the
+pending independent-review state unambiguous.
+
+## Required source order
+
+1. `AGENTS.md` and `CODEX.md`.
+2. `docs/dev/docs_index.md` and `docs/dev/assistant_coding_behavior.md`.
+3. `docs/worklogs/assignments.md`, the supplied authorization, and this packet.
+4. BC-041 assignment, handoff, validation, and immutable Claude review.
+5. The runtime domain index and continuity quartet.
+6. OPSEC contracts, synthetic fixtures, nonproduction harness, readiness
+   records, validators, and tests.
+7. Exact-base, clean-tree, review-finding, and golden-checksum verification.
+
+## Allowed collision domain
+
+```text
+contracts/security/opsec/minimum_contract.json
+contracts/security/opsec/README.md
+tests/security/fixtures/synthetic_cases.json
+tools/validate_opsec_contracts.py
+tests/security/test_validate_opsec_contracts.py
+readiness/python_phase1_readiness_checklist.json
+readiness/README.md
+tools/validate_python_readiness.py
+tests/readiness/test_validate_python_readiness.py
+docs/domains/runtime/assignments/BC-041-C1/**
+docs/domains/runtime/{worklog,failures,next_steps}.md
+docs/worklogs/assignments.md
+docs/dev/docs_index.md
+MANIFEST.sha256
+```
+
+## Protected and prohibited areas
+
+Do not modify `docs/domains/runtime/assignments/BC-041/review.md`, the golden
+CTS, Persona, Operations Law, source precedence, architecture registries,
+Auth, adapters, continuity contracts, model providers, production policy
+values, SUR-002, SUR-011, SUR-012, or PASS/SkillForge. Do not add production
+runtime, LM Studio, Local Mirror, Auth, protected-continuation, tool, daemon,
+UI, or CLI code.
+
+## Required deliverables
+
+1. Normative dual-view `Cf` treatment for every ingress and egress candidate.
+2. Nonproduction harness support that exposes and evaluates both views.
+3. Synthetic ingress and egress probes for U+200B, U+00AD, U+200D, U+200C,
+   U+FEFF, and U+2060 at a protected word boundary and inside a protected token.
+4. Regression proof for all existing negative fixtures.
+5. An explicit general Unicode confusable/homoglyph scope exclusion.
+6. A finite `required_pending` independent-correction-review state that cannot
+   be interpreted as review completion or implementation authorization.
+7. Truthful bounded SUR-001 and technical Python-readiness records.
+8. Assignment handoff, validation, review placeholder, continuity, index, and
+   canonical manifest updates.
+
+## Required checks
+
+Run every validator/test pair named in Dad/Blu's supplied C1 assignment, plus
+`git diff --check`, all eight golden checksums, exact architecture counts,
+canonical Git-blob manifest completeness/digests, protected-path and
+production-code exclusions, synthetic/publication scans, and the known
+host-adapter validator without suppressing its fixed-base finding.
+
+## Completion conditions
+
+- B-1 is closed by both required candidate views and match-on-either behavior.
+- All 24 required `Cf` ingress/egress position probes fail safely.
+- Existing negative fixtures retain their expected behavior.
+- N-7 and N-2 are explicitly resolved within the authorized boundary.
+- SUR-001 remains honestly resolved at the minimum Phase 1 contract level.
+- Technical readiness is green while independent review is `required_pending`
+  and runtime implementation is explicitly unauthorized.
+- The architecture remains 7 components, 8 packets, and 9 interfaces.
+- Golden CTS and the immutable BC-041 review remain unchanged.
+- Two reviewable commits are created and the branch is pushed without merge or
+  history rewriting.
+
+## Handoff format
+
+Use `handoff.md` and `validation.md` in this folder. Claude modifies only
+`review.md` during the separately authorized C1 re-review.
+
+## Approved amendments
+
+No amendments.

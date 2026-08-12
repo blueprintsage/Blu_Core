@@ -3,7 +3,7 @@
 status: review
 owner: docs/domains/runtime
 last_reviewed: 2026-08-11
-assignment: BC-041
+assignment: BC-041-C1
 
 ## Purpose
 
@@ -59,5 +59,11 @@ policy is terminal `UNAVAILABLE`, never `PASS`, and never reaches the model.
 BC-041 resolves SUR-001 only at the minimum Phase 1 contract level. Production
 policy values remain outside the repository, and deterministic normalized-
 phrase matching does not claim arbitrary paraphrase or semantic-equivalence
-detection. The readiness result now permits Dad/Blu to consider authoring the
-named runtime packet; implementation does not start automatically.
+detection. It also does not claim general Unicode confusable/homoglyph
+substitution protection.
+
+The `ready_for_python_phase1` result is technical only. The finite independent
+correction-review state is `required_pending`, not `complete`. Claude must
+independently review C1, and Dad/Blu must complete integration and closure
+authorization before implementation can be authorized. The runtime packet may
+be considered next, but implementation does not start automatically.

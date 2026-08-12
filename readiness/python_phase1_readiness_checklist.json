@@ -1,7 +1,8 @@
 {
-  "spec_version": "1.1.0",
-  "assignment": "BC-041",
+  "spec_version": "1.2.0",
+  "assignment": "BC-041-C1",
   "result": "ready_for_python_phase1",
+  "result_semantics": "technical_conditions_satisfied_pending_independent_correction_review_and_Dad_Blu_closure",
   "full_successor_feature_complete": false,
   "checks": [
     {"id": "one_blu_canon_mapping_complete", "status": "pass"},
@@ -24,12 +25,19 @@
     {"id": "manifest_validator_digest_and_scope_guards_strengthened", "status": "pass"},
     {"id": "golden_CTS_unchanged", "status": "pass"},
     {"id": "no_runtime_code_introduced", "status": "pass"},
-    {"id": "independent_Claude_review_required", "status": "pass"},
+    {"id": "independent_Claude_correction_review", "status": "required_pending"},
     {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "pass", "resolution": "resolved_at_minimum_phase1_contract_level"}
   ],
   "actual_blockers": [],
   "runtime_phase1_packet_may_be_authored_next": true,
+  "independent_correction_review": {
+    "reviewer": "Claude",
+    "state": "required_pending",
+    "completed": false,
+    "required_before_implementation_authorization": true
+  },
+  "implementation_authorized": false,
   "conditional_runtime_packet_after_blocker": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
   "automatic_start_prohibited": true,
-  "authorization_boundary": "This readiness result permits Dad/Blu to consider authoring the named runtime packet. It does not authorize implementation, merge, release, or automatic start."
+  "authorization_boundary": "This is a technical readiness result only. Independent Claude correction review is required and pending; Dad/Blu integration and closure authorization are also required before implementation. This result does not authorize implementation, merge, release, or automatic start."
 }

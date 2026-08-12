@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.0.0",
-  "assignment": "BC-041",
+  "contract_version": "1.1.0",
+  "assignment": "BC-041-C1",
   "disposition": "resolved_at_minimum_phase1_contract_level",
   "authority": {
     "recovered_current_law": [
@@ -45,13 +45,21 @@
     "input_type": "unicode_text",
     "ordered_steps": [
       "reject_non_string_input",
-      "unicode_NFKC",
+      "generate_exactly_two_candidate_views_by_mapping_every_Unicode_general_category_Cf_code_point_to_ASCII_space_or_removing_it",
+      "apply_unicode_NFKC_independently_to_each_candidate_view",
       "normalize_CRLF_CR_and_all_unicode_whitespace_to_ASCII_space",
       "map_bounded_common_separators_dot_comma_colon_semicolon_hyphen_underscore_slash_backslash_pipe_to_ASCII_space",
       "collapse_repeated_ASCII_space",
       "trim_ASCII_space",
       "unicode_casefold_only_for_case_insensitive_rule_evaluation"
     ],
+    "candidate_views": [
+      {"id": "cf_to_ascii_space", "transformation": "every Unicode general-category Cf code point becomes ASCII space"},
+      {"id": "cf_removed", "transformation": "every Unicode general-category Cf code point is removed"}
+    ],
+    "candidate_view_generation_applies_to": ["ingress", "egress"],
+    "both_views_continue_through_remaining_ordered_steps": true,
+    "match_in_either_view_is_protected_match": true,
     "separator_set": [".", ",", ":", ";", "-", "_", "/", "\\", "|"],
     "deterministic": true,
     "semantic_paraphrase_detection": false
@@ -97,6 +105,7 @@
     "public_form": "canonicalized candidate only; raw candidate is never reconstructed for public print",
     "required_postconditions": [
       "every matched span replaced",
+      "redaction is valid across both candidate views; divergent matching views fail closed",
       "no protected rule matches the redacted result",
       "residual contains at least one alphanumeric character outside replacement tokens",
       "no invalid or overlapping span",
@@ -144,7 +153,8 @@
     "tool execution",
     "continuity mutation",
     "production runtime implementation",
-    "arbitrary semantic paraphrase or obfuscation detection"
+    "arbitrary semantic paraphrase or obfuscation detection",
+    "general Unicode confusable or homoglyph substitution detection"
   ],
   "synthetic_fixture_statement": "synthetic test policy != production protected policy"
 }

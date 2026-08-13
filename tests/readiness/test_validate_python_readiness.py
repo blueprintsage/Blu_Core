@@ -367,3 +367,142 @@ class BC050AuthorizationMutationMatrixTests(_ReadinessHarness):
                     )
                 finally:
                     self.tearDown()
+
+
+class InstructionLayerClassificationTests(_ReadinessHarness):
+    """BC-050-C2A: `00_Instructions.md` cannot become successor canon again."""
+
+    MANIFEST = "readiness/one_blu_canon_manifest.json"
+    TARGETS = "readiness/deployment_targets.json"
+    PARITY = "readiness/custom_gpt_python_parity_matrix.json"
+    INSTRUCTIONS = "kernel/golden/v0.22.0/00_Instructions.md"
+
+    def test_clean_classification_passes(self) -> None:
+        self.assertEqual([], self.errors())
+
+    def test_persona_and_operations_law_remain_invariant_sources(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        artifacts = " ".join(
+            str(item.get("canonical_source_artifact")) for item in manifest["mappings"]
+        )
+        self.assertIn("01_Persona.md", artifacts)
+        self.assertIn("02_Operations_Law.md", artifacts)
+
+    def test_instructions_cannot_return_as_an_invariant_mapping(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["mappings"].append({
+            "mapping_id": "CANON-001",
+            "subject": "host_and_deployment_instructions",
+            "canonical_source_artifact": [self.INSTRUCTIONS],
+            "source_role": "deployment_instruction",
+            "current_cts_authority_relationship": "x",
+            "successor_behavioral_relationship": "x",
+            "chatgpt_projection": "x",
+            "python_projection": "host-neutral canon loader",
+            "exact_identity_required": False,
+            "transformation_allowed": True,
+            "allowed_transformation_type": "host_binding_projection",
+            "validation_method": "x",
+            "prohibited_divergence": [],
+        })
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("00_Instructions.md is not successor invariant canon")
+
+    def test_instructions_cannot_be_added_to_an_existing_mapping(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        target = next(m for m in manifest["mappings"] if m["mapping_id"] == "CANON-009")
+        target["canonical_source_artifact"].append(self.INSTRUCTIONS)
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("00_Instructions.md is not successor invariant canon")
+
+    def test_security_mapping_cannot_cite_the_instruction_surface(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        target = next(m for m in manifest["mappings"] if m["mapping_id"] == "CANON-006")
+        target["canonical_source_artifact"].append(self.INSTRUCTIONS)
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("00_Instructions.md is not successor invariant canon")
+
+    def test_provenance_cannot_claim_successor_invariance(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["legacy_deployment_artifacts"][0]["successor_invariant"] = True
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("deployment provenance claims successor invariance")
+
+    def test_provenance_cannot_authorize_a_python_projection(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["legacy_deployment_artifacts"][0]["python_projection"] = "generated_projection"
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("authorizes a Python projection")
+
+    def test_provenance_cannot_become_a_parity_source(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["legacy_deployment_artifacts"][0]["cross_deployment_parity_required"] = True
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("treated as a parity source")
+
+    def test_provenance_cannot_permit_automatic_migration(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["legacy_deployment_artifacts"][0]["automatic_behavior_migration"] = True
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("permits automatic behavior migration")
+
+    def test_host_binding_projection_cannot_be_restored(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["legacy_deployment_artifacts"][0]["allowed_transformation_type"] = "host_binding_projection"
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("host_binding_projection remains authorized")
+
+    def test_provenance_record_must_exist(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["legacy_deployment_artifacts"] = []
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("not recorded exactly once as deployment provenance")
+
+    def test_provenance_must_record_the_immutable_golden_source(self) -> None:
+        manifest = self.load(self.MANIFEST)
+        manifest["legacy_deployment_artifacts"][0]["immutable_golden"] = False
+        self.save(self.MANIFEST, manifest)
+        self.assert_has("does not record the immutable golden source")
+
+    def test_chatgpt_projection_cannot_require_the_instruction_surface(self) -> None:
+        targets = self.load(self.TARGETS)
+        gpt = next(t for t in targets["targets"] if t["target_id"] == "chatgpt_custom_gpt")
+        gpt["projection"] = "current CTS deployment instruction plus six golden capsules"
+        self.save(self.TARGETS, targets)
+        self.assert_has("still requires the legacy instruction surface")
+
+    def test_host_instruction_surface_cannot_be_declared_canon(self) -> None:
+        targets = self.load(self.TARGETS)
+        gpt = next(t for t in targets["targets"] if t["target_id"] == "chatgpt_custom_gpt")
+        gpt["host_instruction_surface"]["successor_invariant"] = True
+        self.save(self.TARGETS, targets)
+        self.assert_has("treated as canon or parity")
+
+    def test_host_instruction_surface_cannot_be_parity_determining(self) -> None:
+        targets = self.load(self.TARGETS)
+        gpt = next(t for t in targets["targets"] if t["target_id"] == "chatgpt_custom_gpt")
+        gpt["host_instruction_surface"]["parity_determining"] = True
+        self.save(self.TARGETS, targets)
+        self.assert_has("treated as canon or parity")
+
+    def test_host_instruction_surface_rule_is_required(self) -> None:
+        targets = self.load(self.TARGETS)
+        del targets["host_instruction_surface_rule"]
+        self.save(self.TARGETS, targets)
+        self.assert_has("do not classify host instruction surfaces")
+
+    def test_parity_matrix_must_exclude_deployment_mechanics(self) -> None:
+        parity = self.load(self.PARITY)
+        del parity["non_parity_rule"]
+        self.save(self.PARITY, parity)
+        self.assert_has("does not exclude deployment-local instruction mechanics")
+
+    def test_real_parity_dimensions_are_preserved(self) -> None:
+        parity = self.load(self.PARITY)
+        for dimension in (
+            "identity", "relational_posture", "tone_floor", "behavioral_law",
+            "truthfulness", "teaching_behavior", "privacy_security_semantics",
+            "refusal_boundary_posture", "continuity_truth_discipline",
+            "source_authority", "unsupported_completion_discipline",
+        ):
+            self.assertIn(dimension, parity["parity_dimensions"])

@@ -1,7 +1,10 @@
 {
   "spec_version": "1.0.0",
   "assignment": "BC-040",
-  "classifications": ["required", "optional_best_effort"],
+  "classifications": [
+    "required",
+    "optional_best_effort"
+  ],
   "targets": [
     {
       "target_id": "chatgpt_custom_gpt",
@@ -9,9 +12,29 @@
       "behavior_canon_parity": "required",
       "host_capability": "host-dependent and must be reported honestly",
       "enforcement_mechanism": "model-executed canonical sources plus only those deterministic host controls and receipts the surface actually exposes",
-      "projection": "current CTS deployment instruction plus six golden capsules until an approved generated successor projection exists",
-      "allowed_host_limits": ["tools", "receipts", "persistence", "host_session evidence", "scheduling", "artifacts", "deterministic enforcement"],
-      "prohibited": ["independent Persona", "independent Operations Law", "invented deterministic guarantees", "unreceipted persistence claims"]
+      "projection": "invariant canon from Persona, Operations Law, and approved shared successor law; the host instruction surface is deployment-local mechanics and may be minimal or empty where the host permits",
+      "allowed_host_limits": [
+        "tools",
+        "receipts",
+        "persistence",
+        "host_session evidence",
+        "scheduling",
+        "artifacts",
+        "deterministic enforcement"
+      ],
+      "prohibited": [
+        "independent Persona",
+        "independent Operations Law",
+        "invented deterministic guarantees",
+        "unreceipted persistence claims",
+        "treating the host instruction surface as independent behavioral canon"
+      ],
+      "host_instruction_surface": {
+        "classification": "deployment_local_mechanics",
+        "successor_invariant": false,
+        "parity_determining": false,
+        "note": "Presence or absence of 00_Instructions.md does not itself determine One-Blu parity. Reducing or removing the live instruction box is a separate deployment task and is not performed by BC-050."
+      }
     },
     {
       "target_id": "python_lm_studio",
@@ -24,7 +47,12 @@
       "offline_local_inference_required": true,
       "cloud_inference_dependency_allowed_for_acceptance": false,
       "continuity_optional_for_phase1": true,
-      "prohibited": ["LM Studio as identity owner", "local model as canon", "LM Studio as continuity owner", "model capability inferred from configuration"]
+      "prohibited": [
+        "LM Studio as identity owner",
+        "local model as canon",
+        "LM Studio as continuity owner",
+        "model capability inferred from configuration"
+      ]
     },
     {
       "target_id": "codex",
@@ -33,9 +61,13 @@
       "architecture_driver": false,
       "blocks_python": false,
       "implementation_in_BC040": false,
-      "prohibited": ["separate Blu canon", "successor redesign for Codex convenience"]
+      "prohibited": [
+        "separate Blu canon",
+        "successor redesign for Codex convenience"
+      ]
     }
   ],
   "same_blu_rule": "Identity, Persona, Compass/core values, behavioral law, teaching behavior, security and authorization semantics, continuity truth, validation truth, receipt discipline, source authority, and architectural invariants come only from canonical sources. Host projections may bind or omit unavailable capabilities but may not redefine them.",
-  "offline_acceptance": "With LM Studio running, a compatible local model loaded, and local configuration selected, Python Blu completes the Phase 1 ordinary-conversation path without OpenAI or ChatGPT cloud inference."
+  "offline_acceptance": "With LM Studio running, a compatible local model loaded, and local configuration selected, Python Blu completes the Phase 1 ordinary-conversation path without OpenAI or ChatGPT cloud inference.",
+  "host_instruction_surface_rule": "Host instruction surfaces are deployment-local mechanics, not independent canon. Both required targets must preserve invariant Blu canon from its actual owners; neither target's instruction text is a parity source."
 }

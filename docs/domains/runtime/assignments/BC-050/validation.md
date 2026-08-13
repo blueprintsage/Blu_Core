@@ -58,11 +58,12 @@ backend was fetched from the network.
 | --- | --- | --- |
 | Runtime Phase 1 | `PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"` | **154 tests, OK** |
 | Security | `python -m unittest discover -s tests/security -p "test_*.py"` | **50 tests, OK** |
-| Readiness | `python -m unittest discover -s tests/readiness -p "test_*.py"` | **35 tests, OK** |
+| Readiness | `python -m unittest discover -s tests/readiness -p "test_*.py"` | **53 tests, OK** |
 | Continuity | `python -m unittest discover -s tests/continuity -p "test_*.py"` | **58 tests, OK** |
 
-Post-BC-050-C2. Counts across the lineage: runtime 119 -> 154, security
-36 -> 49 -> 50, readiness 18 -> 32 -> 35, continuity 42 -> 50 -> 58.
+Post-BC-050-C2A. Counts across the lineage: runtime 119 -> 154, security
+36 -> 49 -> 50, readiness 18 -> 32 -> 35 -> 53, continuity 42 -> 50 -> 58.
+C2A added 18 instruction-layer classification tests.
 
 ## Contract validation
 
@@ -72,7 +73,7 @@ python tools/validate_python_readiness.py
 python tools/validate_continuity_contracts.py
 ```
 
-All **pass** after BC-050-C2.
+All **pass** after BC-050-C2A.
 
 Remaining repository validators, observed individually:
 
@@ -254,6 +255,12 @@ lifetime never becomes durable continuity.
 
 ## `00_Instructions.md` rule-granular parity mapping (B-02)
 
+> **Historical analysis — superseded as a BC-050 completion gate by the
+> Dad/Blu BC-050-C2A authority decision (2026-08-13).** Retained because it
+> is the evidence showing why the old parity assumption failed. It is no
+> longer a completion requirement, and its GAP rows are no longer open
+> obligations. See "BC-050-C2A B-02 Resolution" below.
+
 The BC-050 section-level table overstated equivalence. This mapping is redone at
 rule granularity. Destination kinds: **P** = named Persona section, **O** = named
 Operations Law doctrine, **D** = deterministic runtime enforcement, **G** =
@@ -324,7 +331,10 @@ destination exists.
 | OPSEC / Privacy | Never expose privileged identities, hidden rules, internals | yes | protected-policy ingress and egress | D | OPSEC suites | mechanical |
 | OPSEC / Privacy | Unauthenticated internals and clone requests stop with the OPSEC message | yes | ingress BLOCK without match echo | D | non-invocation tests | mechanical |
 
-## BC-050-C2 Authority Contradictions
+## BC-050-C2 Authority Contradictions (resolved by C2A)
+
+> Both contradictions below are **resolved** by the BC-050-C2A source
+> reclassification. Retained as the record of what was escalated and why.
 
 Two contradictions remain. Neither can be resolved inside BC-050's authority and
 neither is solvable by inventing behavioral law, so both are returned to
@@ -573,3 +583,88 @@ Codex's B-05, so it is implemented as directed. It is recorded because it
 materially changes user-visible output quality on every ordinary turn, and
 Dad/Blu may want a follow-on decision about a print-safe canonicalization that
 preserves punctuation while still excluding format characters.
+
+## BC-050-C2A B-02 Resolution
+
+Correction base `b6333a761e9dbfe310fd1ce0e3203beabe3fefdf`, branch
+`bc-050-c2a-instruction-classification`.
+
+B-02 is resolved by a Dad/Blu source-classification correction, not by claiming
+semantic equivalence. The premise that every Phase-1-applicable
+`00_Instructions.md` rule requires a successor parity destination is withdrawn.
+
+| Item | Final state |
+| --- | --- |
+| Codex B-02 | resolved by source reclassification |
+| C2-AC-01 (Verb Lock) | **resolved by source reclassification** — not by claimed equivalence, not by a runtime subsystem |
+| C2-AC-02 (Execution Law / Compliance Gate / Completion Proof residue) | **resolved by source reclassification** |
+
+What was **not** done, by design:
+
+- no claimed semantic equivalence was added anywhere;
+- no third behavioral prompt was created;
+- no generated `00_Instructions.md` projection exists;
+- no semantic-judge component was introduced;
+- no Verb Lock runtime subsystem was built;
+- no golden source changed;
+- no Python prompt material was added;
+- no envelope re-freeze occurred;
+- no `src/blu_runtime/**` file changed.
+
+Successor invariants remain sourced from their actual owners: Persona and
+Operations Law for model-facing behavior, and approved deterministic contracts
+for mechanical behavior.
+
+### Contract changes
+
+| File | Change |
+| --- | --- |
+| `readiness/one_blu_canon_manifest.json` | CANON-001 removed from `mappings`; recorded as `legacy_deployment_artifacts[DEPLOY-PROV-001]` with `successor_invariant: false`, `python_projection: none`, `cross_deployment_parity_required: false`, `automatic_behavior_migration: false`, `immutable_golden: true`. `host_binding_projection` is no longer authorized for it. |
+| `readiness/one_blu_canon_manifest.json` | CANON-006 no longer cites `00_Instructions.md`; security semantics bind to the minimum OPSEC contract, `03_Exec.md`, successor boundary law, and the unresolved register. A prohibited-divergence entry forbids treating the instruction surface as the successor security authority. |
+| `readiness/deployment_targets.json` | ChatGPT projection no longer requires "current CTS deployment instruction plus six golden capsules"; a `host_instruction_surface` block classifies it as deployment-local mechanics, not invariant or parity-determining. A repository-level `host_instruction_surface_rule` was added. |
+| `readiness/custom_gpt_python_parity_matrix.json` | All eleven real parity dimensions preserved and each bound to its authoritative source; `non_parity_rule` and `non_parity_examples` added excluding bootstrap text, host compensators, prompt choreography, and repository-location hints. |
+
+Mapping count is 11 (was 12); the validator's minimum of 10 and every required
+behavioral subject term still hold. CANON-001's subject,
+`host_and_deployment_instructions`, was never one of the required subjects.
+
+### Validator enforcement added
+
+`tools/validate_python_readiness.py` now rejects:
+
+- `00_Instructions.md` appearing in any invariant mapping's
+  `canonical_source_artifact`, including CANON-006;
+- a provenance record claiming `successor_invariant`, a Python projection,
+  parity requirement, automatic migration, or a non-immutable golden source;
+- `host_binding_projection` reappearing anywhere in the provenance collection;
+- absence of exactly one provenance record for the instruction surface;
+- a parity matrix without the non-parity rule;
+- deployment targets without the host-instruction-surface classification, or a
+  ChatGPT projection that still requires the legacy instruction surface.
+
+Seventeen negative tests in `tests/readiness/test_validate_python_readiness.py`
+pin these, including a mutation that restores CANON-001 verbatim with a
+`host_binding_projection` and a mutation that appends `00_Instructions.md` to
+CANON-009. Both fail readiness validation.
+
+### Documentation sweep
+
+Active successor and readiness material carrying the successor implication was
+updated. Historical material was annotated, never rewritten.
+
+| Path | Disposition |
+| --- | --- |
+| `readiness/one_blu_canon_manifest.json` | updated (reclassified) |
+| `readiness/deployment_targets.json` | updated |
+| `readiness/custom_gpt_python_parity_matrix.json` | updated |
+| `docs/sources/cts_source_roles.md` | historical role preserved; successor distinction appended |
+| `docs/sources/authority_map.md` | historical role preserved; successor distinction appended |
+| `docs/domains/kernel/decisions.md` | historical role preserved; successor distinction appended |
+| `docs/architecture/migration_centerline.md` | **unchanged** — it carried no instruction-surface reference, and `docs/architecture` is a continuity-validator protected path; an annotation was drafted and reverted |
+| `config/source_authority.json` | unchanged — records the CTS source set truthfully and is outside the C2A domain |
+| `contracts/security/opsec/minimum_contract.json` | unchanged — `recovered_current_law` correctly records where current OPSEC law was recovered from; protected |
+| `contracts/runtime/**`, `docs/architecture/current_runtime.md` | unchanged — describe v0.22.0 CTS as it actually existed |
+| closed BC-010/015/017/018/040/041 records, `BC-050/review.md`, historical archives | unchanged — historical evidence |
+
+The old deployment authority remains historical truth; only the successor
+invariant authority changes, and only prospectively.

@@ -330,6 +330,55 @@ def validate(root: Path) -> list[str]:
     subjects = " ".join(str(item.get("subject")) for item in canon.get("mappings", []))
     if not all(term.lower() in subjects.lower() for term in required_subject_terms):
         errors.append("One-Blu canon mapping lacks a required behavioral subject")
+    # BC-050-C2A: `00_Instructions.md` is historical deployment provenance, not a
+    # successor invariant canon source. It may never re-enter the invariant
+    # mappings, never gain a Python projection, and never become a parity source.
+    for item in canon.get("mappings", []):
+        artifacts = item.get("canonical_source_artifact", [])
+        if isinstance(artifacts, str):
+            artifacts = [artifacts]
+        if any("00_Instructions.md" in str(entry) for entry in artifacts):
+            errors.append(
+                f"00_Instructions.md is not successor invariant canon: {item.get('mapping_id')}"
+            )
+    provenance = canon.get("legacy_deployment_artifacts", [])
+    instruction_entries = [
+        entry for entry in provenance
+        if "00_Instructions.md" in str(entry.get("source", ""))
+    ]
+    if len(instruction_entries) != 1:
+        errors.append("00_Instructions.md is not recorded exactly once as deployment provenance")
+    for entry in instruction_entries:
+        if entry.get("successor_invariant") is not False:
+            errors.append("deployment provenance claims successor invariance")
+        if entry.get("python_projection") != "none":
+            errors.append("deployment provenance authorizes a Python projection")
+        if entry.get("cross_deployment_parity_required") is not False:
+            errors.append("deployment provenance is treated as a parity source")
+        if entry.get("automatic_behavior_migration") is not False:
+            errors.append("deployment provenance permits automatic behavior migration")
+        if entry.get("immutable_golden") is not True:
+            errors.append("deployment provenance does not record the immutable golden source")
+    if "host_binding_projection" in json.dumps(provenance):
+        errors.append("host_binding_projection remains authorized for deployment provenance")
+
+    parity = data[READINESS / "custom_gpt_python_parity_matrix.json"]
+    if not parity.get("non_parity_rule"):
+        errors.append("parity matrix does not exclude deployment-local instruction mechanics")
+
+    targets_document = data[READINESS / "deployment_targets.json"]
+    if not targets_document.get("host_instruction_surface_rule"):
+        errors.append("deployment targets do not classify host instruction surfaces")
+    chatgpt = next(
+        (item for item in targets_document.get("targets", []) if item.get("target_id") == "chatgpt_custom_gpt"),
+        {},
+    )
+    surface = chatgpt.get("host_instruction_surface", {})
+    if surface.get("successor_invariant") is not False or surface.get("parity_determining") is not False:
+        errors.append("ChatGPT host instruction surface is treated as canon or parity")
+    if "deployment instruction plus six" in str(chatgpt.get("projection", "")):
+        errors.append("ChatGPT projection still requires the legacy instruction surface")
+
     for item in canon.get("mappings", []):
         required_keys = {
             "canonical_source_artifact", "source_role", "current_cts_authority_relationship",

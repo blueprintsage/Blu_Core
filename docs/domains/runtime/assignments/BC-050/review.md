@@ -430,3 +430,291 @@ reproduction above. Dad/Blu retains final integration authority.
 - Authorized by: not applicable; integration is not authorized by this review
 - Assignment status: return to active correction under Dad/Blu direction
 - Date: 2026-08-13
+
+---
+
+# Independent Re-Review After BC-050-C2 / BC-050-C2A
+
+## Re-review identity
+
+- Date: 2026-08-13
+- Exact target: `25ef59adc6c79edeb3f6347f5f51a5cb072da500`
+- Branch: `bc-050-c2a-instruction-classification`
+- Authorized base: `973589eea05fe42deeb829c5435bd09faf8cbe70`
+- Implementation: `708101d7f6dfc7748bb69d71f56e4da1044a2699`
+- C1: `218f3aed941afe0476d3d211af0146426d1be32e`
+- Prior independent review: `33be23a4c43a160e41e2aeca78962d1cbd3c4a47`
+- C2: `b6333a761e9dbfe310fd1ce0e3203beabe3fefdf`
+- C2A: `25ef59adc6c79edeb3f6347f5f51a5cb072da500`
+- Reviewer: Codex, independently of implementation author Claude
+- Live LM Studio smoke test: `not_performed`
+
+The checkout was clean, exactly at the requested target, and the authorized
+base was an ancestor. C2A changed no file under `src/blu_runtime/**`. No
+implementation fix was made during review.
+
+## Executive result
+
+Disposition: `return-for-correction`.
+
+C2/C2A resolve the amended B-02 question and the substantive B-03 through B-05
+defects. The slash-command control flow and the missing/blank completion-
+evidence cases are also corrected. Three fresh adversarial findings remain:
+
+1. B-01 still accepts a jointly wrong or non-string authorization date at all
+   three independent enforcement points.
+2. B-06 still advertises `/exit` as an operative exit command even though the
+   corrected runtime classifies it as unsupported and continues the session.
+3. B-07 raises `AttributeError` for a truthy non-string completion-evidence
+   reference instead of returning one terminal fail-closed result.
+
+BC-050 is therefore not `ready_for_Dad_Blu_integration_review`.
+
+## Remaining blocking findings
+
+### B-01 — authorization date is cross-file-consistent but not authenticated
+
+- Affected functions: `_bc050_authorized` in
+  `tools/validate_python_readiness.py`, `tools/validate_opsec_contracts.py`, and
+  `tools/validate_continuity_contracts.py`.
+- Minimal reproduction: change both `authorization_date` values in
+  `readiness/python_phase1_readiness_checklist.json` and
+  `readiness/phase1_executable_slice.json` from `2026-08-12` to `1999-01-01`,
+  or to integer `7`, then evaluate each validator's gate independently.
+- Observed: all three return authorized. Every originally requested mutation
+  (wrong/empty authorizer, wrong/empty/missing packet, wrong assignment,
+  checklist/slice disagreement, nested other assignment, malformed partial
+  record, malformed/missing JSON, and `automatic_start_prohibited: false`)
+  correctly returns unauthorized.
+- Expected: the authorization record must bind the actual Dad/Blu authorization
+  date `2026-08-12` as an exact string, not merely require two truthy equal
+  values.
+- Governing rule: BC-050 authorization gate; prior B-01 smallest correction
+  property requiring exact state, assignment, authorizer, date, canonical
+  packet, flags, and cross-file agreement; C2's stated complete-record,
+  fail-closed predicate.
+- Smallest bounded correction property: bind an exact approved date constant in
+  all three predicates, require the same exact string in both records, and add
+  jointly wrong and non-string date cases to the shared independent matrix.
+
+### B-06 — startup text falsely advertises `/exit`
+
+- Affected location: `src/blu_runtime/__main__.py::main`, startup banner.
+- Minimal reproduction: boot successfully, observe `"/exit to end."`, then
+  submit `/exit`.
+- Observed: the corrected adapter creates a `RawHostEvent`; ingress runs; Turn
+  Controller returns `UNAVAILABLE / ROUTE_UNSUPPORTED`; provider invocation
+  count is `0`; one terminal result is rendered; the session continues. The
+  preceding banner nevertheless claimed `/exit` would end it.
+- Expected: no in-band slash command is represented as an operative host
+  bypass. Only EOF/out-of-band stream end terminates the session in Phase 1.
+- Governing rule: BC-050 sections 6, 7.1, and the fixed terminal sequence;
+  One-Blu truthfulness/runtime-truth discipline; B-06's no-magic-command rule.
+- Smallest bounded correction property: remove the `/exit to end` claim from
+  the startup text (or replace it with truthful EOF/out-of-band guidance)
+  without restoring any slash interception.
+
+### B-07 — truthy malformed completion evidence crashes the turn
+
+- Affected function: `src/blu_runtime/__main__.py::run_turn`, expression
+  `(result.completion_evidence_ref or "").strip()`.
+- Minimal reproduction: return an otherwise PASS `NormalizedModelResult` with
+  `completion_evidence_ref=7` from the Model Execution Boundary and call
+  `run_turn`.
+- Observed: `AttributeError: 'int' object has no attribute 'strip'`; no receipt
+  is written, but no terminal packet/result is produced. `None`, empty string,
+  whitespace-only string, empty mapping, and empty list do fail closed as
+  `INVALID / PROVIDER_COMPLETION_EVIDENCE_MISSING` with no output or receipt.
+- Expected: malformed completion evidence is untrusted provider output and must
+  yield one terminal failure, never an exception or success receipt.
+- Governing rule: BC-050 sections 9, 12, and 13; provider-contract malformed-
+  response rule; Completion Proof and one-terminal-result discipline.
+- Smallest bounded correction property: require
+  `isinstance(completion_evidence_ref, str)` and a nonblank value before any
+  string operation or receipt construction; pin truthy non-string values at the
+  boundary-level negative test.
+
+## Prior blocker disposition
+
+### B-02 — resolved under the Dad/Blu C2A authority amendment
+
+The review applied the amended question, not the superseded instruction-parity
+premise.
+
+- Golden `00_Instructions.md` passes its recorded SHA-256 and is unchanged from
+  the authorized base.
+- It appears exactly once under `legacy_deployment_artifacts` with
+  `successor_invariant: false`, `python_projection: none`,
+  `cross_deployment_parity_required: false`,
+  `automatic_behavior_migration: false`, and `immutable_golden: true`.
+- It appears in no invariant mapping. CANON-006 does not cite it. CANON-009
+  remains Persona + Operations Law plus approved successor/provider contracts.
+- Deployment targets classify host instruction surfaces as deployment-local
+  and non-parity-determining. The parity matrix retains eleven actual Blu
+  dimensions: identity, relational posture, tone floor, behavioral law,
+  truthfulness, teaching, privacy/security, refusal/boundary posture,
+  continuity truth, source authority, and unsupported-completion discipline.
+- No instruction text entered the envelope, no generated projection or third
+  prompt appeared, no semantic judge was added, and no golden source changed.
+- Fresh temporary mutations restoring an invariant mapping, CANON-009 source,
+  successor security source, Python projection, `host_binding_projection`, or
+  parity dependency all caused readiness validation to fail. An unmodified
+  temporary repository copy returned zero readiness errors.
+
+Independent inspection found the successor invariant still owned by Persona,
+Operations Law, and deterministic successor contracts. B-02 is resolved by
+source reclassification, not by false equivalence.
+
+### B-03 — resolved
+
+Fresh inventory probes for missing, null, list-valued, and explicitly
+incompatible model `type` all returned unusable
+`PROVIDER_MODEL_INCOMPATIBLE`; Model Execution Boundary invocation count stayed
+`0`. An exact compatible `llm` type was the only usable case. Compatibility was
+not inferred from model name, loaded state, or context capacity.
+
+### B-04 — resolved for the supported LM Studio normalizer
+
+Fresh responses with conflicting provider identity, provider error plus text,
+timeout plus text, `processing`, missing status, non-string status, or
+conflicting model identity produced no candidate and returned `INVALID` or
+`UNAVAILABLE` with the matching safe code. A completed, identity-matching
+response with provider-assigned evidence was the only PASS case.
+
+### B-05 — resolved
+
+`ordinary<U+200B> reply` publicly returned exactly `ordinary reply`.
+Whitespace collapse, separator mapping, NFKC full-width forms, a compatibility
+ligature, and mixed normalization all returned the exact canonical candidate.
+Protected output returned REDACTED canonical text, never CLEAR raw text. Source
+inspection found no post-authorization reintroduction of the raw provider text.
+
+### B-06 — control-flow defect resolved; truthful-banner residue blocks
+
+Fresh `/exit`, `/quit`, and `/auth` probes each created a `RawHostEvent`, ran
+ingress and unsupported routing, produced one terminal result, and invoked the
+provider `0` times. EOF returned no event and remained distinct. The residual
+blocking banner defect is recorded above.
+
+### B-07 — missing/blank defect resolved; malformed-value defect blocks
+
+`None`, empty, and whitespace-only evidence produced no PASS, public output,
+receipt, or synthesized reference. `__main__.py` contains no fallback evidence
+generation. The residual truthy non-string exception is recorded above.
+
+## Foundational and adversarial evidence
+
+### Required suites
+
+| Suite | Result |
+| --- | --- |
+| Runtime Phase 1 | 154 tests, OK |
+| Security | 50 tests, OK |
+| Readiness | 53 tests, OK |
+| Continuity | 58 tests, OK |
+
+Additional suites passed: contracts 21, successor kernel 40, viability 9,
+historical archives 12, historical archaeology 18, and host adapters 34.
+
+### Validators
+
+Passed independently:
+
+```text
+python tools/validate_opsec_contracts.py
+python tools/validate_python_readiness.py
+python tools/validate_continuity_contracts.py
+python tools/validate_runtime_contracts.py
+python tools/validate_successor_kernel_spec.py
+python tools/validate_viability_audit.py
+python tools/validate_historical_archive_inventory.py
+python tools/validate_historical_behavioral_archaeology.py
+```
+
+`python tools/validate_host_adapter_contracts.py` returned only the known BC-020
+fixed-base finding: `contracts/successor/unresolved_register.json` changed after
+the validator's BC-020 base. BC-050/C2/C2A did not modify that protected path;
+no suppression or new host-adapter regression was found.
+
+### Canon, golden, manifest, and architecture
+
+Independent assignment-derived envelope construction reproduced:
+
+```text
+rendered envelope bytes  36887
+canon_projection_digest  103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142
+final byte               0x5D
+```
+
+All seven golden Markdown files and the CTS ZIP passed the PowerShell
+`Get-FileHash -Algorithm SHA256` equivalent against `SHA256SUMS`. Base-to-target
+golden diff was empty. `git diff --check` passed. The readiness, continuity, and
+successor validators independently accepted `MANIFEST.sha256` coverage and
+digests. Architecture remains 7 components, 8 packets, and 9 interfaces.
+
+### OPSEC differential and performance
+
+A fresh seeded corpus of 6,035 cases covered all six required `Cf` code points,
+edges, inside-token and inter-word placement, separators, NFKC and compatibility
+forms, repetitions, and negative controls. Production and
+`tools/validate_opsec_contracts.py::normalized_match_candidate` had zero
+mismatches for normalized text and removed-`Cf` boundaries.
+
+Three-run timings for 2,000, 8,000, and 32,000 removals were 3.866 ms,
+16.906 ms, and 72.334 ms. The approximately linear scaling remains bounded and
+non-quadratic.
+
+Fresh protected-ingress input terminated BLOCK with provider invocation count
+`0`. Protected egress was REDACTED, not CLEAR. An unsupported `/memory` route
+terminated UNAVAILABLE with provider invocation count `0`.
+
+### Continuity truth
+
+No durable provider appeared. Phase 1 still reports `lifetime=turn`,
+`provider_available=false`, and `durability_claimed=false`. Model context,
+process memory, LM Studio state, and filenames are explicitly rejected as
+continuity evidence. SUR-011 remains unresolved.
+
+### Packaging and import truth
+
+No internal `sys.path` mutation returned. The external `PYTHONPATH=src` fallback
+worked for the runtime suite. `setuptools` remains absent, so editable install
+was not performed and is not reported as passed. No tracked or untracked
+`.egg-info` affected manifest validation.
+
+## Nonblocking notes and prerequisites
+
+### N-01 — live LM Studio compatibility smoke remains `not_performed`
+
+Deterministic provider-contract validation is internally coherent and fails
+closed. Repository evidence does not pin the native response terminal-state or
+provider-response identifier field names. A live LM Studio smoke test remains
+a nonblocking live-smoke prerequisite before integration/operational use; if
+the names differ, ordinary turns will safely remain unavailable until a bounded
+contract-aligned correction is reviewed. No live success is claimed.
+
+### N-02 — punctuation canonicalization is contract-conforming but poor presentation
+
+`Hello, Dad.` becomes `Hello Dad`. This is the intended consequence of the
+frozen OPSEC `public_form: canonicalized candidate only` contract, not a
+security bypass or a semantic defect in B-05. It is a presentation-quality note
+for a future explicitly authorized print-safe canonicalization decision.
+
+### N-03 — root README current-truth line is stale for an integrated BC-050
+
+Root `README.md` still says `No Python Blu runtime exists in this bootstrap
+release.` In historical bootstrap context that sentence is understandable, but
+under the `Current truth` heading it becomes stale once BC-050 is integrated.
+Treat this as a bounded integration cleanup item; it was not edited during
+review and is not independently blocking the correction branch.
+
+## Required follow-up
+
+Return BC-050/C2/C2A to the implementation owner for bounded correction of the
+three findings above. Re-review the exact correction target. Do not merge,
+close BC-050, begin Python Phase 2, or begin Local Mirror, Auth, tools, PASS,
+SkillForge, or Custom GPT changes. Dad/Blu retains final integration authority.
+
+## Final disposition
+
+`return-for-correction`

@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blu-runtime"
+version = "0.1.0"
+description = "Blu Core Python Runtime Phase 1 (BC-050): boot, ordinary turn, LM Studio model boundary."
+requires-python = ">=3.12"
+dependencies = ["jsonschema==4.26.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"*" = []

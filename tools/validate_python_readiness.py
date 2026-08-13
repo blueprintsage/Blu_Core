@@ -86,6 +86,12 @@ ALLOWED_PYTHON = {
     "tools/validate_opsec_contracts.py",
     "tests/security/test_validate_opsec_contracts.py",
 }
+# BC-050 production and test roots. Permitted only while the readiness
+# checklist records an explicit Dad/Blu BC-050 implementation authorization;
+# without that record every guard below behaves exactly as it did pre-BC-050.
+BC050_PRODUCTION_PREFIX = "src/blu_runtime/"
+BC050_TEST_PREFIX = "tests/runtime_phase1/"
+BC050_ROOT_FILES = {"pyproject.toml"}
 
 
 def _load(path: Path) -> Any:
@@ -118,7 +124,38 @@ def _validate_golden(root: Path) -> list[str]:
     return errors
 
 
-def _validate_git_scope(root: Path) -> list[str]:
+def _bc050_authorized(root: Path) -> bool:
+    """Report whether Dad/Blu explicitly authorized BC-050 implementation.
+
+    This is the single gate that distinguishes authorized Phase-1 code from
+    implementation appearing without authorization. Absent or malformed, every
+    downstream guard keeps its pre-BC-050 behavior.
+    """
+    checklist = root / READINESS / "python_phase1_readiness_checklist.json"
+    if not checklist.is_file():
+        return False
+    try:
+        document = json.loads(checklist.read_text(encoding="utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return False
+    record = document.get("bc050_implementation_authorization")
+    return (
+        isinstance(record, dict)
+        and record.get("state") == "authorized"
+        and record.get("assignment") == "BC-050"
+        and document.get("implementation_authorized") is True
+    )
+
+
+def _bc050_path_allowed(normalized: str) -> bool:
+    return (
+        normalized.startswith(BC050_PRODUCTION_PREFIX)
+        or normalized.startswith(BC050_TEST_PREFIX)
+        or normalized in BC050_ROOT_FILES
+    )
+
+
+def _validate_git_scope(root: Path, authorized: bool = False) -> list[str]:
     if not (root / ".git").exists():
         return []
     result = _git(root, "diff", "--name-only", BASE_COMMIT, "--")
@@ -131,15 +168,28 @@ def _validate_git_scope(root: Path) -> list[str]:
         if lower.startswith("kernel/golden/v0.22.0/"):
             errors.append(f"golden CTS changed: {path}")
         if lower.endswith(".py") and normalized not in ALLOWED_PYTHON:
-            errors.append(f"production or disallowed Python changed: {path}")
+            if not (authorized and _bc050_path_allowed(normalized)):
+                errors.append(f"production or disallowed Python changed: {path}")
         if re.search(r"(^|/)(pass|skillforge)(/|$)", lower):
             errors.append(f"PASS/SkillForge crossover: {path}")
         if re.search(r"(^|/)(lm[_-]?studio|local_mirror)(/|$)", lower):
             errors.append(f"provider implementation path changed: {path}")
-    for root_name in ("src", "runtime", "blu_core", "providers", "lm_studio", "local_mirror"):
+    # Unauthorized provider and runtime roots stay prohibited unconditionally.
+    for root_name in ("runtime", "blu_core", "providers", "lm_studio", "local_mirror"):
         candidate = root / root_name
         if candidate.exists() and any(item.is_file() for item in candidate.rglob("*")):
             errors.append(f"runtime/provider implementation tree exists: {root_name}")
+    source_root = root / "src"
+    if source_root.exists() and any(item.is_file() for item in source_root.rglob("*")):
+        if not authorized:
+            errors.append("runtime/provider implementation tree exists: src")
+        else:
+            for item in source_root.rglob("*"):
+                if not item.is_file():
+                    continue
+                relative = item.relative_to(root).as_posix()
+                if not relative.startswith(BC050_PRODUCTION_PREFIX):
+                    errors.append(f"production Python outside the BC-050 package root: {relative}")
     return errors
 
 
@@ -206,6 +256,7 @@ def validate(root: Path) -> list[str]:
     if missing:
         return [f"missing required file: {path}" for path in missing]
     errors: list[str] = []
+    authorized = _bc050_authorized(root)
     data: dict[Path, Any] = {}
     for path in sorted(JSON_FILES):
         try:
@@ -282,8 +333,8 @@ def validate(root: Path) -> list[str]:
     routes = phase1.get("route_catalog", [])
     if len(routes) != 1 or routes[0].get("route_id") != "ordinary_conversation":
         errors.append("Phase 1 route catalog is not finite ordinary conversation only")
-    if phase1.get("implementation_authorized") is not False:
-        errors.append("BC-041 authorizes runtime implementation")
+    if phase1.get("implementation_authorized") is not authorized:
+        errors.append("Phase 1 slice authorization disagrees with the BC-050 authorization record")
     if phase1.get("opsec_contract_ref") != "contracts/security/opsec/minimum_contract.json":
         errors.append("Phase 1 slice does not bind the BC-041 OPSEC contract")
     required_security_steps = {
@@ -376,11 +427,40 @@ def validate(root: Path) -> list[str]:
         errors.append("protected policy values can be embedded in runtime configuration")
 
     layout = data[READINESS / "python_package_layout.json"]
-    if layout.get("layout_type") != "src" or layout.get("implementation_present") is not False:
-        errors.append("Python package layout is not a spec-only src layout")
+    if layout.get("layout_type") != "src":
+        errors.append("Python package layout is not an src layout")
+    if layout.get("implementation_present") is not authorized:
+        errors.append("Python package layout implementation state disagrees with BC-050 authorization")
     mapping = layout.get("architecture_mapping", {})
     if set(mapping) != component_ids:
         errors.append("Python package layout does not map beneath exactly seven components")
+
+    # Every Phase-1 path carries a declared classification, and support paths
+    # create no eighth architectural component.
+    mapped_paths = {entry for paths in mapping.values() for entry in paths}
+    for entry in layout.get("paths", []):
+        if not entry.get("phase1"):
+            continue
+        classification = entry.get("classification")
+        if classification not in {"component", "support", "tests"}:
+            errors.append(f"Phase 1 path has no declared classification: {entry.get('path')}")
+            continue
+        if classification != "support":
+            continue
+        relative = str(entry.get("path", "")).removeprefix("src/blu_runtime/")
+        if relative in mapped_paths:
+            errors.append(f"support module claims an architectural component: {entry.get('path')}")
+    support = layout.get("support_layer", {})
+    support_paths = {item.get("path") for item in support.get("modules", [])}
+    declared_support = {
+        entry.get("path")
+        for entry in layout.get("paths", [])
+        if entry.get("classification") == "support"
+    }
+    if support_paths != declared_support:
+        errors.append("support layer roster disagrees with declared path classifications")
+    if not support.get("canon_loader_prohibitions"):
+        errors.append("support layer does not constrain the canonical source loader")
 
     parity = data[READINESS / "custom_gpt_python_parity_matrix.json"]
     if len(parity.get("parity_dimensions", [])) < 11 or len(parity.get("scenarios", [])) < 8:
@@ -428,8 +508,22 @@ def validate(root: Path) -> list[str]:
         errors.append("Dad/Blu closure does not bind the final Claude review")
     if closure.get("review_import_commit") != "3e77111b6d86879f591c7ab8c52a571c51e7c48e":
         errors.append("Dad/Blu closure does not bind the exact imported-review commit")
-    if checklist.get("implementation_authorized") is not False:
-        errors.append("readiness checklist authorizes implementation without a separate runtime authorization")
+    if checklist.get("implementation_authorized") is not authorized:
+        errors.append("readiness checklist authorization disagrees with the BC-050 authorization record")
+    runtime_code_check = checks.get("runtime_phase1_code_introduced_only_under_BC050_authorization", {})
+    if authorized:
+        if runtime_code_check.get("status") != "pass":
+            errors.append("authorized implementation does not record the BC-050 scope check")
+        if "no_runtime_code_introduced" in checks:
+            errors.append("readiness retains the stale pre-implementation runtime-code assertion")
+        record = checklist.get("bc050_implementation_authorization", {})
+        if record.get("authorized_by") != "Dad/Blu" or not record.get("packet"):
+            errors.append("BC-050 authorization record does not bind an authorizing party and packet")
+    else:
+        if checks.get("no_runtime_code_introduced", {}).get("status") != "pass":
+            errors.append("readiness does not assert that no runtime code was introduced")
+    # Authorization permits the assignment to begin; it never creates automatic
+    # start. This requirement is ungated and must hold in every state.
     if checklist.get("automatic_start_prohibited") is not True:
         errors.append("readiness automatically starts runtime implementation")
     if checklist.get("full_successor_feature_complete") is not False:
@@ -447,7 +541,7 @@ def validate(root: Path) -> list[str]:
             errors.append(f"selected jsonschema runtime version mismatch: {installed}")
 
     errors.extend(_validate_golden(root))
-    errors.extend(_validate_git_scope(root))
+    errors.extend(_validate_git_scope(root, authorized))
     errors.extend(_validate_manifest(root))
     return errors
 

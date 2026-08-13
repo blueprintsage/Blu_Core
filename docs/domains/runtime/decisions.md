@@ -1,5 +1,24 @@
 # Runtime Decisions
 
+## BC-050 — frozen Python model-facing envelope
+
+The Phase-1 model-facing payload is exactly `01_Persona.md` then
+`02_Operations_Law.md`, verified as raw bytes against `SHA256SUMS` before
+decoding, wrapped in fixed ASCII delimiters plus one host-mechanics block, with
+no trailing newline after the final delimiter. `canon_projection_digest` is
+SHA-256 over the rendered byte sequence, not over sources.
+
+`00_Instructions.md` does not enter the Python model-facing payload. It remains
+deployment and runtime-entry authority, and every Phase-1-applicable section is
+accounted for in the BC-050 parity mapping as Persona, Operations Law,
+deterministic enforcement, or an explicitly omitted GPT-only mechanic.
+
+Integrity verification precedes decoding deliberately: it is what makes the
+envelope digest portable, because a line-ending-converted checkout fails the
+golden check before rendering rather than silently producing a different digest.
+
+The source asymmetry between the two artifacts is preserved, not normalized.
+
 status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-08

@@ -184,6 +184,7 @@ contracts/security/opsec/minimum_contract.json
 contracts/security/opsec/schemas/
 docs/domains/runtime/assignments/BC-041/
 docs/domains/runtime/assignments/BC-041-C1/
+docs/domains/runtime/assignments/BC-050/
 tools/validate_opsec_contracts.py
 tests/security/
 ```

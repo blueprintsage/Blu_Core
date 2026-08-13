@@ -85,6 +85,23 @@ def _load(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _bc050_authorized(checklist: Mapping[str, Any]) -> bool:
+    """Report explicit Dad/Blu BC-050 implementation authorization.
+
+    Administrative gate only. It does not participate in OPSEC matching,
+    policy loading, normalization, or redaction, and it leaves the C1
+    conformance oracle untouched.
+    """
+    record = checklist.get("bc050_implementation_authorization")
+    return (
+        isinstance(record, Mapping)
+        and record.get("state") == "authorized"
+        and record.get("assignment") == "BC-050"
+        and bool(record.get("authorized_by"))
+        and bool(record.get("packet"))
+    )
+
+
 def _normalize_existing_pipeline(value: str) -> str:
     """Apply the pre-C1 deterministic normalization pipeline."""
     normalized = unicodedata.normalize("NFKC", value)
@@ -649,9 +666,16 @@ def validate(root: Path) -> list[str]:
         errors.append("Dad/Blu closure does not bind the reviewed correction tip")
     if closure.get("review_source_commit") != "f0998f78aaada899a16d4413170ef3689f04fe28":
         errors.append("Dad/Blu closure does not bind the final Claude review")
-    if checklist.get("implementation_authorized") is not False:
+    # BC-050-C1: implementation authorization is permitted only when the
+    # checklist carries explicit Dad/Blu BC-050 authorization evidence. Without
+    # that evidence these assertions keep their original pre-implementation
+    # behavior. Authorization never relaxes automatic_start_prohibited.
+    authorized = _bc050_authorized(checklist)
+    if checklist.get("implementation_authorized") is not authorized:
         errors.append("readiness checklist authorizes implementation without separate runtime authorization")
-    if checklist.get("automatic_start_prohibited") is not True or phase1.get("implementation_authorized") is not False:
+    if phase1.get("implementation_authorized") is not authorized:
+        errors.append("BC-041 improperly starts or authorizes runtime implementation")
+    if checklist.get("automatic_start_prohibited") is not True:
         errors.append("BC-041 improperly starts or authorizes runtime implementation")
     return errors
 

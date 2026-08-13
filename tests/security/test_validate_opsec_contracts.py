@@ -373,3 +373,94 @@ class OpsecContractValidationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BC050AuthorizationGateTests(unittest.TestCase):
+    """BC-050-C1: administrative gate only; OPSEC mechanism is untouched."""
+
+    def setUp(self) -> None:
+        self.checklist = json.loads(
+            (ROOT / "readiness/python_phase1_readiness_checklist.json").read_text(encoding="utf-8")
+        )
+
+    def test_authorized_checklist_is_recognized(self) -> None:
+        self.assertTrue(validator._bc050_authorized(self.checklist))
+
+    def test_missing_record_is_unauthorized(self) -> None:
+        del self.checklist["bc050_implementation_authorization"]
+        self.assertFalse(validator._bc050_authorized(self.checklist))
+
+    def test_wrong_assignment_is_unauthorized(self) -> None:
+        self.checklist["bc050_implementation_authorization"]["assignment"] = "BC-999"
+        self.assertFalse(validator._bc050_authorized(self.checklist))
+
+    def test_unstated_state_is_unauthorized(self) -> None:
+        self.checklist["bc050_implementation_authorization"]["state"] = "proposed"
+        self.assertFalse(validator._bc050_authorized(self.checklist))
+
+    def test_record_without_authorizing_party_is_unauthorized(self) -> None:
+        self.checklist["bc050_implementation_authorization"]["authorized_by"] = ""
+        self.assertFalse(validator._bc050_authorized(self.checklist))
+
+    def test_record_without_packet_is_unauthorized(self) -> None:
+        self.checklist["bc050_implementation_authorization"]["packet"] = ""
+        self.assertFalse(validator._bc050_authorized(self.checklist))
+
+    def test_non_mapping_record_is_unauthorized(self) -> None:
+        self.checklist["bc050_implementation_authorization"] = "authorized"
+        self.assertFalse(validator._bc050_authorized(self.checklist))
+
+
+class OpsecMechanismUnchangedTests(unittest.TestCase):
+    """The C1 oracle must be semantically identical after BC-050-C1."""
+
+    CF = ("​", "­", "‍", "‌", "﻿", "⁠")
+    PHRASE = "cerulean comet charter"
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        fixture = json.loads((ROOT / validator.SYNTHETIC_POLICY).read_text(encoding="utf-8"))
+        cls.policy = fixture["policy"]
+
+    def test_outer_edge_and_interior_cf_still_block(self) -> None:
+        for code_point in self.CF:
+            for candidate in (
+                code_point + self.PHRASE,
+                self.PHRASE + code_point,
+                code_point + self.PHRASE + code_point,
+                code_point.join(self.PHRASE.split(" ")),
+                (code_point * 3).join(self.PHRASE.split(" ")),
+            ):
+                with self.subTest(code_point=hex(ord(code_point))):
+                    result = validator.evaluate_ingress(candidate, self.policy)
+                    self.assertEqual("BLOCK", result["security_decision"])
+
+    def test_provenance_offsets_are_unchanged(self) -> None:
+        self.assertEqual(
+            {"normalized": "abc", "removed_cf_boundaries": [1, 2]},
+            {
+                key: value
+                for key, value in validator.normalized_match_candidate("a​b‌c").items()
+                if key in {"normalized", "removed_cf_boundaries"}
+            },
+        )
+
+    def test_word_adjacency_without_removed_cf_still_does_not_match(self) -> None:
+        self.assertEqual(
+            "PASS", validator.evaluate_ingress("xcerulean comet charter", self.policy)["security_decision"]
+        )
+
+    def test_unseparated_concatenation_still_fail_safe_matches(self) -> None:
+        self.assertEqual(
+            "BLOCK", validator.evaluate_ingress("ceruleancometcharter", self.policy)["security_decision"]
+        )
+
+    def test_redaction_and_rescan_are_unchanged(self) -> None:
+        result = validator.evaluate_egress(f"see {self.PHRASE} today", self.policy)
+        self.assertEqual("REDACTED", result["egress_result"])
+        self.assertNotIn("cerulean", result["public_output"])
+
+    def test_fail_closed_without_policy(self) -> None:
+        result = validator.evaluate_ingress("hello", None, "POLICY_INTEGRITY_MISMATCH")
+        self.assertIsNone(result["security_decision"])
+        self.assertFalse(result["eligible_for_turn_controller"])

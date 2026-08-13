@@ -424,3 +424,77 @@ class ContinuityContractValidationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BC050ImplementationTreeTests(unittest.TestCase):
+    """BC-050-C1: authorized runtime existence is not a continuity violation."""
+
+    CHECKLIST = "readiness/python_phase1_readiness_checklist.json"
+
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.addCleanup(self.temp.cleanup)
+        target = self.root / self.CHECKLIST
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / self.CHECKLIST, target)
+
+    def _write(self, relative: str) -> None:
+        path = self.root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("x = 1\n", encoding="utf-8")
+
+    def _deauthorize(self) -> None:
+        path = self.root / self.CHECKLIST
+        document = json.loads(path.read_text(encoding="utf-8"))
+        del document["bc050_implementation_authorization"]
+        path.write_text(json.dumps(document), encoding="utf-8")
+
+    def test_authorized_runtime_package_is_accepted(self) -> None:
+        self._write("src/blu_runtime/core/turn_controller.py")
+        self.assertEqual([], validator._validate_no_implementation_tree(self.root))
+
+    def test_unauthorized_runtime_package_is_rejected(self) -> None:
+        self._deauthorize()
+        self._write("src/blu_runtime/core/turn_controller.py")
+        self.assertIn(
+            "runtime or provider implementation exists: src",
+            validator._validate_no_implementation_tree(self.root),
+        )
+
+    def test_production_file_outside_the_package_is_rejected(self) -> None:
+        self._write("src/blu_runtime/core/turn_controller.py")
+        self._write("src/rogue_runtime/engine.py")
+        errors = validator._validate_no_implementation_tree(self.root)
+        self.assertTrue(any("src/rogue_runtime/engine.py" in error for error in errors), errors)
+
+    def test_other_prohibited_roots_remain_rejected_even_when_authorized(self) -> None:
+        for root_name in ("runtime", "blu_core", "providers", "local_mirror", "lm_studio", "pass", "skillforge"):
+            with self.subTest(root=root_name):
+                self._write(f"{root_name}/thing.py")
+                errors = validator._validate_no_implementation_tree(self.root)
+                self.assertIn(f"runtime or provider implementation exists: {root_name}", errors)
+                (self.root / root_name / "thing.py").unlink()
+
+    def test_missing_checklist_is_unauthorized(self) -> None:
+        (self.root / self.CHECKLIST).unlink()
+        self.assertFalse(validator._bc050_authorized(self.root))
+
+    def test_malformed_checklist_is_unauthorized(self) -> None:
+        (self.root / self.CHECKLIST).write_text("{not json", encoding="utf-8")
+        self.assertFalse(validator._bc050_authorized(self.root))
+
+    def test_flag_without_record_is_unauthorized(self) -> None:
+        self._deauthorize()
+        self.assertFalse(validator._bc050_authorized(self.root))
+
+    def test_continuity_lifetime_vocabulary_is_unchanged(self) -> None:
+        """BC-050-C1 must not touch the lifetime vocabulary or add `session`."""
+        registry = json.loads(
+            (ROOT / "contracts/successor/component_registry.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            ["none", "turn", "host_session", "durable_external"],
+            registry["state_lifetime_values"],
+        )
+        self.assertNotIn("session", registry["state_lifetime_values"])

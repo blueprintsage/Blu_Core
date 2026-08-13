@@ -1,5 +1,25 @@
 # Runtime Decisions
 
+## BC-050-C1 — one authorization gate, three enforcement points
+
+Pre-implementation law forbidding any runtime tree was encoded independently in
+the readiness, OPSEC, and continuity validators. Authorizing the first real
+implementation therefore required aligning all three, not one.
+
+The decision is that authorization evidence has a single home —
+`bc050_implementation_authorization` in the readiness checklist — and each
+validator reads that same evidence rather than carrying its own policy. Absent
+or malformed evidence, every guard reverts to its original behavior, so
+unauthorized implementation is still rejected in three independent places.
+
+`automatic_start_prohibited` is asserted ungated in every validator.
+Authorization permits a named assignment to begin; it never creates automatic
+start, and no authorization state may relax that.
+
+Administrative gating in the OPSEC validator is explicitly separate from the C1
+conformance oracle. The oracle is proven byte-identical whenever that file is
+touched, so security evidence never rests on the administrative change.
+
 ## BC-050 — frozen Python model-facing envelope
 
 The Phase-1 model-facing payload is exactly `01_Persona.md` then

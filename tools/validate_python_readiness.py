@@ -478,7 +478,15 @@ def validate(root: Path) -> list[str]:
         errors.append("readiness checklist retains stale blockers")
     if checklist.get("runtime_phase1_packet_may_be_authored_next") is not True:
         errors.append("runtime packet may not be authored despite resolved SUR-001")
-    if checklist.get("result_semantics") != "technical_conditions_satisfied_independent_correction_review_and_Dad_Blu_closure_complete_implementation_authorization_pending":
+    # BC-050-C1: the finite result semantics track the authorization state.
+    # Neither value implies implementation completeness, independent review, or
+    # integration approval.
+    expected_semantics = (
+        "python_phase1_implementation_authorized_and_active_pending_independent_review"
+        if authorized
+        else "technical_conditions_satisfied_independent_correction_review_and_Dad_Blu_closure_complete_implementation_authorization_pending"
+    )
+    if checklist.get("result_semantics") != expected_semantics:
         errors.append("readiness result does not distinguish technical status from review and authorization")
     if checklist.get("correction_state") != "b1_prime_and_b1_double_prime_closed_independent_review_complete":
         errors.append("readiness does not record final B-1 prime and B-1 double-prime correction state")

@@ -1,6 +1,6 @@
 # BC-050 — Handoff Record
 
-status: blocked_on_contradiction
+status: ready_for_independent_implementation_review
 owner: Claude
 reviewer: Codex
 project_lead: Blu
@@ -10,11 +10,10 @@ last_reviewed: 2026-08-12
 
 ## Result
 
-Python Runtime Phase 1 is implemented and its deterministic suite passes in
-full. One genuine contract contradiction blocks the readiness-state transition
-and therefore blocks BC-050 from moving to `review`. Per the packet's §21
-deviation protocol it is recorded here rather than solved by editing a
-protected contract or expanding scope.
+Python Runtime Phase 1 is implemented and every deterministic suite passes.
+Contradiction C-1 was resolved by the bounded BC-050-C1 correction pass,
+authorized by Dad/Blu with an explicit collision-domain amendment. BC-050 is
+now ready for independent Codex implementation review.
 
 ## Identity
 
@@ -26,7 +25,7 @@ protected contract or expanding scope.
 - Independent implementation reviewer: Codex
 - Live LM Studio smoke test: `not_performed` (no live environment supplied)
 
-## BLOCKING CONTRADICTION — C-1
+## CONTRADICTION C-1 — RESOLVED by BC-050-C1
 
 **Frozen requirements cannot all hold.** The "no runtime implementation"
 assertion is duplicated across **three** validators. BC-050's collision domain
@@ -62,7 +61,10 @@ Against that:
 - BC-050 completion criterion 21 requires existing repository validators to
   still pass.
 
-All four cannot be satisfied simultaneously. Dad/Blu must resolve this.
+All four could not be satisfied simultaneously. **Resolved** by BC-050-C1
+(option 1 below): both validators now gate on the same explicit BC-050
+authorization evidence the readiness validator uses, and the OPSEC
+conformance oracle was proven byte-identical.
 
 ### C-1b — continuity validator
 
@@ -112,55 +114,49 @@ against, so the guard is stale. BC-050 did not modify that file
 did not repair it: it is outside the collision domain and outside this
 assignment. Recorded for a future narrow hardening pass.
 
-### Why the tree was left in the failing state
+### How C-1 was resolved (BC-050-C1)
 
-Reverting the readiness files to `implementation_authorized: false` would make
-both validators pass, but the repository would then assert that no authorized
-runtime implementation exists while authorized runtime implementation is
-present in the same commit. Operations Law's Runtime Truth Doctrine and
-`00_Instructions.md` Truth Discipline both forbid that record. The truthful
-state with a validator that visibly disagrees is the honest posture; the
-validator failure names the contradiction instead of hiding it.
+Dad/Blu authorized a bounded correction pass, `BC-050-C1 — Authorized-
+Implementation Validator Alignment`, with an explicit collision-domain
+amendment covering both validators and their tests. Option 1 above was taken.
 
-### Assessment for Dad/Blu
+Both validators now gate on the same explicit BC-050 authorization evidence the
+readiness validator already used: `bc050_implementation_authorization` with
+`state: authorized` and `assignment: BC-050`. Absent or malformed evidence, every
+guard keeps its original pre-implementation behavior.
 
-The two offending assertions are not part of the conformance oracle. They sit
-in a readiness/scope-proof function appended to the OPSEC validator, and they
-do not touch `normalized_match_candidate`, the matcher, or policy loading —
-the surfaces the differential tests bind to. A minimal amendment limited to
-those two assertions would not weaken C1 evidence or invalidate any
-differential test.
+- `tools/validate_opsec_contracts.py` — the two stale assertions now compare
+  against the authorization state instead of a hard `False`.
+  `automatic_start_prohibited is True` was split into its own ungated
+  assertion so authorization can never relax it.
+- `tools/validate_continuity_contracts.py` — `src` is conditionally permitted
+  and only for `src/blu_runtime/**`; every other prohibited root stays
+  rejected outright, and any file under `src/` outside the package is
+  rejected. The Python git-scope allowlist admits `src/blu_runtime/**` and
+  `tests/runtime_phase1/**` when authorized, preserving all pre-existing tool
+  and test paths.
 
-I did not make that change. The packet is explicit that
-`tools/validate_opsec_contracts.py` is protected, and §21 directs me to record
-a contradiction rather than resolve it by editing a protected contract.
+The OPSEC conformance oracle was proven byte-identical across all twelve
+functions (`_normalize_existing_pipeline`, `normalized_match_candidate`,
+`normalize_rule_text`, `_comparison_view`, `_matches`,
+`validate_policy_usability`, `load_policy`, `_evidence`,
+`_failure_evaluation`, `evaluate_ingress`, `_has_overlapping_spans`,
+`evaluate_egress`) and all six governing constants, compared against
+`708101d`. Only the administrative gate changed.
 
-Options for Dad/Blu, in order of my recommendation:
-
-1. Amend BC-050 to add `tools/validate_opsec_contracts.py` and
-   `tools/validate_continuity_contracts.py` to the collision domain for changes
-   limited to the assertions listed above, gated exactly the way the readiness
-   validator now is, with the OPSEC oracle functions unchanged and the
-   differential tests re-run to confirm the oracle still behaves identically.
-2. Move the authorization and implementation-tree assertions out of both
-   validators into the readiness validator, where the BC-050 gate already
-   lives, so the rule has one home instead of three.
-3. Direct me to revert the readiness transition and record BC-050 as
-   implemented-but-unrecorded. I do not recommend this; it makes the
-   repository state untruthful.
-
-Whichever path is chosen, the underlying lesson is that the "no runtime
-implementation" rule was encoded in three places, so authorizing the first real
-implementation was always going to require touching all three.
+Continuity law was not weakened: the Generic Continuity Provider Boundary
+remains abstraction-only, no durable provider exists, Local Mirror remains
+unimplemented with no architectural root, the lifetime vocabulary is unchanged
+with no bare `session`, and SUR-007 and SUR-011 dispositions are untouched.
 
 ### Reviewer note on my own pre-flight review
 
 My pre-flight B-1 identified this exact class of defect in
 `tools/validate_python_readiness.py` and asserted that extending the collision
 domain to that file plus its test would be sufficient. It was not. The same
-assertion is duplicated in `tools/validate_opsec_contracts.py`, and I did not
-check for the duplicate. Amendment A closed B-1 as scoped, so the gap reached
-implementation.
+rule was encoded in two more validators and I did not check for duplicates.
+Amendment A closed B-1 as scoped, so the gap reached implementation and needed
+this correction pass.
 
 ## Completed work
 
@@ -236,8 +232,9 @@ vector, persistence, or tool framework was added.
 
 ## Ready for independent Codex review?
 
-**Not yet.** C-1 must be resolved by Dad/Blu first. Once resolved, the
-remaining work is to re-run the two affected suites and the two validators; no
-production code change is expected.
+**Yes.** C-1 is resolved by BC-050-C1. All four suites and every applicable
+validator pass except the known BC-020 fixed-base host-adapter finding, which
+predates BC-050 and reproduces at the authorized base. No production
+`src/blu_runtime/**` file changed during the correction.
 
 Do not merge. BC-050 is not self-closed.

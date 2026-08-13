@@ -1,5 +1,28 @@
 # Runtime Worklog
 
+## BC-050-C1 — Authorized-Implementation Validator Alignment
+
+Bounded correction from `708101d7f6dfc7748bb69d71f56e4da1044a2699` on branch
+`bc-050-c1-validator-alignment`, resolving BC-050 contradiction C-1 under an
+explicit Dad/Blu collision-domain amendment.
+
+The "no runtime implementation" rule lived in three validators. All three now
+gate on the same explicit BC-050 authorization evidence; absent that evidence,
+every guard keeps its pre-implementation behavior. The OPSEC conformance oracle
+was proven byte-identical across twelve functions and six constants, and the
+full differential-equivalence suite was re-run unchanged.
+
+Readiness `result_semantics` now reads
+`python_phase1_implementation_authorized_and_active_pending_independent_review`,
+which claims authorization and activity without implying completeness, review,
+or integration. The internal `sys.path` mutation was removed from the runtime
+test helper; imports now come from the external `PYTHONPATH=src` fallback.
+
+All four suites pass: runtime 119, security 49, readiness 32, continuity 50.
+Every applicable validator passes except the known BC-020 fixed-base
+host-adapter finding, which reproduces at the authorized base. No production
+`src/blu_runtime/**` file changed. BC-050 is ready for independent Codex review.
+
 ## BC-050 — Python Runtime Phase 1 (implementation, blocked on C-1)
 
 Dad/Blu explicitly authorized BC-050 implementation on 2026-08-12 and moved

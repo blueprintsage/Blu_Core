@@ -1,31 +1,26 @@
 # Runtime Next Steps
 
-## Immediate — resolve BC-050 contradiction C-1
+## Immediate — independent Codex review of BC-050
 
-BC-050 implementation is complete and its own suite passes, but the assignment
-cannot move to review until Dad/Blu decide how to reconcile the authorized
-readiness state with two validators that still assert no runtime implementation
-exists:
+BC-050-C1 resolved contradiction C-1. All four suites and every applicable
+validator pass except the known BC-020 fixed-base host-adapter finding.
 
-- `tools/validate_opsec_contracts.py:652-655` (protected by the BC-050 packet)
-- `tools/validate_continuity_contracts.py:91-94` (outside the collision domain)
+BC-050 now goes to Codex for independent implementation review. Claude authored
+the implementation and must not be its sole independent reviewer. Codex should
+review packet compliance, architecture preservation, security and control flow,
+OPSEC equivalence, provider non-invocation proofs, envelope and digest
+construction, LM Studio evidence handling, continuity truth, readiness-validator
+integrity, test adequacy, and scope discipline. Codex must not assume approval.
 
-Recommended: amend BC-050 to cover both files for changes limited to those
-assertions, gated exactly as `tools/validate_python_readiness.py` now is, with
-the OPSEC oracle functions untouched and the differential tests re-run.
+Outstanding environment item: editable-install verification
+(`python -m pip install -e .`) has not been performed because the approved build
+backend is unavailable locally. The authorized external `PYTHONPATH=src`
+fallback works and the package-layout import test passes under it.
 
-After C-1 is resolved, BC-050 goes to Codex for independent implementation
-review. Claude authored the implementation and must not be its sole independent
-reviewer.
-
-Also open, unrelated to BC-050: `tools/validate_host_adapter_contracts.py`
-fails at the authorized base because its BC-020 protected-path guard predates
-BC-041's legitimate change to `contracts/successor/unresolved_register.json`.
-
-status: active
-owner: docs/domains/runtime
-last_reviewed: 2026-08-12
-
+Still open, unrelated to BC-050: `tools/validate_host_adapter_contracts.py`
+fails at the authorized base because its BC-020 fixed-base protected-path guard
+predates BC-041's legitimate change to
+`contracts/successor/unresolved_register.json`. Do not fold this into BC-050.
 ## BC-041 / BC-041-C1 closed gate
 
 BC-041 and BC-041-C1 are `done`. Current `main` integrates the correction

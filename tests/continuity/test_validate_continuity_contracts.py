@@ -21,6 +21,14 @@ validator = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(validator)
 
 
+_MATRIX_SPEC = importlib.util.spec_from_file_location(
+    "bc050_authorization_matrix", ROOT / "tests/readiness/bc050_authorization_matrix.py"
+)
+assert _MATRIX_SPEC and _MATRIX_SPEC.loader
+matrix = importlib.util.module_from_spec(_MATRIX_SPEC)
+_MATRIX_SPEC.loader.exec_module(matrix)
+
+
 class ContinuityContractValidationTests(unittest.TestCase):
     maxDiff = None
 
@@ -430,14 +438,17 @@ class BC050ImplementationTreeTests(unittest.TestCase):
     """BC-050-C1: authorized runtime existence is not a continuity violation."""
 
     CHECKLIST = "readiness/python_phase1_readiness_checklist.json"
+    SLICE = "readiness/phase1_executable_slice.json"
 
     def setUp(self) -> None:
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
         self.addCleanup(self.temp.cleanup)
-        target = self.root / self.CHECKLIST
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / self.CHECKLIST, target)
+        # BC-050-C2: authorization spans both readiness records.
+        for relative in (self.CHECKLIST, self.SLICE):
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, target)
 
     def _write(self, relative: str) -> None:
         path = self.root / relative
@@ -498,3 +509,57 @@ class BC050ImplementationTreeTests(unittest.TestCase):
             registry["state_lifetime_values"],
         )
         self.assertNotIn("session", registry["state_lifetime_values"])
+
+
+class _AuthorizationMatrixHarness(unittest.TestCase):
+    """Copies the two readiness records into a temp root and mutates them.
+
+    B-01: this validator must reject every malformed authorization record on
+    its own, without relying on any other validator running first.
+    """
+
+    RECORDS = ("readiness/python_phase1_readiness_checklist.json",
+               "readiness/phase1_executable_slice.json")
+
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.addCleanup(self.temp.cleanup)
+        for relative in self.RECORDS:
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, target)
+
+    def test_authorized_baseline_authenticates(self) -> None:
+        self.assertTrue(validator._bc050_authorized(self.root))
+
+    def test_every_mutation_is_rejected_independently(self) -> None:
+        for label, mutate in matrix.MUTATIONS:
+            with self.subTest(mutation=label):
+                for relative in self.RECORDS:
+                    shutil.copy2(ROOT / relative, self.root / relative)
+                matrix.apply_mutation(self.root, mutate)
+                self.assertFalse(
+                    validator._bc050_authorized(self.root),
+                    f"{label} authenticated; the prohibition was not restored",
+                )
+
+    def test_missing_records_are_unauthorized(self) -> None:
+        for relative in self.RECORDS:
+            with self.subTest(missing=relative):
+                for other in self.RECORDS:
+                    shutil.copy2(ROOT / other, self.root / other)
+                (self.root / relative).unlink()
+                self.assertFalse(validator._bc050_authorized(self.root))
+
+    def test_malformed_records_are_unauthorized(self) -> None:
+        for relative in self.RECORDS:
+            with self.subTest(malformed=relative):
+                for other in self.RECORDS:
+                    shutil.copy2(ROOT / other, self.root / other)
+                (self.root / relative).write_text("{not json", encoding="utf-8")
+                self.assertFalse(validator._bc050_authorized(self.root))
+
+
+class BC050AuthorizationMatrixTests(_AuthorizationMatrixHarness):
+    """B-01 matrix applied independently to the continuity validator."""

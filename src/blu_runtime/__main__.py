@@ -26,6 +26,7 @@ from blu_runtime.contracts.models import (
     BLOCK,
     INVALID,
     PASS,
+    PROVIDER_COMPLETION_EVIDENCE_MISSING,
     UNAVAILABLE,
     CanonProjection,
     ContinuityState,
@@ -151,6 +152,18 @@ def run_turn(runtime: Runtime, text: Any, request_id: str | None = None) -> Term
     )
 
     result = runtime.boundary.infer(execution_request)
+    # B-07: completion evidence is observed or the turn is not a success. A
+    # generated label is not evidence, so there is deliberately no fallback.
+    if result.status == PASS and not (result.completion_evidence_ref or "").strip():
+        return TerminalPacket(
+            request_id=identifier,
+            status=INVALID,
+            public_output=None,
+            safe_error_code=PROVIDER_COMPLETION_EVIDENCE_MISSING,
+            model_invoked=True,
+            tool_executed=False,
+            continuity=runtime.continuity,
+        )
     if result.status != PASS or result.candidate_text is None:
         return TerminalPacket(
             request_id=identifier,
@@ -184,8 +197,7 @@ def run_turn(runtime: Runtime, text: Any, request_id: str | None = None) -> Term
             control_decision_ref=execution_request.control_decision_ref,
             validation_result_ref=f"validation-result:{identifier}",
             terminal_packet_ref=f"terminal-packet:{identifier}",
-            provider_completion_evidence_ref=result.completion_evidence_ref
-            or f"provider-completion:{identifier}",
+            provider_completion_evidence_ref=result.completion_evidence_ref,
         )
     )
 

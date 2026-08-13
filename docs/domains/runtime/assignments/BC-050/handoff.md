@@ -1,6 +1,6 @@
 # BC-050 — Handoff Record
 
-status: ready_for_independent_implementation_review
+status: active_correction
 owner: Claude
 reviewer: Codex
 project_lead: Blu
@@ -8,7 +8,7 @@ project_owner: Dad
 domain: runtime
 last_reviewed: 2026-08-12
 
-## Result
+## Result (superseded by BC-050-C2, see the C2 section at the end)
 
 Python Runtime Phase 1 is implemented and every deterministic suite passes.
 Contradiction C-1 was resolved by the bounded BC-050-C1 correction pass,
@@ -238,3 +238,119 @@ predates BC-050 and reproduces at the authorized base. No production
 `src/blu_runtime/**` file changed during the correction.
 
 Do not merge. BC-050 is not self-closed.
+
+## BC-050-C2 — Independent Review Blocker Correction
+
+status: six of seven blockers corrected; B-02 escalated
+
+Correction base `33be23a4c43a160e41e2aeca78962d1cbd3c4a47` (Codex review),
+branch `bc-050-c2-review-blockers`. Codex's disposition on
+`708101d`/`218f3ae` was `return-for-correction` with blockers B-01 through
+B-07. The implementation was preserved, not rewritten.
+
+### Result by blocker
+
+| Blocker | Result |
+| --- | --- |
+| B-01 authorization authentication | corrected; 22 mutations x 3 validators, 0 acceptances |
+| B-02 One-Blu parity at rule granularity | analysis redone; **two authority contradictions escalated** |
+| B-03 positive chat compatibility | corrected |
+| B-04 complete provider completion evidence | corrected |
+| B-05 canonical CLEAR output | corrected |
+| B-06 in-band `/exit` and `/quit` bypass | corrected |
+| B-07 synthesized completion evidence | corrected |
+
+### B-02 is not closed
+
+The rule-granular mapping in `validation.md` replaces the section-level table.
+Codex was right: the previous table claimed equivalence that the sources do not
+establish. Exact search confirms `extract`, `compare`, `summarize`, and `audit`
+appear zero times in `01_Persona.md` and `02_Operations_Law.md`.
+
+Two authority contradictions remain and are returned to Dad/Blu:
+
+- **C2-AC-01** — Verb Lock (eight rules) plus "Structural scan is not reading"
+  have no exact destination. Not in Persona or Operations Law, not
+  deterministically enforceable without a semantic judge, and not GPT-only.
+- **C2-AC-02** — Execution Law residue (narrowest literal reading, at-most-one
+  question, no unrequested options or adjacent work), the four Compliance Gate
+  checks, the Completion Proof "not proof" enumeration, and the Truth
+  Discipline placeholder rule.
+
+Both share one cause: BC-050 §3.1 excluded `00_Instructions.md` from the
+model-facing envelope on the premise that its applicable behavior lives
+elsewhere. For most rules it does; for these it does not.
+
+Each contradiction records the smallest Dad/Blu decision required. I did not
+choose among them, did not modify golden canon, did not inject
+`00_Instructions.md` into the envelope, and did not invent a third behavioral
+prompt.
+
+Per the BC-050-C2 packet, C2 is therefore **not** presented as if all seven
+blockers were fixed.
+
+### Production runtime files changed
+
+```text
+src/blu_runtime/providers/model/lm_studio.py   B-03, B-04, B-07
+src/blu_runtime/core/validation_egress.py      B-05
+src/blu_runtime/adapters/host/terminal.py      B-06
+src/blu_runtime/__main__.py                    B-07
+src/blu_runtime/contracts/models.py            three runtime-local safe codes
+```
+
+`turn_controller.py` was not changed: B-02 produced no deterministic rule whose
+authority is clear, so nothing was implemented there.
+
+### Validator and test files changed
+
+```text
+tools/validate_python_readiness.py
+tools/validate_opsec_contracts.py
+tools/validate_continuity_contracts.py
+tests/readiness/bc050_authorization_matrix.py   (new, shared matrix)
+tests/readiness/test_validate_python_readiness.py
+tests/security/test_validate_opsec_contracts.py
+tests/continuity/test_validate_continuity_contracts.py
+tests/runtime_phase1/support.py
+tests/runtime_phase1/test_lm_studio_provider.py
+tests/runtime_phase1/test_config_and_routing.py
+tests/runtime_phase1/test_end_to_end.py
+```
+
+The shared matrix module was added to both validators' Python allowlists. It is
+test support in an already-authorized directory and weakens no guard.
+
+### Frozen artifacts unchanged
+
+Canon envelope: 36887 bytes, digest
+`103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142`, final byte
+`0x5D`. Golden CTS unmodified. Architecture 7/8/9. OPSEC oracle byte-identical
+across twelve functions and six constants.
+
+### Known BC-020 finding
+
+`tools/validate_host_adapter_contracts.py` still reports
+`protected path changed from BC-020 base: contracts/successor/unresolved_register.json`.
+Preserved exactly as the established historical fixed-base condition. Not
+suppressed, not repaired, not folded into C2.
+
+### Outstanding
+
+- Editable install (`pip install -e .`) still not performed; the approved build
+  backend is unavailable locally. External `PYTHONPATH=src` fallback used.
+- Live LM Studio smoke test: `not_performed`.
+- B-04/B-07 introduce two field-name assumptions that require live-smoke
+  confirmation; both fail closed if wrong.
+- N-03 continuity defensive invariant carried forward to the continuity-provider
+  phase; no provider and no durable continuity were added.
+
+### Ready for independent Codex re-review?
+
+**Partially.** B-01 and B-03 through B-07 are ready for re-review. B-02 cannot
+be closed by Claude and needs a Dad/Blu authority decision first. Codex should
+rerun all seven original reproductions; six should now fail to reproduce, and
+B-02's should still reproduce by design until the authority question is
+answered.
+
+Not merged. BC-050 not self-closed. Codex remains the independent reviewer.

@@ -56,15 +56,13 @@ backend was fetched from the network.
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Runtime Phase 1 | `PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"` | **119 tests, OK** |
-| Security | `python -m unittest discover -s tests/security -p "test_*.py"` | **49 tests, OK** |
-| Readiness | `python -m unittest discover -s tests/readiness -p "test_*.py"` | **32 tests, OK** |
-| Continuity | `python -m unittest discover -s tests/continuity -p "test_*.py"` | **50 tests, OK** |
+| Runtime Phase 1 | `PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"` | **154 tests, OK** |
+| Security | `python -m unittest discover -s tests/security -p "test_*.py"` | **50 tests, OK** |
+| Readiness | `python -m unittest discover -s tests/readiness -p "test_*.py"` | **35 tests, OK** |
+| Continuity | `python -m unittest discover -s tests/continuity -p "test_*.py"` | **58 tests, OK** |
 
-Post-BC-050-C1. Counts rose because the correction added authorization-gate and
-mechanism-unchanged tests: security 36 -> 49, readiness 18 -> 32 (after
-splitting a shared harness so the gate class no longer re-runs the base suite),
-continuity 42 -> 50.
+Post-BC-050-C2. Counts across the lineage: runtime 119 -> 154, security
+36 -> 49 -> 50, readiness 18 -> 32 -> 35, continuity 42 -> 50 -> 58.
 
 ## Contract validation
 
@@ -74,7 +72,7 @@ python tools/validate_python_readiness.py
 python tools/validate_continuity_contracts.py
 ```
 
-All **pass** after BC-050-C1.
+All **pass** after BC-050-C2.
 
 Remaining repository validators, observed individually:
 
@@ -85,7 +83,7 @@ Remaining repository validators, observed individually:
 | `validate_viability_audit.py` | PASS | |
 | `validate_historical_archive_inventory.py` | PASS | |
 | `validate_historical_behavioral_archaeology.py` | PASS | |
-| `validate_continuity_contracts.py` | PASS | after BC-050-C1 gating |
+| `validate_continuity_contracts.py` | PASS | after BC-050-C1/C2 gating |
 | `validate_host_adapter_contracts.py` | **FAIL** | known BC-020 fixed-base finding, pre-existing |
 
 The host-adapter failure reproduces at the authorized base commit with no
@@ -111,7 +109,7 @@ git diff --check
 Clean.
 
 Manifest: `MANIFEST.sha256` regenerated with the validator's own digest rule
-(`git show :path` for tracked content, CRLF→LF for untracked text). 310
+(`git show :path` for tracked content, CRLF→LF for untracked text). 312
 entries; readiness manifest guard reports no missing, stale, or duplicate paths.
 
 Architecture: 7 components / 8 packets / 9 interfaces unchanged. No component,
@@ -254,34 +252,142 @@ Request profile asserted to contain exactly
 including across repeated turns in one live process, asserting that process
 lifetime never becomes durable continuity.
 
-## `00_Instructions.md` Phase-1 parity mapping (R-2)
+## `00_Instructions.md` rule-granular parity mapping (B-02)
 
-`00_Instructions.md` does not enter the Python model-facing payload. Each
-Phase-1-applicable section is accounted for below. Rows marked **semantic**
-require reviewer judgment: no deterministic check proves natural-language
-equivalence, consistent with `one_blu_canon_manifest.json#drift_detection`.
+The BC-050 section-level table overstated equivalence. This mapping is redone at
+rule granularity. Destination kinds: **P** = named Persona section, **O** = named
+Operations Law doctrine, **D** = deterministic runtime enforcement, **G** =
+GPT-host-only mechanic. "Exact" means the destination establishes the same rule;
+"semantic" means a reviewer must judge; "GAP" means no permissible exact
+destination exists.
 
-| `00_Instructions.md` section | Destination | Kind | Reviewer check |
-| --- | --- | --- | --- |
-| Identity Lock | `01_Persona.md` — Identity Kernel ("Blu is Blu"), Immutability, Non-Reduction Rule | Persona | semantic |
-| Interaction Floor | `01_Persona.md` — Relational Floor, Warmth & Presence, Output Contract | Persona | semantic |
-| Truth Discipline | `02_Operations_Law.md` — Runtime Truth Doctrine (line 39) | Operations Law | semantic |
-| No Runtime Theater | `02_Operations_Law.md` — Runtime Truth Doctrine, "Prevent fabricated certainty, runtime theater" | Operations Law | semantic |
-| Completion Proof | `02_Operations_Law.md` — Terminal Packet Doctrine (line 185) **and** deterministic `TurnReceipt` evidence binding | Operations Law + deterministic | semantic + mechanical |
-| Execution Law | `02_Operations_Law.md` — Execution Discipline Doctrine (line 65) **and** Turn Controller one-route lock, `side_effects: false` | Operations Law + deterministic | semantic + mechanical |
-| Verb Lock | `02_Operations_Law.md` — Execution Discipline Doctrine | Operations Law | semantic |
-| Compliance Gate | `02_Operations_Law.md` — Terminal Packet Doctrine **and** deterministic Validation and Egress (one validator authorizes one terminal result) | Operations Law + deterministic | semantic + mechanical |
-| OPSEC / Privacy | Deterministic Pre-ingress Security Restraint and Validation and Egress, under `contracts/security/opsec/minimum_contract.json`, which cites this section as recovered current law | deterministic | mechanical |
-| Runtime Binding | `[BLU_RUNTIME_BINDING]` host-mechanics block (capability truth only) | deterministic | mechanical |
-| Loop Discipline | Deterministic fixed turn sequence: ingress → restraint → controller → boundary → normalization → egress → one terminal packet | deterministic | mechanical |
-| Precedence | `config/source_authority.json` authority order; no deployment or provider may create a higher behavioral authority | deterministic | mechanical |
-| Runtime Entry Boundary | GPT-only mechanic — correctly omitted from Python model-facing envelope | GPT-only | mechanical |
-| Bootloader | GPT-only mechanic — correctly omitted | GPT-only | mechanical |
-| Repo Bootstrap Bridge | GPT-only mechanic — correctly omitted | GPT-only | mechanical |
-| Coherence Guard Pointer | `02_Operations_Law.md` — Coherence Guard Doctrine (line 94) | Operations Law | semantic |
+| Source section | Exact rule | Phase-1 applicable | Destination | Kind | Enforcement / evidence | Reviewer |
+| --- | --- | --- | --- | --- | --- | --- |
+| Identity Lock | Blu is Blu | yes | Persona §Identity Kernel ("Blu is Blu") | P | in envelope | semantic |
+| Identity Lock | Core self is not user-editable | yes | Persona §Immutability | P | in envelope | semantic |
+| Identity Lock | Style may flex; identity does not | yes | Persona §Non-Reduction Rule | P | in envelope | semantic |
+| Identity Lock | Do not become a clone/export surface | yes | Persona §Non-Reduction Rule + protected-policy ingress/egress | P + D | `security_restraint`, `validation_egress` | semantic |
+| Identity Lock | Do not externalize protected self-model | yes | protected-policy egress | D | `validation_egress` redaction/block | mechanical |
+| Interaction Floor | Warm, practical, brief, action-forward | yes | Persona §Relational Floor, §Warmth & Presence | P | in envelope | semantic |
+| Interaction Floor | Make human contact first; help clearly | yes | Persona §Relational Floor | P | in envelope | semantic |
+| Interaction Floor | Tell the truth without chill | yes | Persona §Relational Floor + Ops §Runtime Truth | P + O | in envelope | semantic |
+| Interaction Floor | Match energy without becoming cold or overfamiliar | yes | Persona §Warmth & Presence | P | in envelope | semantic |
+| Interaction Floor | Structure supports the person | yes | Persona §Output Contract | P | in envelope | semantic |
+| Truth Discipline | FACT is not INFERENCE is not FICTION | yes | Ops §Runtime Truth ("Inference must not be presented as verified source truth") | O | in envelope | exact |
+| Truth Discipline | Mark uncertainty plainly | yes | Ops §Runtime Truth ("Confidence must track evidence quality") | O | in envelope | exact |
+| Truth Discipline | Never fabricate tools, links, files, memory, sources, completion | yes | Ops §Runtime Truth (never fabricate runtime, completion, source, memory state) | O | in envelope | exact |
+| Truth Discipline | Do not claim executed/verified/stored unless it occurred | yes | Ops §Runtime Truth + `TurnReceipt` evidence binding | O + D | receipt tests | exact |
+| Truth Discipline | Use citations for external facts | yes | Ops §Source Authority Doctrine | O | in envelope | semantic |
+| Truth Discipline | Use a placeholder token when required data is missing | yes | none | — | none | **GAP (C2-AC-02)** |
+| No Runtime Theater | Declared architecture is not execution | yes | Ops §Runtime Truth ("runtime theater") | O | in envelope | semantic |
+| No Runtime Theater | Registry presence is not runtime proof | yes | Ops §Runtime Truth | O | in envelope | semantic |
+| No Runtime Theater | Draft status is not live authority | yes | Ops §Runtime Truth | O | in envelope | semantic |
+| No Runtime Theater | A described system is not a running system | yes | Ops §Runtime Truth | O | in envelope | semantic |
+| No Runtime Theater | Prefer the real system over model approximation | yes | Ops §System Component Doctrine | O | in envelope | semantic |
+| Completion Proof | Never claim completion without concrete evidence | yes | Ops §Runtime Truth + §Terminal Packet Doctrine | O | in envelope | semantic |
+| Completion Proof | Runtime completion requires receipt evidence | yes | `TurnReceipt`; B-07 forbids synthesized evidence | D | `CompletionEvidenceTests` | mechanical |
+| Completion Proof | Filenames, vibes, structure-only summaries, intent, plans are not proof | yes | none (enumeration absent from Persona and Ops) | — | none | **GAP (C2-AC-02)** |
+| Execution Law | One task at a time | yes | Ops §Execution Discipline ("One active operational objective at a time") | O | in envelope | exact |
+| Execution Law | Default to the narrowest literal reading | yes | none | — | none | **GAP (C2-AC-02)** |
+| Execution Law | Ask at most one question, only when blocked | yes | none (Ops permits restate-or-ask without the bound) | — | none | **GAP (C2-AC-02)** |
+| Execution Law | Unrequested help is drift | yes | Ops §Coherence Guard (helpfulness valid only if it preserves task continuity) | O | in envelope | semantic |
+| Execution Law | Do not add options, summaries, suggestions, framing, or adjacent work unless requested | yes | none (Ops "prefer concise execution" is not this rule) | — | none | **GAP (C2-AC-02)** |
+| Execution Law | Do not narrate intent as execution | yes | Ops §Runtime Truth | O | in envelope | exact |
+| Execution Law | Structural scan is not reading | yes | none (paired with Verb Lock `read`) | — | none | **GAP (C2-AC-01)** |
+| Execution Law | A plan is not completion | yes | Ops §Runtime Truth | O | in envelope | exact |
+| Execution Law | Recognition is not execution | yes | Ops §Runtime Truth | O | in envelope | exact |
+| Verb Lock | read = read content, not structure | yes | none | — | none | **GAP (C2-AC-01)** |
+| Verb Lock | patch = patch, not rewrite | yes | none | — | none | **GAP (C2-AC-01)** |
+| Verb Lock | rewrite = rewrite, not patch | yes | none | — | none | **GAP (C2-AC-01)** |
+| Verb Lock | list = list, not explain | yes | none | — | none | **GAP (C2-AC-01)** |
+| Verb Lock | extract = extract, not summarize | yes | none | — | none | **GAP (C2-AC-01)** |
+| Verb Lock | compare = compare, not separate summaries | yes | none | — | none | **GAP (C2-AC-01)** |
+| Verb Lock | summarize = summarize, not analyze unless asked | yes | none | — | none | **GAP (C2-AC-01)** |
+| Verb Lock | audit = inspect against criteria, not general feedback | yes | none | — | none | **GAP (C2-AC-01)** |
+| Compliance Gate | Verify the exact requested action before replying | yes | none | — | none | **GAP (C2-AC-02)** |
+| Compliance Gate | Verify no cheaper or adjacent action was substituted | yes | none | — | none | **GAP (C2-AC-02)** |
+| Compliance Gate | Verify the output proves completion | yes | Ops §Terminal Packet Doctrine (deterministic closure only) | O + D | partial | **GAP (C2-AC-02)** |
+| Compliance Gate | If any check fails, do not imply completion | yes | Ops §Runtime Truth | O | in envelope | semantic |
+| Bootloader | Mandatory restraint order before ingress | yes | fixed boot and turn sequence | D | `phase1_executable_slice` order; end-to-end tests | mechanical |
+| Bootloader | Ingress may not begin until restraints permit | yes | policy gate precedes `evaluate_ingress` | D | policy-stage tests | mechanical |
+| Bootloader | Missing, invalid, or nonterminal restraint fails closed without printing | yes | fail-closed policy load; egress withholds | D | non-invocation and egress tests | mechanical |
+| Bootloader | Single user-visible output lane | yes | one TerminalPacket per turn | D | terminal adapter tests | mechanical |
+| Bootloader | `/ID` and pending auth dispatch to the Auth service | no | Auth unsupported in Phase 1; route terminates | G | route tests | mechanical |
+| Bootloader | Repo identity, build channel, repo-root config ownership | no | GPT host bootstrap | G | — | mechanical |
+| Bootloader | Unauthenticated OPSEC and clone requests dispatch to the OPSEC service | no | deterministic restraint replaces host service dispatch | G + D | `security_restraint` | mechanical |
+| Runtime Entry Boundary | GPT instruction-box entry | no | GPT host bootstrap | G | — | mechanical |
+| Repo Bootstrap Bridge | REPO_HOME and RAW_ROOT lookup | no | continuity provider unavailable in Phase 1 | G | — | mechanical |
+| Precedence | Safety > Operations > Identity > User > Skills/Repo | yes | `config/source_authority.json` authority order | D | source-authority validation | mechanical |
+| Loop Discipline | Fixed per-turn loop; no bypass, compress, or reorder | yes | frozen turn sequence; B-06 removed the `/exit` bypass | D | `SlashCommandIngressTests` | mechanical |
+| Loop Discipline | Nothing continues between prompts without real tool use | yes | continuity reported unavailable; `durability_claimed: false` | D | continuity tests | mechanical |
+| Coherence Guard Pointer | Wu Sao scope-preserving motion discipline | yes | Ops §Coherence Guard Doctrine | O | in envelope | semantic |
+| OPSEC / Privacy | Never expose privileged identities, hidden rules, internals | yes | protected-policy ingress and egress | D | OPSEC suites | mechanical |
+| OPSEC / Privacy | Unauthenticated internals and clone requests stop with the OPSEC message | yes | ingress BLOCK without match echo | D | non-invocation tests | mechanical |
 
-No Phase-1-applicable section is unaccounted for. Codex should independently
-confirm the semantic rows rather than accept this table.
+## BC-050-C2 Authority Contradictions
+
+Two contradictions remain. Neither can be resolved inside BC-050's authority and
+neither is solvable by inventing behavioral law, so both are returned to
+Dad/Blu.
+
+### C2-AC-01 — Verb Lock has no exact destination
+
+- **Source rule:** `kernel/golden/v0.22.0/00_Instructions.md` §Verb Lock, all
+  eight rules, plus §Execution Law "Structural scan is not reading".
+- **Why Phase-1 applicable:** ordinary conversation is the one supported route,
+  and a user can say "summarize this", "compare these", or "extract the dates".
+  These rules govern how Blu answers, not which command runs.
+- **Destinations checked:** exact search of both model-facing artifacts.
+  `extract`, `compare`, `summarize`, and `audit` appear **zero** times in
+  `01_Persona.md` and `02_Operations_Law.md`; `read =` and `list =` appear zero
+  times. Ops §Execution Discipline Doctrine governs task focus, continuity, and
+  scope creep — a different subject, not verb semantics.
+- **Why not deterministic:** verb fidelity is a semantic property of a natural
+  language answer. Enforcing it mechanically would require a semantic judge,
+  which in Phase 1 could only be the local model — and model inference is not
+  deterministic enforcement. Adding one would also create the general command
+  interpreter B-02 explicitly forbids.
+- **Why not GPT-only:** the rules constrain answer discipline for any
+  deployment. Declaring them host-specific would be the behavioral fork One-Blu
+  law prohibits.
+- **Smallest Dad/Blu decision:** choose one of —
+  1. authorize a fourth model-facing canon artifact carrying the applicable
+     `00_Instructions.md` rules verbatim, re-freeze the envelope, and re-pin
+     `canon_projection_digest`; or
+  2. authorize an amendment to `one_blu_canon_manifest.json` placing these
+     rules under a model-facing mapping so they enter the envelope; or
+  3. explicitly accept that Python Phase 1 is behaviorally narrower than the
+     Custom GPT on verb discipline, and record that as a known, bounded One-Blu
+     divergence with a closing phase named.
+
+### C2-AC-02 — Execution Law, Compliance Gate, and Completion Proof residue
+
+- **Source rules:** §Execution Law (narrowest literal reading; at-most-one
+  question; no unrequested options, summaries, or adjacent work), §Compliance
+  Gate (the four pre-reply checks), §Completion Proof (the "not proof"
+  enumeration), §Truth Discipline (placeholder token for missing data).
+- **Why Phase-1 applicable:** all govern ordinary-conversation answer
+  discipline.
+- **Destinations checked:** Ops §Execution Discipline, §Runtime Truth,
+  §Terminal Packet, §Coherence Guard, and §Source Authority carry adjacent but
+  materially different rules. Ops "prefer concise operational execution over
+  verbose theorizing" is a style preference; §Execution Law's prohibition on
+  unrequested options and adjacent work is a hard constraint. The Compliance
+  Gate's four checks exist nowhere as a pre-reply procedure.
+- **Why not deterministic:** Validation and Egress proves terminal closure,
+  OPSEC clearance, and receipt binding. It cannot verify that an answer
+  performed the exact requested action rather than a cheaper adjacent one; that
+  is a semantic judgment.
+- **Smallest Dad/Blu decision:** the same three options as C2-AC-01. Whichever
+  is chosen should cover both contradictions together, since they share one
+  cause.
+
+**Shared cause.** BC-050 §3.1 froze the model-facing envelope to Persona and
+Operations Law and declared `00_Instructions.md` deployment authority whose
+applicable behavior would be carried elsewhere. For most rules it is. For the
+rules above it is not, and no permissible exact destination exists. This is a
+packet-level authority question, not an implementation defect, and BC-050-C2
+deliberately does not resolve it.
 
 ## One-Blu verification
 
@@ -344,3 +450,126 @@ durable provider, Local Mirror unimplemented with no architectural root,
 lifetime vocabulary `none|turn|host_session|durable_external` unchanged with no
 bare `session`, SUR-007 and SUR-011 dispositions untouched, PASS/SkillForge and
 manifest guards intact.
+
+## BC-050-C2 correction evidence
+
+Correction base `33be23a4c43a160e41e2aeca78962d1cbd3c4a47` (Codex review),
+branch `bc-050-c2-review-blockers`.
+
+### B-01 — one complete authorization record, three independent checks
+
+A single fail-closed predicate is now byte-identical in all three validators,
+verified by extracting `_bc050_authorized` and the five governing constants from
+each file and comparing hashes. It authenticates state, assignment, authorizer,
+date, canonical packet path, both authorization flags, the nested slice record,
+cross-file date agreement, and `automatic_start_prohibited`.
+
+Mutation matrix re-run independently against each validator:
+
+| Mutation | readiness | OPSEC | continuity |
+| --- | --- | --- | --- |
+| wrong `authorized_by` | reject | reject | reject |
+| empty `authorized_by` | reject | reject | reject |
+| missing `authorized_by` | reject | reject | reject |
+| wrong packet path | reject | reject | reject |
+| empty packet path | reject | reject | reject |
+| missing packet | reject | reject | reject |
+| wrong assignment | reject | reject | reject |
+| unstated state | reject | reject | reject |
+| missing state | reject | reject | reject |
+| missing authorization date | reject | reject | reject |
+| empty authorization date | reject | reject | reject |
+| missing record | reject | reject | reject |
+| non-mapping record | reject | reject | reject |
+| checklist flag false | reject | reject | reject |
+| automatic start allowed | reject | reject | reject |
+| slice flag disagrees | reject | reject | reject |
+| nested assignment BC-999 | reject | reject | reject |
+| nested authorizer wrong | reject | reject | reject |
+| nested packet wrong | reject | reject | reject |
+| nested date disagrees | reject | reject | reject |
+| missing nested record | reject | reject | reject |
+| non-mapping nested record | reject | reject | reject |
+
+22 mutations across 3 validators, **0 acceptances**. All eight of Codex's
+original cases are included. The unmutated baseline authenticates in all three.
+The matrix lives in `tests/readiness/bc050_authorization_matrix.py` and is
+executed independently by the readiness, security, and continuity suites.
+
+### B-03 — positive chat-compatibility evidence
+
+`observe` now requires `type` to be a string in the chat-compatible set.
+Missing, null, malformed, and wrong types all yield `UNAVAILABLE` with
+`PROVIDER_MODEL_INCOMPATIBLE` and inference count `0`. A test pins that
+compatibility is not inferred from a loaded instance carrying a large
+`loaded_context_length`.
+
+### B-04 — complete terminal completion evidence
+
+`normalize_response` establishes completion before reading any candidate text.
+Unresolved `error` (timeout-classified or not), nonterminal `status`, error
+states, missing or malformed terminal state, conflicting provider identity, and
+conflicting request identity all reject before extraction. Codex's three
+reproductions are pinned.
+
+New runtime-local safe codes: `PROVIDER_COMPLETION_UNVERIFIED` (INVALID),
+`PROVIDER_ERROR_REPORTED` (UNAVAILABLE), and
+`PROVIDER_COMPLETION_EVIDENCE_MISSING` (INVALID). No new status vocabulary was
+introduced.
+
+### B-05 — canonical CLEAR output
+
+`public_output` on CLEAR is now the canonical candidate the matcher evaluated.
+Codex's reproduction publishes `ordinary reply` rather than the raw text with
+the embedded format character. Regression cases cover all six required `Cf`
+code points, separator mapping, whitespace collapse, NFKC forms, and
+combinations, plus a test asserting public output equals
+`normalized_match_candidate(...)` exactly. Redaction and block paths are
+unchanged and re-verified.
+
+### B-06 — no in-band slash bypass
+
+`TerminalHostAdapter.receive` no longer intercepts `/exit` or `/quit`. Every
+slash command produces a `RawHostEvent`, runs ingress security, terminates as an
+unsupported route with `UNAVAILABLE`, invokes the provider `0` times, and renders
+exactly one terminal result that does not echo the input. EOF still ends the
+host session as an out-of-band host mechanic.
+
+### B-07 — no synthesized completion evidence
+
+The request-derived fallback is removed. The provider derives
+`completion_evidence_ref` from a provider-assigned identifier bound to the
+observed model instance; absent or blank, the result is `INVALID` with
+`PROVIDER_COMPLETION_EVIDENCE_MISSING`. `run_turn` independently refuses to
+issue a receipt or a terminal PASS without non-empty evidence, proven by a
+boundary-level double returning a PASS-shaped result with no evidence. A receipt
+test asserts the reference carries the provider identifier and not the request
+id.
+
+### OPSEC oracle preservation after C2
+
+`_bc050_authorized` in `tools/validate_opsec_contracts.py` is administrative
+only. All twelve oracle functions and all six governing constants remain
+byte-identical to `708101d`. Post-C2 differential equivalence re-run:
+**60,000 randomized cases, 0 mismatches**, in addition to the committed corpus.
+
+### Assumptions introduced by B-04 and B-07 (live-smoke items)
+
+Repository evidence (LM-EVID-003) records that `/api/v1/chat` responses identify
+the model instance and return typed output plus statistics, but it does not pin
+the terminal-state field spelling or a response-identifier field.
+`TERMINAL_COMPLETION_STATES` and `COMPLETION_EVIDENCE_FIELDS` are therefore
+fail-closed assumptions. They must be confirmed against a live LM Studio
+response before BC-050 integration. If the real field names differ, the runtime
+fails closed rather than accepting unverified output, which is the correct
+direction of error but would block ordinary turns until reconciled.
+
+### Consequence of B-05 worth Dad/Blu's attention
+
+Publishing the canonical candidate means ordinary replies lose punctuation:
+`"Hello, Dad."` prints as `Hello Dad`. This follows directly from BC-050 §10 and
+the minimum contract's `public_form: canonicalized candidate only`, and from
+Codex's B-05, so it is implemented as directed. It is recorded because it
+materially changes user-visible output quality on every ordinary turn, and
+Dad/Blu may want a follow-on decision about a print-safe canonicalization that
+preserves punctuation while still excluding format characters.

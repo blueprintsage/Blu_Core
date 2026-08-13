@@ -85,20 +85,46 @@ def _load(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _bc050_authorized(checklist: Mapping[str, Any]) -> bool:
-    """Report explicit Dad/Blu BC-050 implementation authorization.
+# BC-050-C2: one complete authorization record, authenticated independently at
+# every enforcement point. Validator ordering is not an authorization mechanism.
+BC050_ASSIGNMENT = "BC-050"
+BC050_AUTHORIZED_BY = "Dad/Blu"
+BC050_PACKET = "docs/domains/runtime/assignments/BC-050/assignment.md"
+BC050_CHECKLIST = Path("readiness/python_phase1_readiness_checklist.json")
+BC050_SLICE = Path("readiness/phase1_executable_slice.json")
 
-    Administrative gate only. It does not participate in OPSEC matching,
-    policy loading, normalization, or redaction, and it leaves the C1
-    conformance oracle untouched.
+
+def _bc050_authorized(root: Path) -> bool:
+    """Authenticate the complete BC-050 implementation authorization record.
+
+    Fail-closed. Any missing, malformed, contradictory, or non-exact value
+    restores this validator's pre-implementation prohibition, independently of
+    what any other validator concludes.
     """
+    try:
+        checklist = json.loads((root / BC050_CHECKLIST).read_text(encoding="utf-8"))
+        executable_slice = json.loads((root / BC050_SLICE).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return False
+    if not isinstance(checklist, dict) or not isinstance(executable_slice, dict):
+        return False
     record = checklist.get("bc050_implementation_authorization")
+    nested = executable_slice.get("implementation_authorization")
+    if not isinstance(record, dict) or not isinstance(nested, dict):
+        return False
     return (
-        isinstance(record, Mapping)
-        and record.get("state") == "authorized"
-        and record.get("assignment") == "BC-050"
-        and bool(record.get("authorized_by"))
-        and bool(record.get("packet"))
+        record.get("state") == "authorized"
+        and record.get("assignment") == BC050_ASSIGNMENT
+        and record.get("authorized_by") == BC050_AUTHORIZED_BY
+        and bool(record.get("authorization_date"))
+        and record.get("packet") == BC050_PACKET
+        and nested.get("assignment") == BC050_ASSIGNMENT
+        and nested.get("authorized_by") == BC050_AUTHORIZED_BY
+        and nested.get("authorization_date") == record.get("authorization_date")
+        and nested.get("packet") == BC050_PACKET
+        and checklist.get("implementation_authorized") is True
+        and executable_slice.get("implementation_authorized") is True
+        and checklist.get("automatic_start_prohibited") is True
     )
 
 
@@ -670,7 +696,7 @@ def validate(root: Path) -> list[str]:
     # checklist carries explicit Dad/Blu BC-050 authorization evidence. Without
     # that evidence these assertions keep their original pre-implementation
     # behavior. Authorization never relaxes automatic_start_prohibited.
-    authorized = _bc050_authorized(checklist)
+    authorized = _bc050_authorized(root)
     if checklist.get("implementation_authorized") is not authorized:
         errors.append("readiness checklist authorizes implementation without separate runtime authorization")
     if phase1.get("implementation_authorized") is not authorized:

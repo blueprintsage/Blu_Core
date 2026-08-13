@@ -52,11 +52,13 @@ class TerminalHostAdapter(HostAdapter):
         self._out.write(PROMPT)
         self._out.flush()
         line = self._in.readline()
+        # End of stream is an out-of-band host mechanic, not user text.
         if not line:
             return None
+        # B-06: no in-band command is privileged. Slash-prefixed text becomes an
+        # ordinary host event, runs the full security and routing path, and
+        # terminates as an unsupported route like any other slash command.
         text = line.rstrip("\n").rstrip("\r")
-        if text.strip().lower() in {"/exit", "/quit"}:
-            return None
         return RawHostEvent(host=self.host, event_id=self._request_id_factory(), text=text)
 
     def submit(self, event: RawHostEvent) -> HostInput:

@@ -112,7 +112,19 @@ def model_inventory(
     return {"data": [record]}
 
 
-def chat_response(instance_id: str, text: str = "Hello.", kinds: tuple[str, ...] = ("message",)) -> dict[str, Any]:
+def chat_response(
+    instance_id: str,
+    text: str = "Hello.",
+    kinds: tuple[str, ...] = ("message",),
+    status: str | None = "completed",
+    evidence_id: str | None = "resp-0001",
+    **extra: Any,
+) -> dict[str, Any]:
+    """Build a provider response.
+
+    `status` and `evidence_id` carry the positive terminal-completion and
+    provider-assigned completion evidence B-04/B-07 now require.
+    """
     output: list[dict[str, Any]] = []
     for kind in kinds:
         if kind == "message":
@@ -121,7 +133,13 @@ def chat_response(instance_id: str, text: str = "Hello.", kinds: tuple[str, ...]
             output.append({"type": "reasoning", "content": "internal reasoning must not print"})
         else:
             output.append({"type": kind, "tool_name": "shell", "arguments": "{}"})
-    return {"model_instance_id": instance_id, "output": output}
+    document: dict[str, Any] = {"model_instance_id": instance_id, "output": output}
+    if status is not None:
+        document["status"] = status
+    if evidence_id is not None:
+        document["id"] = evidence_id
+    document.update(extra)
+    return document
 
 
 class RecordingTransport:

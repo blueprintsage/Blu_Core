@@ -91,7 +91,8 @@ class SuccessfulOrdinaryTurnTests(RuntimeHarness):
 
         packet = runtime_main.run_turn(runtime, "hello, how are you?")
         self.assertEqual(packet.status, PASS)
-        self.assertEqual(packet.public_output, "Hello, Dad.")
+        # B-05: the public form is the canonical candidate policy evaluated.
+        self.assertEqual(packet.public_output, "Hello Dad")
         self.assertTrue(packet.model_invoked)
         self.assertFalse(packet.tool_executed)
         self.assertEqual(runtime.boundary.invocation_count, 1)
@@ -297,8 +298,13 @@ class TerminalAdapterTests(unittest.TestCase):
     def test_end_of_stream_ends_the_session(self) -> None:
         self.assertIsNone(self._adapter("").receive())
 
-    def test_exit_command_ends_the_session(self) -> None:
-        self.assertIsNone(self._adapter("/exit\n").receive())
+    def test_exit_is_not_a_privileged_in_band_command(self) -> None:
+        """B-06: `/exit` is ordinary user text, not a host control command."""
+        for command in ("/exit", "/quit", "/EXIT"):
+            with self.subTest(command=command):
+                event = self._adapter(f"{command}\n").receive()
+                self.assertIsInstance(event, RawHostEvent)
+                self.assertEqual(event.text, command)
 
     def test_blocked_packet_never_echoes_the_protected_input(self) -> None:
         from blu_runtime.contracts.models import TerminalPacket
@@ -334,3 +340,101 @@ class TerminalAdapterTests(unittest.TestCase):
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
+
+
+class SlashCommandIngressTests(RuntimeHarness):
+    """B-06: no slash command bypasses the frozen one-turn sequence."""
+
+    COMMANDS = ("/exit", "/quit", "/auth", "/source", "/pass")
+
+    def test_every_slash_command_runs_the_full_turn_and_never_invokes_provider(self) -> None:
+        for command in self.COMMANDS:
+            with self.subTest(command=command):
+                runtime = self.boot()
+                packet = runtime_main.run_turn(runtime, command)
+                self.assertEqual(packet.status, UNAVAILABLE)
+                self.assertIsNone(packet.public_output)
+                self.assertFalse(packet.model_invoked)
+                self.assertEqual(runtime.boundary.invocation_count, 0)
+                self.assertEqual(runtime.receipts, [])
+
+    def test_slash_command_produces_one_rendered_terminal_result(self) -> None:
+        runtime = self.boot()
+        adapter = TerminalHostAdapter(
+            stream_in=io.StringIO("/exit\n"),
+            stream_out=io.StringIO(),
+            request_id_factory=lambda: "e1",
+        )
+        event = adapter.receive()
+        self.assertIsNotNone(event, "/exit must produce a RawHostEvent")
+        host_input = adapter.submit(event)
+        packet = runtime_main.run_turn(runtime, host_input.text, request_id=host_input.request_id)
+        rendered = adapter.render(packet)
+        self.assertEqual(runtime.boundary.invocation_count, 0)
+        self.assertTrue(rendered.startswith("blu> "))
+        self.assertNotIn("/exit", rendered)
+
+    def test_end_of_stream_still_ends_the_host_session(self) -> None:
+        """EOF is an out-of-band host mechanic, not user command semantics."""
+        adapter = TerminalHostAdapter(
+            stream_in=io.StringIO(""), stream_out=io.StringIO(), request_id_factory=lambda: "e1"
+        )
+        self.assertIsNone(adapter.receive())
+
+
+class CompletionEvidenceTests(RuntimeHarness):
+    """B-07: no success without observed provider completion evidence."""
+
+    def test_missing_completion_evidence_yields_no_success(self) -> None:
+        runtime = self.boot(chat=chat_response(INSTANCE, "Hello.", evidence_id=None))
+        packet = runtime_main.run_turn(runtime, "hello")
+        self.assertNotEqual(packet.status, PASS)
+        self.assertIsNone(packet.public_output)
+        self.assertEqual(runtime.receipts, [])
+
+    def test_boundary_level_result_without_evidence_is_not_success(self) -> None:
+        """An otherwise-PASS normalized result with no evidence must not pass."""
+        from blu_runtime.contracts.models import NormalizedModelResult
+        from blu_runtime.providers.model.base import ModelExecutionBoundary
+
+        class _EvidencelessProvider:
+            provider_id = "lm_studio_native_rest_v1"
+
+            def observe(self, configured_model_key, required_context):
+                return self._observation
+
+            def infer(self, request):
+                return NormalizedModelResult(
+                    request_id=request.request_id,
+                    provider_id=self.provider_id,
+                    model_instance_id=INSTANCE,
+                    status=PASS,
+                    candidate_text="Looks successful.",
+                    output_kinds=("message",),
+                    safe_error_code=None,
+                    completion_evidence_ref=None,
+                )
+
+        real = self.boundary()
+        evidenceless = _EvidencelessProvider()
+        evidenceless._observation = real.observe(MODEL, 4096)
+        boundary = ModelExecutionBoundary(evidenceless)
+
+        runtime = self.boot(boundary=boundary)
+        packet = runtime_main.run_turn(runtime, "hello")
+        self.assertNotEqual(packet.status, PASS)
+        self.assertIsNone(packet.public_output)
+        self.assertEqual(runtime.receipts, [])
+
+    def test_no_evidence_identifier_is_synthesized_from_the_request(self) -> None:
+        runtime = self.boot(chat=chat_response(INSTANCE, "Hello.", evidence_id=None))
+        packet = runtime_main.run_turn(runtime, "hello", request_id="req-xyz")
+        self.assertEqual(runtime.receipts, [])
+        self.assertIsNone(packet.public_output)
+
+    def test_successful_receipt_carries_observed_provider_evidence(self) -> None:
+        runtime = self.boot(chat=chat_response(INSTANCE, "Hello.", evidence_id="resp-77"))
+        runtime_main.run_turn(runtime, "hello", request_id="req-abc")
+        receipt = runtime.receipts[0].as_dict()
+        self.assertIn("resp-77", receipt["provider_completion_evidence_ref"])
+        self.assertNotIn("req-abc", receipt["provider_completion_evidence_ref"])

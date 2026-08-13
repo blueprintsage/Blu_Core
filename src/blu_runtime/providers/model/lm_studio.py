@@ -32,6 +32,9 @@ from blu_runtime.contracts.models import (
     PROVIDER_MODEL_NOT_LOADED,
     PROVIDER_RESPONSE_MALFORMED,
     PROVIDER_TIMEOUT,
+    PROVIDER_COMPLETION_EVIDENCE_MISSING,
+    PROVIDER_COMPLETION_UNVERIFIED,
+    PROVIDER_ERROR_REPORTED,
     PROVIDER_TOOL_CALL_UNSUPPORTED,
     UNAVAILABLE,
     ModelExecutionRequest,
@@ -49,6 +52,21 @@ CHAT_COMPATIBLE_TYPES = frozenset({"llm", "vlm"})
 MESSAGE_KIND = "message"
 REASONING_KIND = "reasoning"
 TOOL_CALL_KINDS = frozenset({"tool_call", "invalid_tool_call"})
+
+#: Positive terminal-completion evidence (B-04). Repository evidence
+#: (LM-EVID-003) records that responses identify the model instance and carry
+#: typed output plus statistics, but does not pin the terminal-state spelling,
+#: so this set is a fail-closed assumption to confirm during live smoke.
+TERMINAL_COMPLETION_STATES = frozenset({"completed", "complete", "finished", "succeeded", "done"})
+TIMEOUT_STATES = frozenset({"timeout", "timed_out"})
+ERROR_STATES = frozenset({"error", "failed", "failure", "cancelled", "canceled", "aborted"})
+
+#: Provider-assigned identifiers accepted as completion evidence (B-07).
+COMPLETION_EVIDENCE_FIELDS = ("id", "response_id", "completion_id")
+
+
+def _looks_like_timeout(error: object) -> bool:
+    return "timeout" in str(error).lower() or "timed out" in str(error).lower()
 
 
 class Transport:
@@ -121,8 +139,12 @@ class LMStudioProvider(ModelExecutionProvider):
             return unusable(PROVIDER_MODEL_ABSENT)
 
         record = matched[0]
+        # B-03: positive compatibility evidence is required. Absent, null, or
+        # malformed type evidence is not "probably compatible" -- compatibility
+        # is never inferred from the configured name, the filename, successful
+        # loading, context capacity, or endpoint availability.
         model_type = record.get("type")
-        if model_type is not None and model_type not in CHAT_COMPATIBLE_TYPES:
+        if not isinstance(model_type, str) or model_type not in CHAT_COMPATIBLE_TYPES:
             return unusable(PROVIDER_MODEL_INCOMPATIBLE)
 
         instances = record.get("loaded_instances")
@@ -233,11 +255,46 @@ class LMStudioProvider(ModelExecutionProvider):
         if not isinstance(document, dict):
             return failure(INVALID, PROVIDER_RESPONSE_MALFORMED)
 
+        # B-04: completion is established before any candidate text is read.
+        # An unresolved error, a nonterminal state, or a conflicting identity
+        # cannot coexist with accepted output.
+        error = document.get("error")
+        if error not in (None, "", {}, [], False):
+            code = PROVIDER_TIMEOUT if _looks_like_timeout(error) else PROVIDER_ERROR_REPORTED
+            return failure(UNAVAILABLE, code)
+
+        status = document.get("status")
+        if not isinstance(status, str):
+            return failure(INVALID, PROVIDER_COMPLETION_UNVERIFIED)
+        if status in TIMEOUT_STATES:
+            return failure(UNAVAILABLE, PROVIDER_TIMEOUT)
+        if status in ERROR_STATES:
+            return failure(UNAVAILABLE, PROVIDER_ERROR_REPORTED)
+        if status not in TERMINAL_COMPLETION_STATES:
+            # Queued, processing, cancelled, or any unknown state.
+            return failure(INVALID, PROVIDER_COMPLETION_UNVERIFIED)
+
         instance_id = document.get("model_instance_id") or document.get("model")
         if not isinstance(instance_id, str) or not instance_id:
             return failure(INVALID, PROVIDER_RESPONSE_MALFORMED)
         if instance_id != request.model_instance_id:
             return failure(INVALID, PROVIDER_IDENTITY_MISMATCH, instance_id)
+
+        # Provider and request identity, when the response asserts them, must
+        # agree with the boundary's own evidence.
+        for field in ("provider_id", "provider"):
+            claimed = document.get(field)
+            if claimed is not None and claimed not in (self.provider_id, self.provider_type):
+                return failure(INVALID, PROVIDER_IDENTITY_MISMATCH, instance_id)
+        claimed_request = document.get("request_id")
+        if claimed_request is not None and claimed_request != request.request_id:
+            return failure(INVALID, PROVIDER_IDENTITY_MISMATCH, instance_id)
+
+        # B-07: completion evidence is observed, never synthesized. Without a
+        # provider-assigned identifier there is no completion to reference.
+        evidence_ref = self._completion_evidence_ref(document, instance_id)
+        if evidence_ref is None:
+            return failure(INVALID, PROVIDER_COMPLETION_EVIDENCE_MISSING, instance_id)
 
         output = document.get("output")
         if not isinstance(output, list) or not output:
@@ -288,8 +345,21 @@ class LMStudioProvider(ModelExecutionProvider):
             candidate_text=candidate,
             output_kinds=tuple(kinds),
             safe_error_code=None,
-            completion_evidence_ref=f"provider-completion:{request.request_id}",
+            completion_evidence_ref=evidence_ref,
         )
+
+    def _completion_evidence_ref(self, document: dict[str, Any], instance_id: str) -> str | None:
+        """Bind completion evidence to a provider-assigned identifier.
+
+        Returns None when the provider asserted no identifier. Fabricating one
+        from the request id would make the receipt claim evidence that was
+        never observed.
+        """
+        for field in COMPLETION_EVIDENCE_FIELDS:
+            value = document.get(field)
+            if isinstance(value, str) and value.strip():
+                return f"{self.provider_id}:{instance_id}:{value}"
+        return None
 
     @staticmethod
     def _message_text(item: dict[str, Any]) -> str | None:

@@ -6,6 +6,7 @@ import hmac
 import importlib.util
 import inspect
 import json
+import shutil
 import tempfile
 import unittest
 import unicodedata
@@ -19,6 +20,14 @@ SPEC = importlib.util.spec_from_file_location(
 assert SPEC and SPEC.loader
 validator = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(validator)
+
+
+_MATRIX_SPEC = importlib.util.spec_from_file_location(
+    "bc050_authorization_matrix", ROOT / "tests/readiness/bc050_authorization_matrix.py"
+)
+assert _MATRIX_SPEC and _MATRIX_SPEC.loader
+matrix = importlib.util.module_from_spec(_MATRIX_SPEC)
+_MATRIX_SPEC.loader.exec_module(matrix)
 
 
 class OpsecContractValidationTests(unittest.TestCase):
@@ -375,42 +384,6 @@ if __name__ == "__main__":
     unittest.main()
 
 
-class BC050AuthorizationGateTests(unittest.TestCase):
-    """BC-050-C1: administrative gate only; OPSEC mechanism is untouched."""
-
-    def setUp(self) -> None:
-        self.checklist = json.loads(
-            (ROOT / "readiness/python_phase1_readiness_checklist.json").read_text(encoding="utf-8")
-        )
-
-    def test_authorized_checklist_is_recognized(self) -> None:
-        self.assertTrue(validator._bc050_authorized(self.checklist))
-
-    def test_missing_record_is_unauthorized(self) -> None:
-        del self.checklist["bc050_implementation_authorization"]
-        self.assertFalse(validator._bc050_authorized(self.checklist))
-
-    def test_wrong_assignment_is_unauthorized(self) -> None:
-        self.checklist["bc050_implementation_authorization"]["assignment"] = "BC-999"
-        self.assertFalse(validator._bc050_authorized(self.checklist))
-
-    def test_unstated_state_is_unauthorized(self) -> None:
-        self.checklist["bc050_implementation_authorization"]["state"] = "proposed"
-        self.assertFalse(validator._bc050_authorized(self.checklist))
-
-    def test_record_without_authorizing_party_is_unauthorized(self) -> None:
-        self.checklist["bc050_implementation_authorization"]["authorized_by"] = ""
-        self.assertFalse(validator._bc050_authorized(self.checklist))
-
-    def test_record_without_packet_is_unauthorized(self) -> None:
-        self.checklist["bc050_implementation_authorization"]["packet"] = ""
-        self.assertFalse(validator._bc050_authorized(self.checklist))
-
-    def test_non_mapping_record_is_unauthorized(self) -> None:
-        self.checklist["bc050_implementation_authorization"] = "authorized"
-        self.assertFalse(validator._bc050_authorized(self.checklist))
-
-
 class OpsecMechanismUnchangedTests(unittest.TestCase):
     """The C1 oracle must be semantically identical after BC-050-C1."""
 
@@ -464,3 +437,57 @@ class OpsecMechanismUnchangedTests(unittest.TestCase):
         result = validator.evaluate_ingress("hello", None, "POLICY_INTEGRITY_MISMATCH")
         self.assertIsNone(result["security_decision"])
         self.assertFalse(result["eligible_for_turn_controller"])
+
+
+class _AuthorizationMatrixHarness(unittest.TestCase):
+    """Copies the two readiness records into a temp root and mutates them.
+
+    B-01: this validator must reject every malformed authorization record on
+    its own, without relying on any other validator running first.
+    """
+
+    RECORDS = ("readiness/python_phase1_readiness_checklist.json",
+               "readiness/phase1_executable_slice.json")
+
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.addCleanup(self.temp.cleanup)
+        for relative in self.RECORDS:
+            target = self.root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / relative, target)
+
+    def test_authorized_baseline_authenticates(self) -> None:
+        self.assertTrue(validator._bc050_authorized(self.root))
+
+    def test_every_mutation_is_rejected_independently(self) -> None:
+        for label, mutate in matrix.MUTATIONS:
+            with self.subTest(mutation=label):
+                for relative in self.RECORDS:
+                    shutil.copy2(ROOT / relative, self.root / relative)
+                matrix.apply_mutation(self.root, mutate)
+                self.assertFalse(
+                    validator._bc050_authorized(self.root),
+                    f"{label} authenticated; the prohibition was not restored",
+                )
+
+    def test_missing_records_are_unauthorized(self) -> None:
+        for relative in self.RECORDS:
+            with self.subTest(missing=relative):
+                for other in self.RECORDS:
+                    shutil.copy2(ROOT / other, self.root / other)
+                (self.root / relative).unlink()
+                self.assertFalse(validator._bc050_authorized(self.root))
+
+    def test_malformed_records_are_unauthorized(self) -> None:
+        for relative in self.RECORDS:
+            with self.subTest(malformed=relative):
+                for other in self.RECORDS:
+                    shutil.copy2(ROOT / other, self.root / other)
+                (self.root / relative).write_text("{not json", encoding="utf-8")
+                self.assertFalse(validator._bc050_authorized(self.root))
+
+
+class BC050AuthorizationMatrixTests(_AuthorizationMatrixHarness):
+    """B-01 matrix applied independently to the OPSEC validator."""

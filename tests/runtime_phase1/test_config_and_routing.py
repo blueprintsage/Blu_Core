@@ -206,3 +206,75 @@ class ValidationEgressTests(unittest.TestCase):
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
+
+
+class CanonicalEgressOutputTests(unittest.TestCase):
+    """B-05: CLEAR publishes the canonical candidate policy evaluated."""
+
+    def setUp(self) -> None:
+        self.policy = synthetic_policy()
+
+    def _clear(self, text: str):
+        result = validation_egress.evaluate_egress("r", text, self.policy)
+        self.assertEqual(result.egress_result, "CLEAR")
+        self.assertTrue(result.eligible_for_print)
+        return result
+
+    def test_harmless_cf_is_not_published(self) -> None:
+        """Codex's reproduction: raw `ordinary<U+200B> reply` must not print."""
+        result = self._clear("ordinary​ reply")
+        self.assertEqual(result.public_output, "ordinary reply")
+        for code_point in REQUIRED_CF:
+            self.assertNotIn(code_point, result.public_output)
+
+    def test_every_required_cf_is_stripped_from_public_output(self) -> None:
+        for code_point in REQUIRED_CF:
+            with self.subTest(code_point=hex(ord(code_point))):
+                result = self._clear(f"safe{code_point} text")
+                self.assertNotIn(code_point, result.public_output)
+
+    def test_separator_normalization_is_published(self) -> None:
+        self.assertEqual(self._clear("a.b,c:d").public_output, "a b c d")
+
+    def test_collapsible_whitespace_is_published_collapsed(self) -> None:
+        self.assertEqual(self._clear("  spaced   out  ").public_output, "spaced out")
+
+    def test_nfkc_forms_are_published_normalized(self) -> None:
+        self.assertEqual(self._clear("ﬁre").public_output, "fire")
+
+    def test_combined_normalization(self) -> None:
+        result = self._clear("  ﬁre​:  bright  ")
+        self.assertEqual(result.public_output, "fire bright")
+
+    def test_public_output_equals_the_evaluated_candidate(self) -> None:
+        from blu_runtime.core.security_restraint import normalized_match_candidate
+
+        for text in ("plain", "a​b", " x , y ", "ﬁn"):
+            with self.subTest(text=text.encode("unicode_escape").decode()):
+                result = self._clear(text)
+                self.assertEqual(
+                    result.public_output, normalized_match_candidate(text)["normalized"]
+                )
+
+    def test_protected_content_still_redacts_after_canonicalization(self) -> None:
+        result = validation_egress.evaluate_egress(
+            "r", f"see {PROTECTED_PHRASE} now", self.policy
+        )
+        self.assertEqual(result.egress_result, "REDACTED")
+        self.assertNotIn("cerulean", result.public_output or "")
+
+    def test_protected_content_still_blocks_after_canonicalization(self) -> None:
+        result = validation_egress.evaluate_egress("r", BLOCK_ONLY_PHRASE, self.policy)
+        self.assertEqual(result.egress_result, "BLOCKED")
+        self.assertIsNone(result.public_output)
+
+    def test_cf_obfuscated_protected_content_never_becomes_clear(self) -> None:
+        for code_point in REQUIRED_CF:
+            for candidate in (
+                code_point + PROTECTED_PHRASE,
+                PROTECTED_PHRASE + code_point,
+                code_point.join(PROTECTED_PHRASE.split(" ")),
+            ):
+                with self.subTest(code_point=hex(ord(code_point))):
+                    result = validation_egress.evaluate_egress("r", candidate, self.policy)
+                    self.assertNotEqual(result.egress_result, "CLEAR")

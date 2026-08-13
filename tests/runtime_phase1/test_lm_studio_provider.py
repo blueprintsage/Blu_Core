@@ -22,6 +22,9 @@ from blu_runtime.contracts.models import (
     PROVIDER_MODEL_NOT_LOADED,
     PROVIDER_RESPONSE_MALFORMED,
     PROVIDER_TIMEOUT,
+    PROVIDER_COMPLETION_EVIDENCE_MISSING,
+    PROVIDER_COMPLETION_UNVERIFIED,
+    PROVIDER_ERROR_REPORTED,
     PROVIDER_TOOL_CALL_UNSUPPORTED,
     UNAVAILABLE,
     ModelExecutionRequest,
@@ -198,6 +201,8 @@ class InferenceTests(unittest.TestCase):
     def test_structured_message_content_is_supported(self) -> None:
         document = {
             "model_instance_id": INSTANCE,
+            "status": "completed",
+            "id": "resp-0002",
             "output": [{"type": "message", "content": [{"type": "text", "text": "Chunked reply."}]}],
         }
         result = provider(RecordingTransport(chat=document)).infer(execution_request())
@@ -205,10 +210,149 @@ class InferenceTests(unittest.TestCase):
         self.assertEqual(result.candidate_text, "Chunked reply.")
 
     def test_unknown_output_kind_is_invalid(self) -> None:
-        document = {"model_instance_id": INSTANCE, "output": [{"type": "surprise"}]}
+        document = chat_response(INSTANCE, kinds=("surprise",))
         result = provider(RecordingTransport(chat=document)).infer(execution_request())
         self.assertEqual(result.status, INVALID)
 
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
+
+
+class ChatCompatibilityEvidenceTests(unittest.TestCase):
+    """B-03: usability requires positive compatibility evidence."""
+
+    def _observe(self, record: dict) -> object:
+        return provider(RecordingTransport(inventory={"data": [record]})).observe(MODEL, 4096)
+
+    def _record(self, **overrides) -> dict:
+        record = {
+            "id": MODEL,
+            "type": "llm",
+            "loaded_instances": [{"instance_id": INSTANCE, "context_length": 8192}],
+        }
+        record.update(overrides)
+        return record
+
+    def test_valid_chat_compatible_type_is_usable(self) -> None:
+        for model_type in ("llm", "vlm"):
+            with self.subTest(type=model_type):
+                observation = self._observe(self._record(type=model_type))
+                self.assertTrue(observation.usable)
+
+    def test_missing_type_is_not_usable(self) -> None:
+        record = self._record()
+        del record["type"]
+        observation = self._observe(record)
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_INCOMPATIBLE)
+
+    def test_null_type_is_not_usable(self) -> None:
+        observation = self._observe(self._record(type=None))
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_INCOMPATIBLE)
+
+    def test_malformed_type_is_not_usable(self) -> None:
+        for value in (7, ["llm"], {"kind": "llm"}, True, ""):
+            with self.subTest(value=value):
+                observation = self._observe(self._record(type=value))
+                self.assertFalse(observation.usable)
+                self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_INCOMPATIBLE)
+
+    def test_wrong_type_is_not_usable(self) -> None:
+        for value in ("embeddings", "reranker", "unknown"):
+            with self.subTest(value=value):
+                self.assertFalse(self._observe(self._record(type=value)).usable)
+
+    def test_compatibility_is_not_inferred_from_other_signals(self) -> None:
+        """A loaded, well-named, high-context model is still not evidence."""
+        record = self._record()
+        del record["type"]
+        record["loaded_context_length"] = 131072
+        observation = self._observe(record)
+        self.assertFalse(observation.usable)
+
+
+class TerminalCompletionEvidenceTests(unittest.TestCase):
+    """B-04/B-07: completion must be positively evidenced before any text."""
+
+    def _normalize(self, document) -> object:
+        return provider(RecordingTransport()).normalize_response(execution_request(), document)
+
+    def test_ordinary_completion_is_accepted(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, "Fine."))
+        self.assertEqual(result.status, PASS)
+        self.assertEqual(result.candidate_text, "Fine.")
+        self.assertTrue(result.completion_evidence_ref)
+
+    def test_conflicting_provider_identity_rejects(self) -> None:
+        for field in ("provider_id", "provider"):
+            with self.subTest(field=field):
+                document = chat_response(INSTANCE, **{field: "someone-elses-provider"})
+                result = self._normalize(document)
+                self.assertEqual(result.status, INVALID)
+                self.assertEqual(result.safe_error_code, PROVIDER_IDENTITY_MISMATCH)
+                self.assertIsNone(result.candidate_text)
+
+    def test_conflicting_request_identity_rejects(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, request_id="some-other-request"))
+        self.assertEqual(result.status, INVALID)
+        self.assertIsNone(result.candidate_text)
+
+    def test_error_state_with_valid_message_rejects(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, "Looks fine.", error="model crashed"))
+        self.assertEqual(result.status, UNAVAILABLE)
+        self.assertEqual(result.safe_error_code, PROVIDER_ERROR_REPORTED)
+        self.assertIsNone(result.candidate_text)
+
+    def test_timeout_state_with_valid_message_rejects(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, "Partial.", error="request timed out"))
+        self.assertEqual(result.status, UNAVAILABLE)
+        self.assertEqual(result.safe_error_code, PROVIDER_TIMEOUT)
+        self.assertIsNone(result.candidate_text)
+
+    def test_nonterminal_processing_state_rejects(self) -> None:
+        for state in ("processing", "queued", "in_progress", "streaming"):
+            with self.subTest(state=state):
+                result = self._normalize(chat_response(INSTANCE, "Not done.", status=state))
+                self.assertEqual(result.status, INVALID)
+                self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_UNVERIFIED)
+                self.assertIsNone(result.candidate_text)
+
+    def test_error_status_values_reject_as_unavailable(self) -> None:
+        for state in ("error", "failed", "cancelled", "aborted"):
+            with self.subTest(state=state):
+                result = self._normalize(chat_response(INSTANCE, "Text.", status=state))
+                self.assertEqual(result.status, UNAVAILABLE)
+                self.assertIsNone(result.candidate_text)
+
+    def test_missing_terminal_completion_evidence_rejects(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, "Text.", status=None))
+        self.assertEqual(result.status, INVALID)
+        self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_UNVERIFIED)
+        self.assertIsNone(result.candidate_text)
+
+    def test_malformed_terminal_state_rejects(self) -> None:
+        for value in (7, ["completed"], {"state": "completed"}, True):
+            with self.subTest(value=value):
+                result = self._normalize(chat_response(INSTANCE, "Text.", status=value))
+                self.assertEqual(result.status, INVALID)
+                self.assertIsNone(result.candidate_text)
+
+    def test_missing_completion_evidence_rejects(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, "Text.", evidence_id=None))
+        self.assertEqual(result.status, INVALID)
+        self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_EVIDENCE_MISSING)
+        self.assertIsNone(result.candidate_text)
+
+    def test_blank_completion_evidence_rejects(self) -> None:
+        for value in ("", "   "):
+            with self.subTest(value=repr(value)):
+                result = self._normalize(chat_response(INSTANCE, "Text.", evidence_id=value))
+                self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_EVIDENCE_MISSING)
+
+    def test_completion_evidence_is_provider_bound_not_request_derived(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, "Text.", evidence_id="resp-42"))
+        self.assertIn("resp-42", result.completion_evidence_ref)
+        self.assertIn(INSTANCE, result.completion_evidence_ref)
+        self.assertNotIn(execution_request().request_id, result.completion_evidence_ref)

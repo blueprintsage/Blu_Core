@@ -25,7 +25,7 @@
     {"id": "instance_level_schema_validation_active", "status": "pass"},
     {"id": "manifest_validator_digest_and_scope_guards_strengthened", "status": "pass"},
     {"id": "golden_CTS_unchanged", "status": "pass"},
-    {"id": "no_runtime_code_introduced", "status": "pass"},
+    {"id": "runtime_phase1_code_introduced_only_under_BC050_authorization", "status": "pass"},
     {"id": "independent_Claude_correction_review", "status": "pass"},
     {"id": "BC_041_and_BC_041_C1_Dad_Blu_closure", "status": "pass"},
     {"id": "minimum_OPSEC_match_and_redaction_contract_available", "status": "pass", "resolution": "B-1_double_prime_closed_by_Cf_removal_separator_tolerance_and_outer_boundary_provenance_with_expanded_proof"}
@@ -49,8 +49,19 @@
     "review_source_commit": "f0998f78aaada899a16d4413170ef3689f04fe28",
     "review_import_commit": "3e77111b6d86879f591c7ab8c52a571c51e7c48e"
   },
-  "implementation_authorized": false,
+  "implementation_authorized": true,
+  "bc050_implementation_authorization": {
+    "state": "authorized",
+    "assignment": "BC-050",
+    "authorized_by": "Dad/Blu",
+    "authorization_date": "2026-08-12",
+    "packet": "docs/domains/runtime/assignments/BC-050/assignment.md",
+    "implementation_owner": "Claude",
+    "independent_implementation_reviewer": "Codex",
+    "preflight_review_disposition": "approve-with-notes",
+    "preflight_blocking_findings": 0
+  },
   "conditional_runtime_packet_after_blocker": "Python Runtime Phase 1 - Boot + Ordinary Turn + LM Studio Model Boundary",
   "automatic_start_prohibited": true,
-  "authorization_boundary": "Technical readiness, independent Claude correction review, and BC-041/BC-041-C1 Dad/Blu closure are complete. Python Runtime Phase 1 implementation remains separately unauthorized, has not started, and cannot begin automatically. A later Dad/Blu action must explicitly authorize the named runtime packet."
+  "authorization_boundary": "Technical readiness, independent Claude correction review, and BC-041/BC-041-C1 Dad/Blu closure are complete. Dad/Blu explicitly authorized BC-050 implementation on 2026-08-12, so Python Runtime Phase 1 implementation is present under that named authorization only. Authorization permits the named assignment to begin; it never creates an automatic-start mechanism, and automatic_start_prohibited remains true. Later Python phases, Auth, tools, Local Mirror, PASS, and SkillForge remain unauthorized."
 }

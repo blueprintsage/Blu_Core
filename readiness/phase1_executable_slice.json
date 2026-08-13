@@ -2,7 +2,13 @@
   "spec_version": "1.1.0",
   "assignment": "BC-041",
   "slice_id": "python_phase1_boot_ordinary_turn_lm_studio",
-  "implementation_authorized": false,
+  "implementation_authorized": true,
+  "implementation_authorization": {
+    "assignment": "BC-050",
+    "authorized_by": "Dad/Blu",
+    "authorization_date": "2026-08-12",
+    "packet": "docs/domains/runtime/assignments/BC-050/assignment.md"
+  },
   "purpose": "Smallest useful real Blu turn centered on ordinary conversation.",
   "boot_sequence": [
     "load_and_validate_portable_configuration",

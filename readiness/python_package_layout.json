@@ -3,24 +3,42 @@
   "assignment": "BC-040",
   "layout_type": "src",
   "production_root": "src/blu_runtime",
-  "implementation_present": false,
+  "implementation_present": true,
+  "implementation_assignment": "BC-050",
+  "classification_values": ["component", "support", "tests"],
   "paths": [
-    {"path": "src/blu_runtime/__main__.py", "owner": "runtime_entrypoint", "phase1": true},
-    {"path": "src/blu_runtime/config.py", "owner": "configuration", "phase1": true},
-    {"path": "src/blu_runtime/canon/loader.py", "owner": "canonical_source_loader", "phase1": true},
-    {"path": "src/blu_runtime/contracts/models.py", "owner": "typed_contract_model_layer", "phase1": true},
-    {"path": "src/blu_runtime/core/security_restraint.py", "owner": "security_restraint", "phase1": true},
-    {"path": "src/blu_runtime/core/authorization.py", "owner": "authorization_evaluator", "phase1": false},
-    {"path": "src/blu_runtime/core/turn_controller.py", "owner": "turn_controller", "phase1": true},
-    {"path": "src/blu_runtime/core/validation_egress.py", "owner": "validation_egress", "phase1": true},
-    {"path": "src/blu_runtime/providers/model/base.py", "owner": "model_execution_provider_abstraction", "phase1": true},
-    {"path": "src/blu_runtime/providers/model/lm_studio.py", "owner": "lm_studio_provider_binding", "phase1": true},
-    {"path": "src/blu_runtime/adapters/host/base.py", "owner": "host_adapter_abstraction", "phase1": true},
-    {"path": "src/blu_runtime/adapters/host/terminal.py", "owner": "terminal_host_adapter", "phase1": true},
-    {"path": "src/blu_runtime/providers/continuity/base.py", "owner": "continuity_provider_abstraction", "phase1": true},
-    {"path": "tests/runtime_phase1", "owner": "phase1_tests", "phase1": true},
-    {"path": "tests/runtime_phase1/fixtures", "owner": "phase1_fixtures", "phase1": true}
+    {"path": "src/blu_runtime/__main__.py", "owner": "runtime_entrypoint", "phase1": true, "classification": "support"},
+    {"path": "src/blu_runtime/config.py", "owner": "configuration", "phase1": true, "classification": "support"},
+    {"path": "src/blu_runtime/canon/loader.py", "owner": "canonical_source_loader", "phase1": true, "classification": "support"},
+    {"path": "src/blu_runtime/contracts/models.py", "owner": "typed_contract_model_layer", "phase1": true, "classification": "support"},
+    {"path": "src/blu_runtime/core/security_restraint.py", "owner": "security_restraint", "phase1": true, "classification": "component"},
+    {"path": "src/blu_runtime/core/authorization.py", "owner": "authorization_evaluator", "phase1": false, "classification": "component"},
+    {"path": "src/blu_runtime/core/turn_controller.py", "owner": "turn_controller", "phase1": true, "classification": "component"},
+    {"path": "src/blu_runtime/core/validation_egress.py", "owner": "validation_egress", "phase1": true, "classification": "component"},
+    {"path": "src/blu_runtime/providers/model/base.py", "owner": "model_execution_provider_abstraction", "phase1": true, "classification": "component"},
+    {"path": "src/blu_runtime/providers/model/lm_studio.py", "owner": "lm_studio_provider_binding", "phase1": true, "classification": "component"},
+    {"path": "src/blu_runtime/adapters/host/base.py", "owner": "host_adapter_abstraction", "phase1": true, "classification": "component"},
+    {"path": "src/blu_runtime/adapters/host/terminal.py", "owner": "terminal_host_adapter", "phase1": true, "classification": "component"},
+    {"path": "src/blu_runtime/providers/continuity/base.py", "owner": "continuity_provider_abstraction", "phase1": true, "classification": "component"},
+    {"path": "tests/runtime_phase1", "owner": "phase1_tests", "phase1": true, "classification": "tests"},
+    {"path": "tests/runtime_phase1/fixtures", "owner": "phase1_fixtures", "phase1": true, "classification": "tests"}
   ],
+  "support_layer": {
+    "rule": "Support modules carry zero architectural authority and appear in no architecture_mapping entry.",
+    "modules": [
+      {"path": "src/blu_runtime/__main__.py", "role": "process assembly and entrypoint"},
+      {"path": "src/blu_runtime/config.py", "role": "configuration parsing and validation"},
+      {"path": "src/blu_runtime/canon/loader.py", "role": "golden verification and deterministic frozen-envelope rendering"},
+      {"path": "src/blu_runtime/contracts/models.py", "role": "typed packet and data representations"}
+    ],
+    "canon_loader_prohibitions": [
+      "choose canon",
+      "create canon",
+      "rewrite canon",
+      "determine behavioral precedence",
+      "become a Canon Manager"
+    ]
+  },
   "architecture_mapping": {
     "security_restraint": ["core/security_restraint.py"],
     "authorization_evaluator": ["core/authorization.py"],

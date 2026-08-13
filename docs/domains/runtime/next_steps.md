@@ -1,5 +1,27 @@
 # Runtime Next Steps
 
+## Immediate — resolve BC-050 contradiction C-1
+
+BC-050 implementation is complete and its own suite passes, but the assignment
+cannot move to review until Dad/Blu decide how to reconcile the authorized
+readiness state with two validators that still assert no runtime implementation
+exists:
+
+- `tools/validate_opsec_contracts.py:652-655` (protected by the BC-050 packet)
+- `tools/validate_continuity_contracts.py:91-94` (outside the collision domain)
+
+Recommended: amend BC-050 to cover both files for changes limited to those
+assertions, gated exactly as `tools/validate_python_readiness.py` now is, with
+the OPSEC oracle functions untouched and the differential tests re-run.
+
+After C-1 is resolved, BC-050 goes to Codex for independent implementation
+review. Claude authored the implementation and must not be its sole independent
+reviewer.
+
+Also open, unrelated to BC-050: `tools/validate_host_adapter_contracts.py`
+fails at the authorized base because its BC-020 protected-path guard predates
+BC-041's legitimate change to `contracts/successor/unresolved_register.json`.
+
 status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-12

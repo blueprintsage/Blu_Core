@@ -1,5 +1,35 @@
 # Runtime Worklog
 
+## BC-050 — Python Runtime Phase 1 (implementation, blocked on C-1)
+
+Dad/Blu explicitly authorized BC-050 implementation on 2026-08-12 and moved
+implementation ownership from Codex to Claude for BC-050 only. Independent
+implementation review is assigned to Codex; Claude does not review her own
+implementation.
+
+Base `973589eea05fe42deeb829c5435bd09faf8cbe70`, branch
+`bc-050-python-runtime-phase1`. First real Python Blu runtime: boot, portable
+configuration, verified canon load, terminal ingress, pre-ingress restraint,
+one-route Turn Controller, Model Execution Boundary, LM Studio binding,
+untrusted response normalization, Validation and Egress, one terminal packet,
+evidence-bound receipt. `tests/runtime_phase1` passes 119/119.
+
+The frozen model-facing envelope reproduces its pinned digest
+`103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142` at 36887
+bytes. Production OPSEC provenance is differential-equivalent to the BC-041-C1
+reference across the full corpus and is bounded rather than quadratic
+(6400 removals: 5.6 ms production vs 1376.7 ms reference).
+
+**Blocked on contradiction C-1.** The "no runtime implementation" rule is
+encoded in three validators, and BC-050's collision domain covers only one.
+`tools/validate_opsec_contracts.py:652-655` (protected) and
+`tools/validate_continuity_contracts.py:91-94` (out of domain) both reject the
+authorized state. Recorded under the packet's §21 protocol rather than resolved
+by editing a protected contract. See `assignments/BC-050/handoff.md`.
+
+Separately recorded: `tools/validate_host_adapter_contracts.py` fails at the
+authorized base as well, independent of BC-050.
+
 status: active
 owner: docs/domains/runtime
 last_reviewed: 2026-08-12

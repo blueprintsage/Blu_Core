@@ -121,14 +121,16 @@ def chat_response(
     instance_id: str,
     text: str = "Hello.",
     kinds: tuple[str, ...] = ("message",),
-    status: str | None = "completed",
-    evidence_id: str | None = "resp-0001",
+    status: str | None = None,
+    evidence_id: str | None = None,
     **extra: Any,
 ) -> dict[str, Any]:
-    """Build a provider response.
+    """Build a provider response in the live native-v1 stateless shape.
 
-    `status` and `evidence_id` carry the positive terminal-completion and
-    provider-assigned completion evidence B-04/B-07 now require.
+    The live `/api/v1/chat` response carries `model_instance_id`, typed
+    `output`, and `stats` -- no terminal `status` and no per-completion
+    identifier (BC-050-C5). Tests that need either assert it explicitly by
+    passing `status` or `evidence_id`.
     """
     output: list[dict[str, Any]] = []
     for kind in kinds:
@@ -138,7 +140,11 @@ def chat_response(
             output.append({"type": "reasoning", "content": "internal reasoning must not print"})
         else:
             output.append({"type": kind, "tool_name": "shell", "arguments": "{}"})
-    document: dict[str, Any] = {"model_instance_id": instance_id, "output": output}
+    document: dict[str, Any] = {
+        "model_instance_id": instance_id,
+        "output": output,
+        "stats": {"input_tokens": 30, "total_output_tokens": 27, "reasoning_output_tokens": 0},
+    }
     if status is not None:
         document["status"] = status
     if evidence_id is not None:

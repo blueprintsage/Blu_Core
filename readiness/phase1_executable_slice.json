@@ -86,8 +86,10 @@
     "control_decision_ref",
     "validation_result_ref",
     "terminal_packet_ref",
-    "provider_completion_evidence_ref"
+    "provider_completion_evidence_ref",
+    "provider_completion_proof"
   ],
+  "provider_completion_proof_semantics": "A receipt states which completion proof it rests on. provider_assigned_completion_id requires a usable provider-assigned identifier. synchronous_provider_response is for provider profiles that assign none, such as LM Studio native REST v1 with stream:false and store:false, where the synchronous response is the completion; provider_completion_evidence_ref is then null and is never filled from a request id, hash, uuid, or model_instance_id.",
   "sur003_disposition": "route_catalog_frozen_for_phase1",
   "opsec_contract_ref": "contracts/security/opsec/minimum_contract.json",
   "security_gate": "The implemented runtime must resolve, load, schema-validate, integrity-check, and mark the protected policy usable before evaluating ingress; only SecurityDecision PASS may reach Turn Controller. Candidate output must be cleared or safely redacted by the same policy before terminal print. Missing or invalid policy is UNAVAILABLE and never reaches the model."

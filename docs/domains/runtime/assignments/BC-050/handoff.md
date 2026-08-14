@@ -434,3 +434,77 @@ assignment. C4 did not speculate about them.
 **Yes.** C4 is a single-file provider-adapter correction with live
 reproduction, 13 new live-contract regression tests, and unchanged frozen
 artifacts. Not merged; BC-050 is not self-closed.
+
+## BC-050-C5 — Native-v1 Completion Proof Correction
+
+Branch `bc-050-c5-lmstudio-completion-proof`, base
+`ac784f0cb136593b73f65a128eee658918dbb023`.
+
+C4 unblocked boot; the first live turn then failed with
+`PROVIDER_COMPLETION_UNVERIFIED` after the model had already answered. The live
+native-v1 stateless response supplies no terminal `status`, no per-completion
+identifier, and a per-load instance ordinal (`granite-4.0-h-micro:3`) that the
+inventory does not show. All three were required by the C3 boundary, so all
+three were corrected together rather than one at a time.
+
+Under the Dad/Blu authority decision, a successful synchronous native-v1
+completion is now established from a structurally valid response with a
+consistent instance identity, supported typed output, usable assistant content,
+and no provider or transport failure. A textual terminal state is honoured when
+present and not required when absent.
+
+### Contract changes
+
+- `COMPLETION_PROOF_PROVIDER_ID` and `COMPLETION_PROOF_SYNCHRONOUS_RESPONSE`
+  added to `contracts/models.py`.
+- `NormalizedModelResult.completion_proof: str | None`.
+- `TurnReceipt.provider_completion_evidence_ref` widened to `str | None`;
+  `TurnReceipt.provider_completion_proof: str` added.
+- `readiness/phase1_executable_slice.json` records the new receipt field and
+  what each proof asserts.
+
+The receipt now states which proof it rests on, so a null provider reference
+reads as "this provider assigns none" rather than as missing data. No id is
+fabricated on that path: no uuid, no hash, no `str()` coercion, no request-id
+fallback, no `model_instance_id` relabelling, and `store` stays `false`.
+
+### Fail-closed behavior
+
+B-07 is unchanged where evidence is actually asserted: a blank or non-string
+identifier still rejects with `PROVIDER_COMPLETION_EVIDENCE_MISSING`, and a
+result that claims no proof at all can never become a successful turn. 24
+malformed live-shaped bodies are pinned by regression test, all failing closed
+without exception.
+
+### Live smoke: full turn PASS
+
+```text
+you> Hey, Blu.
+blu> Greetings! How can I assist you today?
+```
+
+Receipt: `model_instance_id: granite-4.0-h-micro:2`,
+`provider_completion_evidence_ref: None`,
+`provider_completion_proof: synchronous_provider_response`, canon digest
+`103e0e2d...`. Run with the synthetic protected-policy fixture and
+`requested_tokens: 16384`, because 4096 cannot carry the frozen envelope.
+
+### Outstanding
+
+- `requested_tokens` in the operator's `smoke.runtime.json` is still 4096 and
+  cannot carry the ~8,021-token envelope; that file is untracked and was not
+  modified.
+- HTTP-level provider errors are still classified
+  `PROVIDER_ENDPOINT_UNAVAILABLE` rather than `PROVIDER_ERROR_REPORTED` (C4
+  finding 2). Left for its own bounded correction.
+- The instance-ordinal rule is a live-evidenced inference, not documented
+  provider behavior.
+- Editable install still unverified; `PYTHONPATH=src` fallback in use.
+- N-03 continuity defensive invariant and the BC-020 fixed-base host-adapter
+  finding remain open and unrelated.
+
+### Ready for independent Codex review?
+
+**Yes.** Three production files changed, the live ordinary turn completes end
+to end, and the fabrication prohibitions are pinned by test. Not merged; BC-050
+is not self-closed.

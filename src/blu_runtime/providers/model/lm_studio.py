@@ -21,6 +21,8 @@ import uuid
 from typing import Any, Callable
 
 from blu_runtime.contracts.models import (
+    COMPLETION_PROOF_PROVIDER_ID,
+    COMPLETION_PROOF_SYNCHRONOUS_RESPONSE,
     INVALID,
     PASS,
     PROVIDER_CONTEXT_INSUFFICIENT,
@@ -70,16 +72,25 @@ MESSAGE_KIND = "message"
 REASONING_KIND = "reasoning"
 TOOL_CALL_KINDS = frozenset({"tool_call", "invalid_tool_call"})
 
-#: Positive terminal-completion evidence (B-04). Repository evidence
-#: (LM-EVID-003) records that responses identify the model instance and carry
-#: typed output plus statistics, but does not pin the terminal-state spelling,
-#: so this set is a fail-closed assumption to confirm during live smoke.
+#: Terminal-state spellings, honoured when the provider asserts a state at all.
+#: The live native-v1 stateless response (BC-050-C5) carries no `status` field:
+#: the synchronous HTTP response *is* the completion. A state is therefore not
+#: required, but a state that is present is still binding -- a provider that
+#: says "processing" has not completed, whatever else the body contains.
 TERMINAL_COMPLETION_STATES = frozenset({"completed", "complete", "finished", "succeeded", "done"})
 TIMEOUT_STATES = frozenset({"timeout", "timed_out"})
 ERROR_STATES = frozenset({"error", "failed", "failure", "cancelled", "canceled", "aborted"})
 
-#: Provider-assigned identifiers accepted as completion evidence (B-07).
+#: Provider-assigned identifiers accepted as completion evidence (B-07). Native
+#: v1 with `store: false` assigns none; see `_completion_evidence`.
 COMPLETION_EVIDENCE_FIELDS = ("id", "response_id", "completion_id")
+
+#: Separator between a model key and LM Studio's per-load instance ordinal
+#: (BC-050-C5). `/api/v1/models` reported the loaded instance as
+#: `granite-4.0-h-micro` while two live `/api/v1/chat` responses identified the
+#: same instance as `granite-4.0-h-micro:2` and `granite-4.0-h-micro:3`. The
+#: model portion must still match exactly; only this suffix may be added.
+INSTANCE_ORDINAL_SEPARATOR = ":"
 
 
 def _looks_like_timeout(error: object) -> bool:
@@ -312,21 +323,27 @@ class LMStudioProvider(ModelExecutionProvider):
             code = PROVIDER_TIMEOUT if _looks_like_timeout(error) else PROVIDER_ERROR_REPORTED
             return failure(UNAVAILABLE, code)
 
-        status = document.get("status")
-        if not isinstance(status, str):
-            return failure(INVALID, PROVIDER_COMPLETION_UNVERIFIED)
-        if status in TIMEOUT_STATES:
-            return failure(UNAVAILABLE, PROVIDER_TIMEOUT)
-        if status in ERROR_STATES:
-            return failure(UNAVAILABLE, PROVIDER_ERROR_REPORTED)
-        if status not in TERMINAL_COMPLETION_STATES:
-            # Queued, processing, cancelled, or any unknown state.
-            return failure(INVALID, PROVIDER_COMPLETION_UNVERIFIED)
+        # C5: native v1 with `stream: false` and `store: false` defines no
+        # terminal state field -- the synchronous response is the completion.
+        # Requiring a `status` rejected real completions. A state that IS
+        # asserted still binds, and a present-but-not-a-string state is
+        # malformed rather than absent, so it still fails closed.
+        if "status" in document:
+            status = document.get("status")
+            if not isinstance(status, str):
+                return failure(INVALID, PROVIDER_COMPLETION_UNVERIFIED)
+            if status in TIMEOUT_STATES:
+                return failure(UNAVAILABLE, PROVIDER_TIMEOUT)
+            if status in ERROR_STATES:
+                return failure(UNAVAILABLE, PROVIDER_ERROR_REPORTED)
+            if status not in TERMINAL_COMPLETION_STATES:
+                # Queued, processing, cancelled, or any unknown state.
+                return failure(INVALID, PROVIDER_COMPLETION_UNVERIFIED)
 
         instance_id = document.get("model_instance_id") or document.get("model")
         if not isinstance(instance_id, str) or not instance_id:
             return failure(INVALID, PROVIDER_RESPONSE_MALFORMED)
-        if instance_id != request.model_instance_id:
+        if not self._instance_identity_agrees(instance_id, request.model_instance_id):
             return failure(INVALID, PROVIDER_IDENTITY_MISMATCH, instance_id)
 
         # Provider and request identity, when the response asserts them, must
@@ -339,11 +356,13 @@ class LMStudioProvider(ModelExecutionProvider):
         if claimed_request is not None and claimed_request != request.request_id:
             return failure(INVALID, PROVIDER_IDENTITY_MISMATCH, instance_id)
 
-        # B-07: completion evidence is observed, never synthesized. Without a
-        # provider-assigned identifier there is no completion to reference.
-        evidence_ref = self._completion_evidence_ref(document, instance_id)
-        if evidence_ref is None:
+        # B-07 preserved, C5 corrected: evidence is observed, never synthesized.
+        # An identifier the provider asserts must be usable; an identifier the
+        # provider profile never assigns is an honest absence, not a loss.
+        evidence = self._completion_evidence(document, instance_id)
+        if evidence is None:
             return failure(INVALID, PROVIDER_COMPLETION_EVIDENCE_MISSING, instance_id)
+        evidence_ref, completion_proof = evidence
 
         output = document.get("output")
         if not isinstance(output, list) or not output:
@@ -395,20 +414,54 @@ class LMStudioProvider(ModelExecutionProvider):
             output_kinds=tuple(kinds),
             safe_error_code=None,
             completion_evidence_ref=evidence_ref,
+            completion_proof=completion_proof,
         )
 
-    def _completion_evidence_ref(self, document: dict[str, Any], instance_id: str) -> str | None:
-        """Bind completion evidence to a provider-assigned identifier.
+    @staticmethod
+    def _instance_identity_agrees(observed: str, requested: str) -> bool:
+        """Does the responding instance identity name the instance Blu selected?
 
-        Returns None when the provider asserted no identifier. Fabricating one
-        from the request id would make the receipt claim evidence that was
-        never observed.
+        Native v1 answers with a per-load instance ordinal that the inventory
+        does not show: `/api/v1/models` reported `granite-4.0-h-micro` while
+        `/api/v1/chat` answered as `granite-4.0-h-micro:3`. The model portion
+        must match exactly -- only the ordinal suffix may differ, and only by
+        being added to what Blu asked for. A different model, a truncated key,
+        or an empty ordinal is a mismatch.
         """
+        if observed == requested:
+            return True
+        prefix = f"{requested}{INSTANCE_ORDINAL_SEPARATOR}"
+        return observed.startswith(prefix) and bool(observed[len(prefix) :])
+
+    def _completion_evidence(
+        self, document: dict[str, Any], instance_id: str
+    ) -> tuple[str | None, str] | None:
+        """Return `(reference, proof)`, or None when asserted evidence is unusable.
+
+        Three distinct cases, kept distinct:
+
+        * the provider assigned a usable identifier -> reference it;
+        * the provider assigned no identifier at all -> the synchronous
+          response is the proof and the reference is None. Native v1 with
+          `store: false` has nothing to reference: there is no stored
+          completion, so there is no id, and inventing one -- from the request
+          id, a hash, a uuid, or `model_instance_id` -- would put a claim in
+          the receipt that no provider ever made;
+        * the provider asserted an identifier field that is blank or not a
+          string -> malformed evidence, which fails closed (B-07). This is not
+          the same as absence and must never be treated as absence.
+        """
+        asserted = False
         for field in COMPLETION_EVIDENCE_FIELDS:
+            if field not in document:
+                continue
+            asserted = True
             value = document.get(field)
             if isinstance(value, str) and value.strip():
-                return f"{self.provider_id}:{instance_id}:{value}"
-        return None
+                return f"{self.provider_id}:{instance_id}:{value}", COMPLETION_PROOF_PROVIDER_ID
+        if asserted:
+            return None
+        return None, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE
 
     @staticmethod
     def _message_text(item: dict[str, Any]) -> str | None:

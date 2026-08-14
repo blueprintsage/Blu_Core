@@ -24,6 +24,8 @@ from blu_runtime.adapters.host.terminal import TerminalHostAdapter
 from blu_runtime.canon.loader import CanonError, load_projection
 from blu_runtime.contracts.models import (
     BLOCK,
+    COMPLETION_PROOF_PROVIDER_ID,
+    COMPLETION_PROOF_SYNCHRONOUS_RESPONSE,
     INVALID,
     PASS,
     PROVIDER_COMPLETION_EVIDENCE_MISSING,
@@ -31,6 +33,7 @@ from blu_runtime.contracts.models import (
     CanonProjection,
     ContinuityState,
     ModelExecutionRequest,
+    NormalizedModelResult,
     TerminalPacket,
     TurnReceipt,
 )
@@ -125,6 +128,28 @@ def _valid_completion_evidence(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
+def _completion_proof_holds(result: NormalizedModelResult) -> bool:
+    """Does the boundary's claimed proof match the evidence it carries?
+
+    The boundary must say what it proved; the runtime does not infer it. Each
+    proof admits exactly one shape of evidence (BC-050-C5):
+
+    * `provider_assigned_completion_id` requires a usable provider reference,
+      so B-07's malformed-evidence rejection is unchanged;
+    * `synchronous_provider_response` requires the reference to be exactly
+      None, so a profile that assigns no id cannot smuggle one in.
+
+    Any other proof value -- including none at all -- fails closed. A provider
+    that returns a successful-looking result while claiming no proof is still
+    not a completed turn.
+    """
+    if result.completion_proof == COMPLETION_PROOF_PROVIDER_ID:
+        return _valid_completion_evidence(result.completion_evidence_ref)
+    if result.completion_proof == COMPLETION_PROOF_SYNCHRONOUS_RESPONSE:
+        return result.completion_evidence_ref is None
+    return False
+
+
 def run_turn(runtime: Runtime, text: Any, request_id: str | None = None) -> TerminalPacket:
     """Run exactly one ordinary turn and return exactly one terminal packet."""
     identifier = request_id or runtime.request_id_factory()
@@ -164,8 +189,10 @@ def run_turn(runtime: Runtime, text: Any, request_id: str | None = None) -> Term
     # B-07: completion evidence is observed or the turn is not a success. A
     # generated label is not evidence, so there is deliberately no fallback,
     # and a malformed type is rejected here rather than coerced with str() --
-    # coercion would fabricate apparent evidence out of invalid input.
-    if result.status == PASS and not _valid_completion_evidence(result.completion_evidence_ref):
+    # coercion would fabricate apparent evidence out of invalid input. C5 adds
+    # the one honest alternative: a provider profile that assigns no id proves
+    # its completion with the synchronous response itself, and says so.
+    if result.status == PASS and not _completion_proof_holds(result):
         return TerminalPacket(
             request_id=identifier,
             status=INVALID,
@@ -209,6 +236,7 @@ def run_turn(runtime: Runtime, text: Any, request_id: str | None = None) -> Term
             validation_result_ref=f"validation-result:{identifier}",
             terminal_packet_ref=f"terminal-packet:{identifier}",
             provider_completion_evidence_ref=result.completion_evidence_ref,
+            provider_completion_proof=result.completion_proof,
         )
     )
 

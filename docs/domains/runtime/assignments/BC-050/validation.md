@@ -955,5 +955,15 @@ Two working-tree artifacts of the live smoke sit outside the commit and make
 errors while they are present: the untracked operator config `smoke.runtime.json`
 (absent from `MANIFEST.sha256`) and the gitignored `src/blu_runtime.egg-info/`
 build directory left by a local editable install. Neither is repository content
-and neither is caused by C4; both validators pass on a clean checkout of the C4
-commit.
+and neither is caused by C4 — every reported error names one of those two
+artifacts and none names a repository file. Verified by moving both aside and
+re-running: **both validators pass**, after which both artifacts were restored.
+`smoke.runtime.json` was deliberately not committed and not added to the
+manifest; it is the operator's local file, and a manifest entry for it would go
+stale on any checkout that lacks it.
+
+A `git worktree` checkout is not a usable verification vehicle here: this
+Windows clone converts line endings on checkout, so a fresh worktree fails the
+golden checksum and several digest-sensitive validators for reasons unrelated to
+any commit. Golden verification was therefore run in the working clone, where it
+reports zero non-`OK` lines.

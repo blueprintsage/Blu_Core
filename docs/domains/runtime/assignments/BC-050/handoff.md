@@ -1,6 +1,6 @@
 # BC-050 — Handoff Record
 
-status: ready_for_independent_Codex_re_review
+status: ready_for_final_independent_Codex_re_review
 owner: Claude
 reviewer: Codex
 project_lead: Blu
@@ -14,6 +14,27 @@ Python Runtime Phase 1 is implemented and every deterministic suite passes.
 Contradiction C-1 was resolved by the bounded BC-050-C1 correction pass,
 authorized by Dad/Blu with an explicit collision-domain amendment. BC-050 is
 now ready for independent Codex implementation review.
+
+## BC-050-C3 — final micro-correction
+
+Codex's second independent review (`157441d`) closed B-02 through B-05 and
+confirmed B-06/B-07 substantively, leaving three narrow defects. All three are
+corrected on `bc-050-c3-final-micro-correction`:
+
+- **B-01** — the authorization date is now bound to the exact approved value
+  `2026-08-12` in all three validators. Cross-file equality is no longer
+  mistaken for authentication: nine wrong dates written consistently into every
+  record are rejected by every validator independently.
+- **B-06** — the startup banner no longer claims `/exit` ends the session; it
+  names end-of-input, which the host adapter actually implements. `/exit` and
+  `/quit` remain ordinary unsupported input with zero provider invocations.
+- **B-07** — malformed `completion_evidence_ref` types (integer, float,
+  boolean, list, dict, bytes) now fail closed at the evidence boundary instead
+  of raising `AttributeError` from `.strip()`. No coercion, no fallback.
+
+`src/blu_runtime/__main__.py` is the only production file changed. B-02 was not
+reopened; B-03 through B-05 are unregressed. See `validation.md` for the full
+matrices.
 
 ## Identity
 
@@ -241,7 +262,7 @@ Do not merge. BC-050 is not self-closed.
 
 ## BC-050-C2 — Independent Review Blocker Correction
 
-status: all seven blockers addressed (B-02 resolved by BC-050-C2A)
+status: all blockers addressed through BC-050-C3
 
 Correction base `33be23a4c43a160e41e2aeca78962d1cbd3c4a47` (Codex review),
 branch `bc-050-c2-review-blockers`. Codex's disposition on

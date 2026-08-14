@@ -1,5 +1,26 @@
 # Runtime Next Steps
 
+## Immediate — final independent Codex re-review of BC-050
+
+BC-050-C3 corrected the last three blockers from Codex's second review. All
+suites and every applicable validator pass except the known BC-020 fixed-base
+host-adapter condition.
+
+Codex should rerun the three C3 reproductions: a wrong authorization date
+written consistently across both readiness records, `/exit` startup guidance,
+and `completion_evidence_ref = 7`.
+
+Carried nonblocking into integration:
+
+- editable install still blocked by a missing local build backend;
+- live LM Studio smoke `not_performed`, including the two B-04/B-07 field-name
+  assumptions;
+- B-05 canonical output strips punctuation from safe replies, a presentation
+  note rather than a contract violation;
+- the root `README.md` may still say no Python runtime exists;
+- N-03 continuity defensive invariant;
+- the BC-020 fixed-base host-adapter guard.
+
 ## Immediate — independent Codex re-review of BC-050
 
 B-02 is resolved by the BC-050-C2A source-classification decision, and B-01 plus

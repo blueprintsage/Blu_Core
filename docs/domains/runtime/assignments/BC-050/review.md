@@ -718,3 +718,119 @@ SkillForge, or Custom GPT changes. Dad/Blu retains final integration authority.
 ## Final disposition
 
 `return-for-correction`
+
+---
+
+# Final Independent Re-Review After BC-050-C3
+
+status: complete
+reviewer: Codex
+review_target: `9f5a9e695622064ead37cf2da5208eb79a0a53de`
+correction_base: `157441d3ea224760e8c800cdd19202cbb230d01d`
+review_date: 2026-08-13
+disposition: approve-with-notes
+
+## Executive result
+
+Disposition: `approve-with-notes`.
+
+No reproducible BC-050-C3 blocker remains. The exact authorization date is
+authenticated independently by all three validators; startup guidance names
+end-of-input rather than a slash command; `/exit` and `/quit` remain ordinary
+unsupported inputs; and malformed completion evidence fails closed without an
+exception, receipt, PASS, or public success output.
+
+BC-050-C3 is approved for Dad/Blu integration review. This review does not
+merge, close, push, or begin any later runtime phase.
+
+## Blocking findings
+
+None.
+
+## Final blocker disposition
+
+### B-01 — resolved
+
+All three `_bc050_authorized` predicates bind both authorization-date fields to
+the exact string `2026-08-12`. Their function ASTs and six governing constants
+are identical across the readiness, OPSEC, and continuity validators.
+
+A fresh temporary-directory probe authenticated the valid baseline in all
+three. It then wrote the same invalid value into both authorization records for
+`1999-01-01`, `2026-08-13`, empty string, whitespace-only string, integer,
+null, boolean, list, and dictionary. All 27 validator/value combinations
+returned unauthorized; there were zero acceptances.
+
+### B-06 — resolved
+
+Executing `main` through end-of-input produced startup text containing neither
+`/exit` nor `/quit` and truthfully named end-of-input. Fresh `/exit` and `/quit`
+submissions each produced a normal `RawHostEvent`, entered ordinary ingress,
+terminated `UNAVAILABLE` as an unsupported route, invoked the provider zero
+times, created no receipt, and rendered exactly one `blu>` terminal result.
+
+### B-07 — resolved
+
+Fresh boundary-level probes supplied `None`, empty string, whitespace-only
+string, integer, float, boolean, list, dictionary, and bytes as
+`completion_evidence_ref`. Every value returned one deterministic
+`INVALID / PROVIDER_COMPLETION_EVIDENCE_MISSING` terminal packet with no
+exception, PASS, receipt, public output, coercion, or synthesized evidence. A
+valid nonblank string produced PASS, one public result, and one receipt carrying
+the exact provider evidence reference. The predicate is exactly equivalent to:
+
+```python
+isinstance(value, str) and bool(value.strip())
+```
+
+## Foundational regression evidence
+
+| Check | Result |
+| --- | --- |
+| Runtime Phase 1 suite | 162 tests, OK |
+| Security suite | 50 tests, OK |
+| Readiness suite | 53 tests, OK |
+| Continuity suite | 58 tests, OK |
+| Frozen envelope | 36,887 bytes; pinned SHA-256; final byte `0x5D` |
+| Architecture | 7 components / 8 packets / 9 interfaces |
+| Golden CTS | all seven Markdown files and CTS ZIP OK; base-to-target diff empty |
+| OPSEC differential | 20,000 fresh cases; 0 normalized/provenance mismatches |
+| Removed-`Cf` provenance | 16,353 corpus cases plus all six focused code points equivalent |
+| Protected ingress | BLOCK; provider invocation count `0` |
+| Protected egress | REDACTED or BLOCKED; never CLEAR |
+
+Median production timings for 2,000, 8,000, and 32,000 removals were 0.973 ms,
+5.502 ms, and 23.326 ms. Fourfold size increases produced 5.65x and 4.24x
+timing increases, remaining bounded and inconsistent with quadratic growth.
+
+The continuity, historical archive, historical archaeology, OPSEC, Python
+readiness, runtime-contract, successor-kernel, and viability validators passed.
+`git diff --check` passed and the target checkout was clean before this review
+record was added.
+
+The host-adapter validator returned only the preserved BC-020 fixed-base
+finding on `contracts/successor/unresolved_register.json`. The condition
+predates BC-050, is unchanged by C3, and was neither suppressed nor reported as
+a new blocker.
+
+## Review execution note
+
+The first combined fresh probe completed B-01, then stopped before B-06/B-07
+because the standalone process lacked the documented `PYTHONPATH=src` fallback.
+The runtime probes were rerun with that external fallback and passed. This was
+review-harness setup, not a product failure; no internal `sys.path` mutation was
+introduced.
+
+## Nonblocking notes
+
+- Live LM Studio smoke remains accurately `not_performed`; no live-provider
+  evidence is claimed.
+- Editable-install verification remains unperformed because the approved local
+  build backend is unavailable; the external `PYTHONPATH=src` fallback passed.
+- Punctuation canonicalization and root README wording remain bounded
+  integration-quality notes, not reproduced semantic or security defects.
+- The prior continuity defensive-invariant note remains future continuity work.
+
+## Final disposition
+
+`approve-with-notes`

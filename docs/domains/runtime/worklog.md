@@ -1,5 +1,30 @@
 # Runtime Worklog
 
+## BC-050-C3 — Final Independent Re-Review Micro-Correction
+
+Codex's second review (`157441d`) closed B-02 through B-05 and left three narrow
+defects, all corrected on `bc-050-c3-final-micro-correction`.
+
+B-01: the authorization date is bound to the exact approved value `2026-08-12`
+in all three validators. Codex showed that cross-file equality accepted the same
+wrong date everywhere; nine wrong dates written consistently into both readiness
+records are now rejected by every validator independently. The shared predicate
+and its six constants remain byte-identical.
+
+B-06: the startup banner no longer claims `/exit` ends the session. It names
+end-of-input, the mechanism the host adapter actually implements. No `/exit`
+interception was restored.
+
+B-07: malformed `completion_evidence_ref` types fail closed at the evidence
+boundary. Codex's integer reproduction previously raised `AttributeError` from
+`.strip()`; it now yields one deterministic terminal failure. No `str()`
+coercion, because coercion would fabricate evidence from invalid input.
+
+`src/blu_runtime/__main__.py` is the only production file changed. Suites:
+runtime 162, security 50, readiness 53, continuity 58. Envelope, golden,
+architecture, and OPSEC oracle unchanged; differential clean over 40,000 fresh
+cases. Known BC-020 finding preserved.
+
 ## BC-050-C2A — Instruction-Layer Classification Cleanup
 
 Dad/Blu resolved B-02 by correcting a source-classification premise rather than

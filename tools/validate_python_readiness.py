@@ -128,6 +128,7 @@ def _validate_golden(root: Path) -> list[str]:
 BC050_ASSIGNMENT = "BC-050"
 BC050_AUTHORIZED_BY = "Dad/Blu"
 BC050_PACKET = "docs/domains/runtime/assignments/BC-050/assignment.md"
+BC050_AUTHORIZATION_DATE = "2026-08-12"
 BC050_CHECKLIST = Path("readiness/python_phase1_readiness_checklist.json")
 BC050_SLICE = Path("readiness/phase1_executable_slice.json")
 BC050_PRODUCTION_PREFIX = "src/blu_runtime/"
@@ -141,6 +142,11 @@ def _bc050_authorized(root: Path) -> bool:
     Fail-closed. Any missing, malformed, contradictory, or non-exact value
     restores this validator's pre-implementation prohibition, independently of
     what any other validator concludes.
+
+    Every field is compared to its exact approved value. Cross-file equality is
+    not authentication: the same wrong date in every record is still the wrong
+    date, so the authorization date is bound to the approved constant rather
+    than merely to its own copies.
     """
     try:
         checklist = json.loads((root / BC050_CHECKLIST).read_text(encoding="utf-8"))
@@ -157,11 +163,11 @@ def _bc050_authorized(root: Path) -> bool:
         record.get("state") == "authorized"
         and record.get("assignment") == BC050_ASSIGNMENT
         and record.get("authorized_by") == BC050_AUTHORIZED_BY
-        and bool(record.get("authorization_date"))
+        and record.get("authorization_date") == BC050_AUTHORIZATION_DATE
         and record.get("packet") == BC050_PACKET
         and nested.get("assignment") == BC050_ASSIGNMENT
         and nested.get("authorized_by") == BC050_AUTHORIZED_BY
-        and nested.get("authorization_date") == record.get("authorization_date")
+        and nested.get("authorization_date") == BC050_AUTHORIZATION_DATE
         and nested.get("packet") == BC050_PACKET
         and checklist.get("implementation_authorized") is True
         and executable_slice.get("implementation_authorized") is True

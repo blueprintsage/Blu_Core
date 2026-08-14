@@ -29,6 +29,12 @@ def _nested(executable_slice: dict[str, Any]) -> dict[str, Any]:
     return executable_slice["implementation_authorization"]
 
 
+def _set_date(checklist: dict[str, Any], executable_slice: dict[str, Any], value: Any) -> None:
+    """Write one authorization date into every record that carries it."""
+    _record(checklist)["authorization_date"] = value
+    _nested(executable_slice)["authorization_date"] = value
+
+
 #: Codex's reproduction matrix, plus the nested-record and date cases.
 MUTATIONS: tuple[Mutation, ...] = (
     ("wrong_authorized_by", lambda c, s: _record(c).__setitem__("authorized_by", "Mallory")),
@@ -42,6 +48,17 @@ MUTATIONS: tuple[Mutation, ...] = (
     ("missing_state", lambda c, s: _record(c).pop("state")),
     ("missing_authorization_date", lambda c, s: _record(c).pop("authorization_date")),
     ("empty_authorization_date", lambda c, s: _record(c).__setitem__("authorization_date", "")),
+    # BC-050-C3 B-01: cross-file equality is not authentication. Each of these
+    # writes the same wrong value into both records.
+    ("wrong_date_1999_everywhere", lambda c, s: _set_date(c, s, "1999-01-01")),
+    ("wrong_date_off_by_one_everywhere", lambda c, s: _set_date(c, s, "2026-08-13")),
+    ("empty_date_everywhere", lambda c, s: _set_date(c, s, "")),
+    ("whitespace_date_everywhere", lambda c, s: _set_date(c, s, " ")),
+    ("integer_date_everywhere", lambda c, s: _set_date(c, s, 7)),
+    ("null_date_everywhere", lambda c, s: _set_date(c, s, None)),
+    ("boolean_date_everywhere", lambda c, s: _set_date(c, s, True)),
+    ("list_date_everywhere", lambda c, s: _set_date(c, s, ["2026-08-12"])),
+    ("dict_date_everywhere", lambda c, s: _set_date(c, s, {"date": "2026-08-12"})),
     ("missing_record", lambda c, s: c.pop("bc050_implementation_authorization")),
     ("non_mapping_record", lambda c, s: c.__setitem__("bc050_implementation_authorization", "authorized")),
     ("checklist_flag_false", lambda c, s: c.__setitem__("implementation_authorized", False)),

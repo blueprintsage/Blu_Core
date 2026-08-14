@@ -116,6 +116,15 @@ def boot(
     )
 
 
+def _valid_completion_evidence(value: Any) -> bool:
+    """Accept only a non-blank string reference to observed provider evidence.
+
+    Any other type is malformed provider output and fails closed here, at the
+    evidence boundary, rather than reaching string handling deeper in the turn.
+    """
+    return isinstance(value, str) and bool(value.strip())
+
+
 def run_turn(runtime: Runtime, text: Any, request_id: str | None = None) -> TerminalPacket:
     """Run exactly one ordinary turn and return exactly one terminal packet."""
     identifier = request_id or runtime.request_id_factory()
@@ -153,8 +162,10 @@ def run_turn(runtime: Runtime, text: Any, request_id: str | None = None) -> Term
 
     result = runtime.boundary.infer(execution_request)
     # B-07: completion evidence is observed or the turn is not a success. A
-    # generated label is not evidence, so there is deliberately no fallback.
-    if result.status == PASS and not (result.completion_evidence_ref or "").strip():
+    # generated label is not evidence, so there is deliberately no fallback,
+    # and a malformed type is rejected here rather than coerced with str() --
+    # coercion would fabricate apparent evidence out of invalid input.
+    if result.status == PASS and not _valid_completion_evidence(result.completion_evidence_ref):
         return TerminalPacket(
             request_id=identifier,
             status=INVALID,
@@ -224,8 +235,11 @@ def main(argv: list[str] | None = None) -> int:
 
     adapter = TerminalHostAdapter()
     sys.stdout.write(
+        # B-06: advertise only what the host adapter actually does. Slash
+        # commands are ordinary unsupported input, not termination controls.
         "Blu Core Python Runtime Phase 1. Ordinary conversation only; "
-        "durable continuity unavailable. /exit to end.\n"
+        "durable continuity unavailable. End input (Ctrl-Z then Enter on "
+        "Windows, Ctrl-D elsewhere) to end the session.\n"
     )
     while True:
         event = adapter.receive()

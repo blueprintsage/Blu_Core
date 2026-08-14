@@ -56,14 +56,15 @@ backend was fetched from the network.
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Runtime Phase 1 | `PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"` | **154 tests, OK** |
+| Runtime Phase 1 | `PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"` | **162 tests, OK** |
 | Security | `python -m unittest discover -s tests/security -p "test_*.py"` | **50 tests, OK** |
 | Readiness | `python -m unittest discover -s tests/readiness -p "test_*.py"` | **53 tests, OK** |
 | Continuity | `python -m unittest discover -s tests/continuity -p "test_*.py"` | **58 tests, OK** |
 
-Post-BC-050-C2A. Counts across the lineage: runtime 119 -> 154, security
-36 -> 49 -> 50, readiness 18 -> 32 -> 35 -> 53, continuity 42 -> 50 -> 58.
-C2A added 18 instruction-layer classification tests.
+Post-BC-050-C3. Counts across the lineage: runtime 119 -> 154 -> 162,
+security 36 -> 49 -> 50, readiness 18 -> 32 -> 35 -> 53, continuity
+42 -> 50 -> 58. C2A added 18 instruction-layer classification tests; C3 added
+8 terminal-guidance and malformed-evidence tests plus 9 date mutations.
 
 ## Contract validation
 
@@ -73,7 +74,7 @@ python tools/validate_python_readiness.py
 python tools/validate_continuity_contracts.py
 ```
 
-All **pass** after BC-050-C2A.
+All **pass** after BC-050-C3.
 
 Remaining repository validators, observed individually:
 
@@ -668,3 +669,152 @@ updated. Historical material was annotated, never rewritten.
 
 The old deployment authority remains historical truth; only the successor
 invariant authority changes, and only prospectively.
+
+## BC-050-C3 final micro-correction evidence
+
+Correction base `157441d3ea224760e8c800cdd19202cbb230d01d` (Codex second
+review), branch `bc-050-c3-final-micro-correction`. Three blockers, no redesign.
+
+### Files changed
+
+```text
+tools/validate_python_readiness.py        B-01
+tools/validate_opsec_contracts.py         B-01
+tools/validate_continuity_contracts.py    B-01
+tests/readiness/bc050_authorization_matrix.py  B-01 date mutations
+src/blu_runtime/__main__.py               B-06, B-07
+tests/runtime_phase1/test_end_to_end.py   B-06, B-07
+```
+
+`src/blu_runtime/__main__.py` is the **only** production file changed. No other
+runtime module was touched.
+
+### B-01 — exact authorization-date authentication
+
+`BC050_AUTHORIZATION_DATE = "2026-08-12"` was added to the shared predicate, and
+both date comparisons now bind to that constant instead of to each other. The
+predicate and its six constants remain byte-identical across all three
+validators, verified by hash.
+
+Codex's finding was that cross-file equality is not authentication: the same
+wrong value in every record satisfied the old check. It no longer does.
+
+Date mutation matrix, written into **both** readiness records and evaluated
+against each validator independently:
+
+| Date written to every record | readiness | OPSEC | continuity |
+| --- | --- | --- | --- |
+| `1999-01-01` | reject | reject | reject |
+| `2026-08-13` (off by one) | reject | reject | reject |
+| `""` | reject | reject | reject |
+| `" "` | reject | reject | reject |
+| `7` (integer) | reject | reject | reject |
+| `null` | reject | reject | reject |
+| `true` (boolean) | reject | reject | reject |
+| `["2026-08-12"]` (list) | reject | reject | reject |
+| `{"date": "2026-08-12"}` (dict) | reject | reject | reject |
+
+Nine wrong dates x three validators, **0 acceptances**. The unmutated baseline
+still authenticates in all three.
+
+All prior B-01 mutations are retained: wrong/empty/missing authorizer,
+wrong/empty/missing packet, wrong assignment, unstated and missing state,
+missing record, non-mapping record, checklist flag false, automatic start
+allowed, slice flag disagreement, nested wrong assignment/authorizer/packet/date,
+missing and non-mapping nested record. The shared matrix is now 31 mutations,
+executed independently by the readiness, security, and continuity suites.
+
+### B-06 — truthful terminal guidance
+
+The startup banner no longer claims `/exit` ends the session. It now names the
+mechanism the host adapter actually implements: end-of-input (Ctrl-Z then Enter
+on Windows, Ctrl-D elsewhere).
+
+No `/exit` interception was restored and no slash-command subsystem was added.
+
+| Probe | Result |
+| --- | --- |
+| banner contains `/exit` or `/quit` | no |
+| banner names the real termination mechanism | yes |
+| EOF actually ends the session | yes |
+| `/exit` enters the ordinary user-input path | yes |
+| `/quit` enters the ordinary user-input path | yes |
+| provider invocations for each | `0` |
+| terminal results rendered per input | exactly `1` |
+
+### B-07 — malformed completion-evidence types fail closed
+
+`_valid_completion_evidence` validates at the evidence boundary before any
+string operation or receipt construction:
+
+```python
+isinstance(value, str) and bool(value.strip())
+```
+
+No `str()` coercion, because coercion would fabricate apparent evidence from
+invalid input. No fallback reference. No generic top-level exception catch.
+
+| `completion_evidence_ref` | accepted | terminal PASS | receipt | public output | exception |
+| --- | --- | --- | --- | --- | --- |
+| `None` | no | no | no | none | none |
+| `""` | no | no | no | none | none |
+| `"   "` | no | no | no | none | none |
+| `7` (integer) | no | no | no | none | none |
+| `1.5` (float) | no | no | no | none | none |
+| `True` (boolean) | no | no | no | none | none |
+| `["resp-1"]` (list) | no | no | no | none | none |
+| `{"id": "resp-1"}` (dict) | no | no | no | none | none |
+| `b"resp-1"` (bytes) | no | no | no | none | none |
+| `"resp-9"` (valid) | yes | yes | yes | rendered | none |
+
+Codex's `7` reproduction previously raised `AttributeError` from `.strip()`; it
+now produces one deterministic fail-closed terminal result. A test asserts the
+request id never appears in any failure path, so nothing is fabricated.
+
+### Preserved
+
+| Item | State |
+| --- | --- |
+| B-02 | resolved under C2A; not reopened |
+| B-03 positive chat compatibility | closed; 28-test spot regression green |
+| B-04 provider completion evidence | closed |
+| B-05 canonical CLEAR output | closed |
+| Frozen envelope | 36887 bytes, `103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142`, final byte `0x5D` |
+| OPSEC oracle | byte-identical to `708101d` across all twelve functions |
+| OPSEC differential | 40,000 fresh cases, 0 mismatches |
+| Architecture | 7 / 8 / 9 |
+| Golden CTS | unchanged; zero non-`OK` checksum lines |
+
+### Suites and validators
+
+| Suite | Result |
+| --- | --- |
+| Runtime Phase 1 | 162 OK (was 154) |
+| Security | 50 OK |
+| Readiness | 53 OK |
+| Continuity | 58 OK |
+
+Eight validators pass. `validate_host_adapter_contracts.py` still reports the
+known BC-020 fixed-base finding on
+`contracts/successor/unresolved_register.json`, preserved and unsuppressed.
+
+`git diff --check` clean; `MANIFEST.sha256` 312 entries with no missing, stale,
+or duplicate paths. Golden verified with
+`cd kernel/golden/v0.22.0 && sha256sum -c SHA256SUMS`.
+
+### Outstanding nonblocking notes
+
+- Editable install (`pip install -e .`) still not performed; the approved build
+  backend is unavailable locally. External `PYTHONPATH=src` fallback in use.
+- Live LM Studio smoke test: `not_performed`. The B-04/B-07 terminal-state and
+  response-identifier field names remain fail-closed assumptions awaiting live
+  confirmation.
+- B-05 canonicalization still strips punctuation from otherwise safe output
+  (`"Hello, Dad."` prints as `Hello Dad`). Carried as a presentation-quality
+  note; not redesigned during C3 because no frozen contract is violated.
+- The root `README.md` may still say no Python runtime exists. Not changed:
+  C3 was not broadened into general documentation cleanup. Recorded as an
+  integration cleanup note.
+- N-03 continuity defensive invariant remains carried to the
+  continuity-provider phase.
+- BC-020 fixed-base host-adapter guard remains open and unrelated.

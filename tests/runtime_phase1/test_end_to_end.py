@@ -438,3 +438,124 @@ class CompletionEvidenceTests(RuntimeHarness):
         receipt = runtime.receipts[0].as_dict()
         self.assertIn("resp-77", receipt["provider_completion_evidence_ref"])
         self.assertNotIn("req-abc", receipt["provider_completion_evidence_ref"])
+
+
+class TerminalGuidanceTests(RuntimeHarness):
+    """B-06: startup guidance must describe only real host behavior."""
+
+    def _banner(self) -> str:
+        import inspect
+        source = inspect.getsource(runtime_main.main)
+        start = source.index('"Blu Core Python Runtime Phase 1')
+        return source[start:source.index(")", start)]
+
+    def test_startup_text_does_not_claim_a_slash_command_exits(self) -> None:
+        banner = self._banner()
+        self.assertNotIn("/exit", banner)
+        self.assertNotIn("/quit", banner)
+
+    def test_startup_text_describes_the_real_termination_mechanism(self) -> None:
+        self.assertIn("End input", self._banner())
+
+    def test_advertised_termination_actually_ends_the_session(self) -> None:
+        """EOF is the mechanism the banner names, and it really works."""
+        adapter = TerminalHostAdapter(
+            stream_in=io.StringIO(""), stream_out=io.StringIO(), request_id_factory=lambda: "e1"
+        )
+        self.assertIsNone(adapter.receive())
+
+    def test_exit_and_quit_remain_ordinary_unsupported_input(self) -> None:
+        for command in ("/exit", "/quit"):
+            with self.subTest(command=command):
+                runtime = self.boot()
+                stream = io.StringIO()
+                adapter = TerminalHostAdapter(
+                    stream_in=io.StringIO(f"{command}\n"),
+                    stream_out=stream,
+                    request_id_factory=lambda: "e1",
+                )
+                event = adapter.receive()
+                self.assertIsNotNone(event)
+                host_input = adapter.submit(event)
+                packet = runtime_main.run_turn(
+                    runtime, host_input.text, request_id=host_input.request_id
+                )
+                rendered = adapter.render(packet)
+                self.assertEqual(packet.status, UNAVAILABLE)
+                self.assertEqual(runtime.boundary.invocation_count, 0)
+                self.assertEqual(rendered.count("blu> "), 1)
+
+
+class MalformedCompletionEvidenceTests(RuntimeHarness):
+    """B-07: malformed evidence types fail closed without an exception."""
+
+    MALFORMED = (
+        ("none", None),
+        ("empty", ""),
+        ("whitespace", "   "),
+        ("integer", 7),
+        ("float", 1.5),
+        ("boolean", True),
+        ("list", ["resp-1"]),
+        ("dict", {"id": "resp-1"}),
+        ("bytes", b"resp-1"),
+    )
+
+    def _boundary_with_evidence(self, evidence):
+        from blu_runtime.contracts.models import NormalizedModelResult
+        from blu_runtime.providers.model.base import ModelExecutionBoundary
+
+        real = self.boundary()
+        observation = real.observe(MODEL, 4096)
+
+        class _Provider:
+            provider_id = "lm_studio_native_rest_v1"
+
+            def observe(self, configured_model_key, required_context):
+                return observation
+
+            def infer(self, request):
+                return NormalizedModelResult(
+                    request_id=request.request_id,
+                    provider_id=self.provider_id,
+                    model_instance_id=INSTANCE,
+                    status=PASS,
+                    candidate_text="Looks successful.",
+                    output_kinds=("message",),
+                    safe_error_code=None,
+                    completion_evidence_ref=evidence,
+                )
+
+        return ModelExecutionBoundary(_Provider())
+
+    def test_guard_accepts_only_non_blank_strings(self) -> None:
+        for label, value in self.MALFORMED:
+            with self.subTest(value=label):
+                self.assertFalse(runtime_main._valid_completion_evidence(value))
+        self.assertTrue(runtime_main._valid_completion_evidence("resp-1"))
+
+    def test_malformed_evidence_fails_closed_without_exception(self) -> None:
+        for label, value in self.MALFORMED:
+            with self.subTest(value=label):
+                runtime = self.boot(boundary=self._boundary_with_evidence(value))
+                packet = runtime_main.run_turn(runtime, "hello", request_id="req-1")
+                self.assertNotEqual(packet.status, PASS)
+                self.assertIsNone(packet.public_output)
+                self.assertEqual(runtime.receipts, [])
+                self.assertNotIn("req-1", str(packet.safe_error_code))
+
+    def test_valid_evidence_still_succeeds(self) -> None:
+        runtime = self.boot(boundary=self._boundary_with_evidence("resp-9"))
+        packet = runtime_main.run_turn(runtime, "hello", request_id="req-1")
+        self.assertEqual(packet.status, PASS)
+        self.assertEqual(len(runtime.receipts), 1)
+        self.assertEqual(
+            runtime.receipts[0].as_dict()["provider_completion_evidence_ref"], "resp-9"
+        )
+
+    def test_no_evidence_is_ever_fabricated_from_the_request(self) -> None:
+        for label, value in self.MALFORMED:
+            with self.subTest(value=label):
+                runtime = self.boot(boundary=self._boundary_with_evidence(value))
+                runtime_main.run_turn(runtime, "hello", request_id="req-unique-token")
+                self.assertEqual(runtime.receipts, [])

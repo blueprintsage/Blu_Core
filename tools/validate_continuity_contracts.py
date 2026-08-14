@@ -92,6 +92,34 @@ PROHIBITED_IMPLEMENTATION_ROOTS = {
     Path("src"), Path("runtime"), Path("blu_core"), Path("providers"),
     Path("local_mirror"), Path("lm_studio"), Path("pass"), Path("skillforge"),
 }
+# BC-050-C1: `src` is conditionally permitted, and only for the authorized
+# BC-050 Phase-1 package. Every other root above stays prohibited outright.
+BC050_PRODUCTION_PREFIX = "src/blu_runtime/"
+BC050_TEST_PREFIX = "tests/runtime_phase1/"
+BC050_ROOT_FILES = {"pyproject.toml"}
+
+
+def _bc050_authorized(root: Path) -> bool:
+    """Report explicit Dad/Blu BC-050 implementation authorization.
+
+    Absent or malformed evidence keeps every guard at its pre-implementation
+    behavior. This gate concerns runtime existence only; it grants no
+    continuity capability and no durable provider.
+    """
+    checklist = root / "readiness/python_phase1_readiness_checklist.json"
+    if not checklist.is_file():
+        return False
+    try:
+        document = json.loads(checklist.read_text(encoding="utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return False
+    record = document.get("bc050_implementation_authorization")
+    return (
+        isinstance(record, dict)
+        and record.get("state") == "authorized"
+        and record.get("assignment") == "BC-050"
+        and document.get("implementation_authorized") is True
+    )
 
 
 def _load(path: Path) -> Any:
@@ -203,10 +231,21 @@ def _validate_git_scope(root: Path) -> list[str]:
         "tools/validate_opsec_contracts.py",
         "tests/security/test_validate_opsec_contracts.py",
     }
+    authorized = _bc050_authorized(root)
     for path in all_changed:
-        normalized = path.replace("\\", "/").lower()
-        if normalized.endswith(".py") and path.replace("\\", "/") not in allowed_python:
-            errors.append(f"runtime or provider Python implementation changed: {path}")
+        forward = path.replace("\\", "/")
+        normalized = forward.lower()
+        if normalized.endswith(".py") and forward not in allowed_python:
+            # BC-050-C1: authorized Phase-1 code is permitted under exactly the
+            # BC-050 production and test roots. Everything else still fails.
+            if not (
+                authorized
+                and (
+                    forward.startswith(BC050_PRODUCTION_PREFIX)
+                    or forward.startswith(BC050_TEST_PREFIX)
+                )
+            ):
+                errors.append(f"runtime or provider Python implementation changed: {path}")
         if re.search(r"(^|/)(pass|skillforge)(/|$)", normalized):
             errors.append(f"PASS/SkillForge scope bleed: {path}")
         if re.search(r"(^|/)(lm[_-]?studio)(/|$)", normalized):
@@ -216,10 +255,22 @@ def _validate_git_scope(root: Path) -> list[str]:
 
 def _validate_no_implementation_tree(root: Path) -> list[str]:
     errors: list[str] = []
+    authorized = _bc050_authorized(root)
     for relative in PROHIBITED_IMPLEMENTATION_ROOTS:
         path = root / relative
-        if path.exists() and any(item.is_file() for item in path.rglob("*")):
-            errors.append(f"runtime or provider implementation exists: {relative.as_posix()}")
+        if not (path.exists() and any(item.is_file() for item in path.rglob("*"))):
+            continue
+        # BC-050-C1: an authorized BC-050 runtime under src/blu_runtime/** is no
+        # longer itself a continuity-contract violation. Unauthorized trees, and
+        # any file under src/ outside that package, remain violations.
+        if relative == Path("src") and authorized:
+            for item in path.rglob("*"):
+                if item.is_file():
+                    entry = item.relative_to(root).as_posix()
+                    if not entry.startswith(BC050_PRODUCTION_PREFIX):
+                        errors.append(f"runtime or provider implementation exists: {entry}")
+            continue
+        errors.append(f"runtime or provider implementation exists: {relative.as_posix()}")
     for path in (root / SPEC_DIR).rglob("*"):
         if path.is_file() and path.suffix.lower() not in {".json", ".md"}:
             errors.append(f"executable continuity implementation exists: {path.relative_to(root).as_posix()}")

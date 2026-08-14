@@ -17,7 +17,9 @@ validator = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(validator)
 
 
-class PythonReadinessValidationTests(unittest.TestCase):
+class _ReadinessHarness(unittest.TestCase):
+    """Shared temp-root harness. Holds no test methods."""
+
     maxDiff = None
 
     def setUp(self) -> None:
@@ -56,6 +58,8 @@ class PythonReadinessValidationTests(unittest.TestCase):
         errors = self.errors()
         self.assertTrue(any(fragment in error for error in errors), errors)
 
+
+class PythonReadinessValidationTests(_ReadinessHarness):
     def test_canonical_readiness_contracts_pass(self) -> None:
         self.assertEqual([], self.errors())
 
@@ -156,12 +160,20 @@ class PythonReadinessValidationTests(unittest.TestCase):
         self.assert_has("not complete")
         self.assert_has("completion is not recorded")
 
-    def test_completed_review_still_cannot_authorize_implementation(self) -> None:
+    def test_authorization_without_evidence_is_rejected(self) -> None:
+        """BC-050-C1: the flag alone never authorizes implementation.
+
+        Before BC-050 this asserted that `implementation_authorized` could
+        never be true. It is now true under explicit Dad/Blu evidence, so the
+        test asserts the property that actually matters: stripping the
+        authorization record while leaving the flag set must still fail.
+        """
         path = "readiness/python_phase1_readiness_checklist.json"
         data = self.load(path)
+        del data["bc050_implementation_authorization"]
         data["implementation_authorized"] = True
         self.save(path, data)
-        self.assert_has("without a separate runtime authorization")
+        self.assert_has("authorization disagrees with the BC-050 authorization record")
 
     def test_closure_receipts_are_pinned(self) -> None:
         path = "readiness/python_phase1_readiness_checklist.json"
@@ -215,3 +227,99 @@ class PythonReadinessValidationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BC050AuthorizationGateTests(_ReadinessHarness):
+    """BC-050-C1: authorized implementation is permitted; stale states fail."""
+
+    CHECKLIST = "readiness/python_phase1_readiness_checklist.json"
+    SLICE = "readiness/phase1_executable_slice.json"
+    LAYOUT = "readiness/python_package_layout.json"
+
+    def test_authorized_state_passes(self) -> None:
+        self.assertEqual([], self.errors())
+
+    def test_authorization_record_is_required_for_authorized_state(self) -> None:
+        checklist = self.load(self.CHECKLIST)
+        del checklist["bc050_implementation_authorization"]
+        self.save(self.CHECKLIST, checklist)
+        self.assert_has("authorization disagrees with the BC-050 authorization record")
+
+    def test_authorization_record_must_name_assignment_bc050(self) -> None:
+        checklist = self.load(self.CHECKLIST)
+        checklist["bc050_implementation_authorization"]["assignment"] = "BC-999"
+        self.save(self.CHECKLIST, checklist)
+        self.assert_has("authorization disagrees with the BC-050 authorization record")
+
+    def test_authorization_record_must_bind_authorizing_party_and_packet(self) -> None:
+        checklist = self.load(self.CHECKLIST)
+        checklist["bc050_implementation_authorization"]["authorized_by"] = "someone else"
+        self.save(self.CHECKLIST, checklist)
+        self.assert_has("does not bind an authorizing party and packet")
+
+    def test_slice_and_checklist_authorization_must_agree(self) -> None:
+        document = self.load(self.SLICE)
+        document["implementation_authorized"] = False
+        self.save(self.SLICE, document)
+        self.assert_has("Phase 1 slice authorization disagrees")
+
+    def test_implementation_present_must_match_authorization(self) -> None:
+        layout = self.load(self.LAYOUT)
+        layout["implementation_present"] = False
+        self.save(self.LAYOUT, layout)
+        self.assert_has("implementation state disagrees with BC-050 authorization")
+
+    def test_automatic_start_prohibition_is_ungated(self) -> None:
+        checklist = self.load(self.CHECKLIST)
+        checklist["automatic_start_prohibited"] = False
+        self.save(self.CHECKLIST, checklist)
+        self.assert_has("readiness automatically starts runtime implementation")
+
+    def test_stale_result_semantics_fail_under_authorization(self) -> None:
+        checklist = self.load(self.CHECKLIST)
+        checklist["result_semantics"] = (
+            "technical_conditions_satisfied_independent_correction_review_and_"
+            "Dad_Blu_closure_complete_implementation_authorization_pending"
+        )
+        self.save(self.CHECKLIST, checklist)
+        self.assert_has("readiness result does not distinguish technical status")
+
+    def test_stale_no_runtime_code_assertion_is_rejected(self) -> None:
+        checklist = self.load(self.CHECKLIST)
+        checklist["checks"].append({"id": "no_runtime_code_introduced", "status": "pass"})
+        self.save(self.CHECKLIST, checklist)
+        self.assert_has("stale pre-implementation runtime-code assertion")
+
+    def test_authorized_state_requires_the_scope_check(self) -> None:
+        checklist = self.load(self.CHECKLIST)
+        checklist["checks"] = [
+            item
+            for item in checklist["checks"]
+            if item.get("id") != "runtime_phase1_code_introduced_only_under_BC050_authorization"
+        ]
+        self.save(self.CHECKLIST, checklist)
+        self.assert_has("does not record the BC-050 scope check")
+
+    def test_support_module_cannot_claim_a_component(self) -> None:
+        layout = self.load(self.LAYOUT)
+        layout["architecture_mapping"]["turn_controller"].append("config.py")
+        self.save(self.LAYOUT, layout)
+        self.assert_has("support module claims an architectural component")
+
+    def test_every_phase1_path_needs_a_classification(self) -> None:
+        layout = self.load(self.LAYOUT)
+        del layout["paths"][0]["classification"]
+        self.save(self.LAYOUT, layout)
+        self.assert_has("no declared classification")
+
+    def test_support_roster_must_match_declared_classifications(self) -> None:
+        layout = self.load(self.LAYOUT)
+        layout["support_layer"]["modules"].pop()
+        self.save(self.LAYOUT, layout)
+        self.assert_has("support layer roster disagrees")
+
+    def test_canon_loader_constraints_are_required(self) -> None:
+        layout = self.load(self.LAYOUT)
+        layout["support_layer"]["canon_loader_prohibitions"] = []
+        self.save(self.LAYOUT, layout)
+        self.assert_has("does not constrain the canonical source loader")

@@ -8,17 +8,17 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 
-# Offline fallback: BC-050 §16 permits running the suite with `src` on the
-# import path when the build backend is unavailable for an editable install.
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+# `blu_runtime` is imported normally. The suite does not mutate sys.path: doing
+# so could conceal a broken package layout. Supply the import path externally,
+# either by installing the package or, when the build backend is unavailable,
+# with the authorized offline fallback:
+#
+#   PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"
 
 SYNTHETIC_POLICY_FIXTURE = ROOT / "tests/security/fixtures/synthetic_policy.json"
 

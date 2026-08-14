@@ -30,7 +30,8 @@ Already satisfied; `jsonschema==4.26.0` present.
 python -m pip install -e .
 ```
 
-**Not run.** The declared build backend (`setuptools>=68`) is unavailable
+**Editable-install verification: not performed — blocked by missing local build
+backend.** The declared build backend (`setuptools>=68`) is unavailable
 locally. Under pip 25.0.1 build isolation this would fetch the backend from the
 network, which BC-050 §16 forbids during an offline acceptance run. Setup
 therefore reports the missing prerequisite rather than going online.
@@ -41,40 +42,39 @@ Documented fallback used (§16):
 PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"
 ```
 
-`tests/runtime_phase1/support.py` also inserts `src` on `sys.path` so the suite
-runs from a clean checkout without an install. This is the recorded fallback,
-not a substitute for install verification; install verification remains
-outstanding until a backend is present.
+BC-050-C1 removed the internal `sys.path` mutation from
+`tests/runtime_phase1/support.py`; the suite imports `blu_runtime` normally and
+the import path is supplied externally. Verified: `python -c "import
+blu_runtime"` without `PYTHONPATH` raises `ModuleNotFoundError`, proving the
+tests no longer conceal a broken package layout.
+
+Package-layout import test under the external fallback: **passed** (119/119).
+Editable-install verification remains an outstanding environment item. No build
+backend was fetched from the network.
 
 ## Test results
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Runtime Phase 1 | `python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"` | **119 tests, OK** |
-| Security | `python -m unittest discover -s tests/security -p "test_*.py"` | 36 tests, **1 failure** (C-1) |
-| Readiness | `python -m unittest discover -s tests/readiness -p "test_*.py"` | 18 tests, **2 failures** (C-1) |
-| Continuity | `python -m unittest discover -s tests/continuity -p "test_*.py"` | 42 tests, OK |
+| Runtime Phase 1 | `PYTHONPATH=src python -m unittest discover -s tests/runtime_phase1 -p "test_*.py"` | **119 tests, OK** |
+| Security | `python -m unittest discover -s tests/security -p "test_*.py"` | **49 tests, OK** |
+| Readiness | `python -m unittest discover -s tests/readiness -p "test_*.py"` | **32 tests, OK** |
+| Continuity | `python -m unittest discover -s tests/continuity -p "test_*.py"` | **50 tests, OK** |
 
-All three failures share one root cause, recorded as C-1a in `handoff.md`:
-`tools/validate_opsec_contracts.py:652-655` requires
-`implementation_authorized` to be `false`, which contradicts the authorized
-BC-050 readiness transition. No failure is attributable to runtime code.
+Post-BC-050-C1. Counts rose because the correction added authorization-gate and
+mechanism-unchanged tests: security 36 -> 49, readiness 18 -> 32 (after
+splitting a shared harness so the gate class no longer re-runs the base suite),
+continuity 42 -> 50.
 
 ## Contract validation
 
 ```bash
 python tools/validate_opsec_contracts.py
-```
-
-**2 errors**, both C-1.
-
-```bash
 python tools/validate_python_readiness.py
+python tools/validate_continuity_contracts.py
 ```
 
-**2 errors**, both C-1 surfaced through the expanded OPSEC proof. Every other
-readiness check passes, including the amended BC-050 gate, layout
-classification, support-layer roster, manifest completeness, and golden digests.
+All **pass** after BC-050-C1.
 
 Remaining repository validators, observed individually:
 
@@ -85,8 +85,8 @@ Remaining repository validators, observed individually:
 | `validate_viability_audit.py` | PASS | |
 | `validate_historical_archive_inventory.py` | PASS | |
 | `validate_historical_behavioral_archaeology.py` | PASS | |
-| `validate_continuity_contracts.py` | **FAIL** | C-1b: `PROHIBITED_IMPLEMENTATION_ROOTS` includes `src` |
-| `validate_host_adapter_contracts.py` | **FAIL** | **pre-existing**, not caused by BC-050 |
+| `validate_continuity_contracts.py` | PASS | after BC-050-C1 gating |
+| `validate_host_adapter_contracts.py` | **FAIL** | known BC-020 fixed-base finding, pre-existing |
 
 The host-adapter failure reproduces at the authorized base commit with no
 BC-050 changes present. `contracts/successor/unresolved_register.json` was last
@@ -111,7 +111,7 @@ git diff --check
 Clean.
 
 Manifest: `MANIFEST.sha256` regenerated with the validator's own digest rule
-(`git show :path` for tracked content, CRLF→LF for untracked text). 307
+(`git show :path` for tracked content, CRLF→LF for untracked text). 310
 entries; readiness manifest guard reports no missing, stale, or duplicate paths.
 
 Architecture: 7 components / 8 packets / 9 interfaces unchanged. No component,
@@ -174,8 +174,18 @@ Decision-level differential (`evaluate_ingress`) also equal across the attack
 and negative corpus, including `ordinary_word_adjacency` negatives and
 `unseparated_self_repetition` positives.
 
-The reference file is unmodified and is loaded as published via
-`importlib.util.spec_from_file_location`.
+The reference is loaded as published via
+`importlib.util.spec_from_file_location`. BC-050-C1 changed only the
+administrative authorization assertions in that file; the conformance oracle
+itself was proven byte-identical to `708101d` across all twelve functions
+(`_normalize_existing_pipeline`, `normalized_match_candidate`,
+`normalize_rule_text`, `_comparison_view`, `_matches`,
+`validate_policy_usability`, `load_policy`, `_evidence`,
+`_failure_evaluation`, `evaluate_ingress`, `_has_overlapping_spans`,
+`evaluate_egress`) and all six governing constants (`SEPARATORS`,
+`REDACTION_REPLACEMENT`, `CF_MATCH_VIEW_NAME`, `SECURITY_DECISIONS`,
+`EGRESS_RESULTS`, `SAFE_ERROR_CODES`). The full differential suite was re-run
+after the change and remains equal.
 
 ## Provenance boundedness (C1 N-2) and invariant (C1 N-1)
 
@@ -293,3 +303,44 @@ without provider invocation, asserted by test.
 
 `not_performed`. No live environment was supplied. No live evidence is
 fabricated or implied.
+
+## BC-050-C1 correction pass
+
+Bounded validator/readiness alignment, authorized by Dad/Blu with an explicit
+collision-domain amendment. Correction base `708101d7f6dfc7748bb69d71f56e4da1044a2699`,
+branch `bc-050-c1-validator-alignment`.
+
+**No production `src/blu_runtime/**` file changed.**
+`git diff --stat 708101d -- src/blu_runtime` is empty.
+
+| Correction | File | Change |
+| --- | --- | --- |
+| C-1A | `tools/validate_opsec_contracts.py` | the two stale authorization assertions now compare against explicit BC-050 evidence; `automatic_start_prohibited is True` split into its own ungated assertion |
+| C-1B guard 1 | `tools/validate_continuity_contracts.py` | `src` conditionally permitted for `src/blu_runtime/**` only; other prohibited roots unchanged; files under `src/` outside the package rejected |
+| C-1B guard 2 | `tools/validate_continuity_contracts.py` | Python git-scope allowlist admits `src/blu_runtime/**` and `tests/runtime_phase1/**` when authorized; pre-existing tool/test paths preserved |
+| C-2 | `readiness/python_phase1_readiness_checklist.json` | `result_semantics` updated (see below) |
+| C-3 | `tools/validate_python_readiness.py` | expects the corrected finite semantics, selected by authorization state |
+| C-4 | `tests/runtime_phase1/support.py` | internal `sys.path` mutation removed |
+
+Readiness `result_semantics`:
+
+- before: `technical_conditions_satisfied_independent_correction_review_and_Dad_Blu_closure_complete_implementation_authorization_pending`
+- after: `python_phase1_implementation_authorized_and_active_pending_independent_review`
+
+The new value asserts authorization and activity only. It does not imply
+implementation completeness, review completion, integration approval, or any
+later Python phase.
+
+Tests added: security authorization-gate (7) and mechanism-unchanged (6);
+readiness authorization-gate (14, including support-layer and stale-state
+mutations); continuity implementation-tree (8). One pre-existing readiness test,
+`test_completed_review_still_cannot_authorize_implementation`, encoded the
+superseded law that authorization could never be true; it was rewritten as
+`test_authorization_without_evidence_is_rejected`, which asserts the property
+that still matters — the flag alone never authorizes implementation.
+
+Continuity law verified unweakened: boundary remains abstraction-only, no
+durable provider, Local Mirror unimplemented with no architectural root,
+lifetime vocabulary `none|turn|host_session|durable_external` unchanged with no
+bare `session`, SUR-007 and SUR-011 dispositions untouched, PASS/SkillForge and
+manifest guards intact.

@@ -743,3 +743,144 @@ class LiveStatelessCompletionTests(unittest.TestCase):
         self.assertEqual(result.status, UNAVAILABLE)
         self.assertEqual(result.safe_error_code, PROVIDER_ERROR_REPORTED)
         self.assertIsNone(result.candidate_text)
+
+
+class InstanceIdentityIsRequiredTests(unittest.TestCase):
+    """C5A blocker 1: `model_instance_id` is the only accepted instance identity.
+
+    A response may echo the `model` the request asked for while saying nothing
+    about which loaded instance answered. That is not identity evidence, so it
+    can no longer stand in for a missing `model_instance_id`.
+    """
+
+    def _normalize(self, document, request: ModelExecutionRequest | None = None):
+        return provider(RecordingTransport()).normalize_response(
+            request or live_request(), document
+        )
+
+    def _without_identity(self, **overrides) -> dict:
+        document = live_chat_response(**overrides)
+        document.pop("model_instance_id", None)
+        return document
+
+    def test_missing_instance_identity_fails_closed(self) -> None:
+        result = self._normalize(self._without_identity())
+        self.assertEqual(result.status, INVALID)
+        self.assertEqual(result.safe_error_code, PROVIDER_RESPONSE_MALFORMED)
+        self.assertIsNone(result.candidate_text)
+
+    def test_model_field_is_not_accepted_as_instance_identity(self) -> None:
+        """The exact substitution C5A closes."""
+        document = self._without_identity(model=LIVE_MODEL)
+        self.assertEqual(document["model"], LIVE_MODEL)
+        result = self._normalize(document, live_request(LIVE_MODEL))
+        self.assertEqual(result.status, INVALID)
+        self.assertEqual(result.safe_error_code, PROVIDER_RESPONSE_MALFORMED)
+        self.assertIsNone(result.candidate_text)
+        self.assertIsNone(result.completion_proof)
+
+    def test_model_field_cannot_rescue_a_malformed_instance_identity(self) -> None:
+        for value in (None, "", "   ", 7, True, ["granite"], {"id": LIVE_MODEL}):
+            with self.subTest(value=value):
+                document = live_chat_response(model_instance_id=value, model=LIVE_MODEL)
+                result = self._normalize(document, live_request(LIVE_MODEL))
+                self.assertEqual(result.status, INVALID)
+                self.assertEqual(result.safe_error_code, PROVIDER_RESPONSE_MALFORMED)
+                self.assertIsNone(result.candidate_text)
+
+    def test_malformed_instance_identity_types_fail_closed(self) -> None:
+        for value in (None, "", " ", "\t\n", 0, 7, True, False, 1.5, [], ["x"], {}, {"a": 1}):
+            with self.subTest(value=value):
+                result = self._normalize(live_chat_response(model_instance_id=value))
+                self.assertEqual(result.status, INVALID)
+                self.assertEqual(result.safe_error_code, PROVIDER_RESPONSE_MALFORMED)
+                self.assertIsNone(result.candidate_text)
+                self.assertIsNone(result.completion_proof)
+
+    def test_valid_instance_identity_still_completes(self) -> None:
+        result = self._normalize(live_chat_response())
+        self.assertEqual(result.status, PASS)
+        self.assertEqual(result.model_instance_id, LIVE_INSTANCE)
+
+    def test_expected_model_consistency_is_unchanged(self) -> None:
+        """C5A tightens presence, not the identity agreement rule."""
+        result = self._normalize(
+            live_chat_response(model_instance_id="some-other-model:3"), live_request(LIVE_MODEL)
+        )
+        self.assertEqual(result.safe_error_code, PROVIDER_IDENTITY_MISMATCH)
+
+
+class AssertedCompletionIdentifierTests(unittest.TestCase):
+    """C5A blocker 2: every asserted completion id is validated before selection.
+
+    A usable identifier in one field must not conceal a malformed identifier
+    the provider asserted in another.
+    """
+
+    def _normalize(self, document):
+        return provider(RecordingTransport()).normalize_response(live_request(), document)
+
+    def _reject(self, **identifiers) -> None:
+        result = self._normalize(live_chat_response(**identifiers))
+        self.assertEqual(result.status, INVALID)
+        self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_EVIDENCE_MISSING)
+        self.assertIsNone(result.candidate_text)
+        self.assertIsNone(result.completion_evidence_ref)
+        self.assertIsNone(result.completion_proof)
+
+    def test_valid_identifier_does_not_excuse_a_malformed_sibling(self) -> None:
+        self._reject(id="good", response_id=7)
+
+    def test_malformed_first_field_is_not_skipped_for_a_valid_later_one(self) -> None:
+        self._reject(id=7, response_id="good")
+
+    def test_blank_sibling_rejects(self) -> None:
+        self._reject(id="good", completion_id="")
+
+    def test_null_sibling_rejects(self) -> None:
+        self._reject(response_id="good", completion_id=None)
+
+    def test_two_valid_identifiers_do_not_excuse_a_third(self) -> None:
+        self._reject(id="good", response_id="also-good", completion_id=[])
+
+    def test_whitespace_sibling_rejects(self) -> None:
+        self._reject(id="good", response_id="   ")
+
+    def test_boolean_sibling_rejects(self) -> None:
+        self._reject(id="good", response_id=True)
+
+    def test_no_identifier_fields_remains_a_valid_stateless_completion(self) -> None:
+        result = self._normalize(live_chat_response())
+        self.assertEqual(result.status, PASS)
+        self.assertIsNone(result.completion_evidence_ref)
+        self.assertEqual(result.completion_proof, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE)
+
+    def test_one_valid_identifier_is_referenced(self) -> None:
+        for field in ("id", "response_id", "completion_id"):
+            with self.subTest(field=field):
+                result = self._normalize(live_chat_response(**{field: "resp-7"}))
+                self.assertEqual(result.status, PASS)
+                self.assertEqual(result.completion_proof, COMPLETION_PROOF_PROVIDER_ID)
+                self.assertIn("resp-7", result.completion_evidence_ref)
+
+    def test_multiple_valid_identifiers_select_deterministically(self) -> None:
+        """Selection follows the declared field order: id, response_id, completion_id."""
+        result = self._normalize(
+            live_chat_response(id="first", response_id="second", completion_id="third")
+        )
+        self.assertEqual(result.status, PASS)
+        self.assertEqual(
+            result.completion_evidence_ref,
+            f"lm_studio_native_rest_v1:{LIVE_INSTANCE}:first",
+        )
+
+        without_id = live_chat_response(response_id="second", completion_id="third")
+        self.assertEqual(
+            self._normalize(without_id).completion_evidence_ref,
+            f"lm_studio_native_rest_v1:{LIVE_INSTANCE}:second",
+        )
+
+    def test_a_rejected_identifier_set_never_yields_public_text(self) -> None:
+        result = self._normalize(live_chat_response(id="good", response_id=7))
+        self.assertIsNone(result.candidate_text)
+        self.assertEqual(result.output_kinds, ())

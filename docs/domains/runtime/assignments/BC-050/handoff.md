@@ -508,3 +508,35 @@ Receipt: `model_instance_id: granite-4.0-h-micro:2`,
 **Yes.** Three production files changed, the live ordinary turn completes end
 to end, and the fabrication prohibitions are pinned by test. Not merged; BC-050
 is not self-closed.
+
+## BC-050-C5A — Completion Evidence Fail-Closed Micro-Correction
+
+Branch `bc-050-c5a-completion-failclosed`, base
+`374cc29da43d104f7ed6e9628e3fd8ebe9c4ff25`. One production file changed:
+`src/blu_runtime/providers/model/lm_studio.py`.
+
+Blu's bounded C5 review found two malformed-response holes, both now closed:
+
+1. `model_instance_id` could fall back to `model`, so a response that omitted
+   the instance identity was accepted if it echoed the requested model. The
+   fallback is gone; the field must be present, a string, and non-blank after
+   trimming, with nothing synthesized, coerced, or inferred.
+2. Completion-evidence validation stopped at the first usable identifier, so
+   `{"id": "good", "response_id": 7}` passed. Every asserted identifier is now
+   validated before any is selected, and selection then follows the declared
+   order `id`, `response_id`, `completion_id`.
+
+Absence is still absence: with no identifier fields present, the stateless path
+is unchanged -- null reference, `synchronous_provider_response` proof, valid
+completion, `store: false`.
+
+Runtime tests 190 -> 207. Security 50, readiness 53, continuity 58, all OK.
+Live smoke re-run after the tightening: the ordinary turn still returns PASS
+with a truthful receipt. Envelope, golden CTS, architecture 7/8/9, and every
+frozen invariant are unchanged.
+
+### Ready for independent Codex review?
+
+**Yes.** Micro-correction only: two fail-closed defects, seventeen regression
+tests, no change to C5 success semantics. Not merged; BC-050 is not
+self-closed.

@@ -81,8 +81,13 @@ TERMINAL_COMPLETION_STATES = frozenset({"completed", "complete", "finished", "su
 TIMEOUT_STATES = frozenset({"timeout", "timed_out"})
 ERROR_STATES = frozenset({"error", "failed", "failure", "cancelled", "canceled", "aborted"})
 
+#: The one field naming which loaded instance answered (C5A). `model` is the
+#: request's own echo and is never accepted as instance identity.
+INSTANCE_IDENTITY_FIELD = "model_instance_id"
+
 #: Provider-assigned identifiers accepted as completion evidence (B-07). Native
-#: v1 with `store: false` assigns none; see `_completion_evidence`.
+#: v1 with `store: false` assigns none; see `_completion_evidence`. Every field
+#: the provider asserts is validated, in this order, before one is selected.
 COMPLETION_EVIDENCE_FIELDS = ("id", "response_id", "completion_id")
 
 #: Separator between a model key and LM Studio's per-load instance ordinal
@@ -340,8 +345,12 @@ class LMStudioProvider(ModelExecutionProvider):
                 # Queued, processing, cancelled, or any unknown state.
                 return failure(INVALID, PROVIDER_COMPLETION_UNVERIFIED)
 
-        instance_id = document.get("model_instance_id") or document.get("model")
-        if not isinstance(instance_id, str) or not instance_id:
+        # C5A: `model_instance_id` is the only instance identity this profile
+        # accepts. The request's own `model` field being echoed back is not
+        # evidence of which loaded instance answered, so a response that omits
+        # the instance identity is malformed even when it names a model.
+        instance_id = document.get(INSTANCE_IDENTITY_FIELD)
+        if not isinstance(instance_id, str) or not instance_id.strip():
             return failure(INVALID, PROVIDER_RESPONSE_MALFORMED)
         if not self._instance_identity_agrees(instance_id, request.model_instance_id):
             return failure(INVALID, PROVIDER_IDENTITY_MISMATCH, instance_id)
@@ -450,18 +459,26 @@ class LMStudioProvider(ModelExecutionProvider):
         * the provider asserted an identifier field that is blank or not a
           string -> malformed evidence, which fails closed (B-07). This is not
           the same as absence and must never be treated as absence.
+
+        C5A: every asserted field is checked before any is selected. One usable
+        identifier does not excuse another that the provider also asserted and
+        got wrong -- a response carrying `{"id": "good", "response_id": 7}` is
+        internally inconsistent about its own completion, and picking the
+        readable half would hide that. Selection is only reached once all
+        asserted fields are usable, and then follows the declared field order.
         """
-        asserted = False
+        selected: str | None = None
         for field in COMPLETION_EVIDENCE_FIELDS:
             if field not in document:
                 continue
-            asserted = True
             value = document.get(field)
-            if isinstance(value, str) and value.strip():
-                return f"{self.provider_id}:{instance_id}:{value}", COMPLETION_PROOF_PROVIDER_ID
-        if asserted:
-            return None
-        return None, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE
+            if not isinstance(value, str) or not value.strip():
+                return None
+            if selected is None:
+                selected = value
+        if selected is None:
+            return None, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE
+        return f"{self.provider_id}:{instance_id}:{selected}", COMPLETION_PROOF_PROVIDER_ID
 
     @staticmethod
     def _message_text(item: dict[str, Any]) -> str | None:

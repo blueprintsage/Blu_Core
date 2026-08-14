@@ -1192,3 +1192,112 @@ exclusion are all unchanged.
   declare `provider_assigned_completion_id`; nothing in the runtime prevents a
   future adapter from declaring the weaker proof incorrectly, so adapter
   review remains the control there.
+
+## BC-050-C5A correction pass
+
+Micro-correction closing the two malformed-response holes Blu's bounded review
+found in C5. Correction base `374cc29da43d104f7ed6e9628e3fd8ebe9c4ff25`, branch
+`bc-050-c5a-completion-failclosed`. One production file changed:
+`src/blu_runtime/providers/model/lm_studio.py`. C5's live-success contract is
+untouched.
+
+### Blocker 1 — `model_instance_id` is required
+
+Was:
+
+```python
+instance_id = document.get("model_instance_id") or document.get("model")
+```
+
+A response could omit the instance identity entirely and still be accepted by
+echoing back the `model` the request had asked for. That echo says nothing
+about which loaded instance answered, so it was never identity evidence. The
+fallback is removed; `model_instance_id` must be present, a string, and
+non-blank after trimming. Nothing is synthesized, coerced, or inferred from
+another field, and the falsy-value bug in the old `or` chain goes with it — a
+blank identity no longer silently reaches the second operand.
+
+Trimming is used only to test blankness. The value itself is compared as the
+provider sent it, so `_instance_identity_agrees` still decides expected-model
+and loaded-instance consistency exactly as C5 established it.
+
+### Blocker 2 — every asserted completion id is validated before selection
+
+Was: the scan returned the first usable identifier, so
+`{"id": "good", "response_id": 7}` passed on the readable half. Now the loop
+validates every field the provider asserted — each must be a non-blank string —
+and only then selects, in the declared order `id`, `response_id`,
+`completion_id`. A response that is internally inconsistent about its own
+completion fails closed with `PROVIDER_COMPLETION_EVIDENCE_MISSING` rather than
+having the inconsistency hidden.
+
+Absence is still absence: when none of the three fields is present, the
+stateless path is unchanged — reference `None`, proof
+`synchronous_provider_response`, completion valid. No coercion, no synthesis,
+no silent discard, and `model_instance_id` is still never relabelled as a
+completion identifier.
+
+### Regression tests (+17, runtime 190 -> 207)
+
+`InstanceIdentityIsRequiredTests` (6): missing identity; `model` present with
+no `model_instance_id`; `model` unable to rescue seven malformed identity
+values; thirteen malformed identity types including `None`, empty, whitespace,
+`0`, `7`, `True`, `False`, `1.5`, lists, and dicts; the valid live identity
+still completing; and expected-model consistency unchanged.
+
+`AssertedCompletionIdentifierTests` (11): all five mixed-validity payloads the
+assignment names, plus whitespace and boolean siblings; no-identifier,
+one-identifier, and multiple-valid-identifier cases preserved; deterministic
+selection pinned in field order (`id` first, `response_id` when `id` is
+absent); and a rejected identifier set proven to yield no candidate text and no
+output kinds.
+
+### C5 live-success behavior confirmed intact
+
+The C5 shape still normalizes to a valid synchronous completion with extracted
+content, an absent provider reference, no fabricated id, and neither
+`PROVIDER_COMPLETION_UNVERIFIED` nor `PROVIDER_COMPLETION_EVIDENCE_MISSING`.
+`store` remains `false`.
+
+Live LM Studio smoke re-run 2026-08-14 after the tightening (same environment,
+synthetic protected-policy fixture, `requested_tokens: 16384`):
+
+```text
+TURN:  status: PASS   safe_error_code: None   model_invoked: True
+       public_output: Greetings! How may I assist you today?
+RECEIPT:
+  model_instance_id                 : granite-4.0-h-micro:2
+  provider_completion_evidence_ref  : None
+  provider_completion_proof         : synchronous_provider_response
+```
+
+### Suites and validators after C5A
+
+| Suite | Result |
+| --- | --- |
+| Runtime Phase 1 | **207 OK** (was 190) |
+| Security | **50 OK** |
+| Readiness | **53 OK** |
+| Continuity | **58 OK** |
+
+Envelope `36887` bytes, digest
+`103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142`, final byte
+`0x5D`. Architecture 7 / 8 / 9. Golden CTS zero non-`OK` lines. OPSEC oracle,
+differential suites, `SecurityDecision` vocabulary, protected ingress/egress
+semantics, authorization-date enforcement, `/exit` and `/quit` ordinary-ingress
+behavior, C5's synchronous stateless proof, and `store: false` all unchanged.
+Eight validators pass; `validate_host_adapter_contracts.py` still reports the
+known BC-020 fixed-base finding, and the readiness/continuity validators still
+report only the two untracked local smoke artifacts recorded under C4.
+
+### Remaining risks
+
+- Unchanged from C5: the instance-ordinal rule is a live-evidenced inference,
+  HTTP-level provider errors are still classified
+  `PROVIDER_ENDPOINT_UNAVAILABLE` rather than `PROVIDER_ERROR_REPORTED`, and
+  the terminal-state vocabulary stays unexercised by this provider.
+- Blocker 2 rejects a response that asserts one usable and one malformed
+  identifier. If some future LM Studio build emits a null placeholder beside a
+  real id, that response now fails closed rather than being read past. That is
+  the intended direction under this assignment, and it would surface as a
+  live-smoke observation rather than as silent acceptance.

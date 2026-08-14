@@ -1,5 +1,23 @@
 # Runtime Worklog
 
+## BC-050-C5A — Completion Evidence Fail-Closed Micro-Correction
+
+Blu's bounded C5 review found two malformed-response holes. `model_instance_id`
+could fall back to `model`, so a response that never said which loaded instance
+answered was accepted for echoing back the requested model; the fallback is
+removed and the field must be a non-blank string. Completion-evidence
+validation stopped at the first usable identifier, so a provider asserting
+`{"id": "good", "response_id": 7}` had its inconsistency hidden; every asserted
+identifier is now validated before one is selected, in the declared order.
+
+Absence is still absence -- no identifier fields means a null reference, the
+`synchronous_provider_response` proof, and a valid completion. C5's live
+success path is untouched, and the live smoke re-run after the tightening still
+returns PASS with a truthful receipt.
+
+Runtime tests 190 -> 207. Security 50, readiness 53, continuity 58. Envelope,
+golden CTS, architecture 7/8/9, and the frozen invariants unchanged.
+
 ## BC-050-C5 — LM Studio Native-v1 Completion Proof Correction
 
 C4 got Blu to the terminal loop; the first live turn then failed with

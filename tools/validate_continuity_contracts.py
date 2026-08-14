@@ -94,31 +94,51 @@ PROHIBITED_IMPLEMENTATION_ROOTS = {
 }
 # BC-050-C1: `src` is conditionally permitted, and only for the authorized
 # BC-050 Phase-1 package. Every other root above stays prohibited outright.
+
+
+# BC-050-C2: one complete authorization record, authenticated independently at
+# every enforcement point. Validator ordering is not an authorization mechanism.
+BC050_ASSIGNMENT = "BC-050"
+BC050_AUTHORIZED_BY = "Dad/Blu"
+BC050_PACKET = "docs/domains/runtime/assignments/BC-050/assignment.md"
+BC050_CHECKLIST = Path("readiness/python_phase1_readiness_checklist.json")
+BC050_SLICE = Path("readiness/phase1_executable_slice.json")
 BC050_PRODUCTION_PREFIX = "src/blu_runtime/"
 BC050_TEST_PREFIX = "tests/runtime_phase1/"
 BC050_ROOT_FILES = {"pyproject.toml"}
 
 
 def _bc050_authorized(root: Path) -> bool:
-    """Report explicit Dad/Blu BC-050 implementation authorization.
+    """Authenticate the complete BC-050 implementation authorization record.
 
-    Absent or malformed evidence keeps every guard at its pre-implementation
-    behavior. This gate concerns runtime existence only; it grants no
-    continuity capability and no durable provider.
+    Fail-closed. Any missing, malformed, contradictory, or non-exact value
+    restores this validator's pre-implementation prohibition, independently of
+    what any other validator concludes.
     """
-    checklist = root / "readiness/python_phase1_readiness_checklist.json"
-    if not checklist.is_file():
-        return False
     try:
-        document = json.loads(checklist.read_text(encoding="utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
+        checklist = json.loads((root / BC050_CHECKLIST).read_text(encoding="utf-8"))
+        executable_slice = json.loads((root / BC050_SLICE).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return False
-    record = document.get("bc050_implementation_authorization")
+    if not isinstance(checklist, dict) or not isinstance(executable_slice, dict):
+        return False
+    record = checklist.get("bc050_implementation_authorization")
+    nested = executable_slice.get("implementation_authorization")
+    if not isinstance(record, dict) or not isinstance(nested, dict):
+        return False
     return (
-        isinstance(record, dict)
-        and record.get("state") == "authorized"
-        and record.get("assignment") == "BC-050"
-        and document.get("implementation_authorized") is True
+        record.get("state") == "authorized"
+        and record.get("assignment") == BC050_ASSIGNMENT
+        and record.get("authorized_by") == BC050_AUTHORIZED_BY
+        and bool(record.get("authorization_date"))
+        and record.get("packet") == BC050_PACKET
+        and nested.get("assignment") == BC050_ASSIGNMENT
+        and nested.get("authorized_by") == BC050_AUTHORIZED_BY
+        and nested.get("authorization_date") == record.get("authorization_date")
+        and nested.get("packet") == BC050_PACKET
+        and checklist.get("implementation_authorized") is True
+        and executable_slice.get("implementation_authorized") is True
+        and checklist.get("automatic_start_prohibited") is True
     )
 
 
@@ -228,6 +248,8 @@ def _validate_git_scope(root: Path) -> list[str]:
         "tests/continuity/test_validate_continuity_contracts.py",
         "tools/validate_python_readiness.py",
         "tests/readiness/test_validate_python_readiness.py",
+        # BC-050-C2: shared authorization mutation matrix (test support only).
+        "tests/readiness/bc050_authorization_matrix.py",
         "tools/validate_opsec_contracts.py",
         "tests/security/test_validate_opsec_contracts.py",
     }

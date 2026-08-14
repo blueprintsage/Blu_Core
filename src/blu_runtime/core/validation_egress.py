@@ -64,11 +64,14 @@ def evaluate_egress(
     refs = [item["rule"]["rule_ref"] for item in matches]
 
     if not matches:
+        # B-05: the public form is the canonical candidate that policy actually
+        # evaluated. Returning the raw provider text would publish bytes the
+        # matcher never saw -- including any Cf the normalizer removed.
         return ValidationResult(
             request_id=request_id,
             egress_result=CLEAR,
             eligible_for_print=True,
-            public_output=text,
+            public_output=normalized,
             safe_error_code=None,
             evidence=safe_evidence("egress", CLEAR, policy, normalized, ()),
         )

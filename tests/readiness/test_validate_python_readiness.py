@@ -17,6 +17,14 @@ validator = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(validator)
 
 
+_MATRIX_SPEC = importlib.util.spec_from_file_location(
+    "bc050_authorization_matrix", ROOT / "tests/readiness/bc050_authorization_matrix.py"
+)
+assert _MATRIX_SPEC and _MATRIX_SPEC.loader
+matrix = importlib.util.module_from_spec(_MATRIX_SPEC)
+_MATRIX_SPEC.loader.exec_module(matrix)
+
+
 class _ReadinessHarness(unittest.TestCase):
     """Shared temp-root harness. Holds no test methods."""
 
@@ -252,16 +260,20 @@ class BC050AuthorizationGateTests(_ReadinessHarness):
         self.assert_has("authorization disagrees with the BC-050 authorization record")
 
     def test_authorization_record_must_bind_authorizing_party_and_packet(self) -> None:
+        """B-01: a wrong authorizer restores the prohibition in this validator."""
         checklist = self.load(self.CHECKLIST)
         checklist["bc050_implementation_authorization"]["authorized_by"] = "someone else"
         self.save(self.CHECKLIST, checklist)
-        self.assert_has("does not bind an authorizing party and packet")
+        self.assertFalse(validator._bc050_authorized(self.root))
+        self.assertNotEqual([], self.errors())
 
     def test_slice_and_checklist_authorization_must_agree(self) -> None:
+        """B-01: cross-file disagreement is not authorization."""
         document = self.load(self.SLICE)
         document["implementation_authorized"] = False
         self.save(self.SLICE, document)
-        self.assert_has("Phase 1 slice authorization disagrees")
+        self.assertFalse(validator._bc050_authorized(self.root))
+        self.assertNotEqual([], self.errors())
 
     def test_implementation_present_must_match_authorization(self) -> None:
         layout = self.load(self.LAYOUT)
@@ -323,3 +335,35 @@ class BC050AuthorizationGateTests(_ReadinessHarness):
         layout["support_layer"]["canon_loader_prohibitions"] = []
         self.save(self.LAYOUT, layout)
         self.assert_has("does not constrain the canonical source loader")
+
+
+class BC050AuthorizationMutationMatrixTests(_ReadinessHarness):
+    """B-01: this validator rejects every malformed record on its own."""
+
+    def test_authorized_baseline_passes(self) -> None:
+        self.assertEqual([], self.errors())
+
+    def test_every_mutation_is_rejected_independently(self) -> None:
+        for label, mutate in matrix.MUTATIONS:
+            with self.subTest(mutation=label):
+                self.setUp()
+                try:
+                    matrix.apply_mutation(self.root, mutate)
+                    self.assertNotEqual(
+                        [], self.errors(), f"{label} did not restore the prohibition"
+                    )
+                finally:
+                    self.tearDown()
+
+    def test_predicate_rejects_every_mutation(self) -> None:
+        self.assertTrue(validator._bc050_authorized(self.root))
+        for label, mutate in matrix.MUTATIONS:
+            with self.subTest(mutation=label):
+                self.setUp()
+                try:
+                    matrix.apply_mutation(self.root, mutate)
+                    self.assertFalse(
+                        validator._bc050_authorized(self.root), f"{label} authenticated"
+                    )
+                finally:
+                    self.tearDown()

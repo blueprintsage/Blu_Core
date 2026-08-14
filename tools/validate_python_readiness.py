@@ -83,15 +83,14 @@ ALLOWED_PYTHON = {
     "tests/continuity/test_validate_continuity_contracts.py",
     "tools/validate_python_readiness.py",
     "tests/readiness/test_validate_python_readiness.py",
+    # BC-050-C2: shared authorization mutation matrix (test support only).
+    "tests/readiness/bc050_authorization_matrix.py",
     "tools/validate_opsec_contracts.py",
     "tests/security/test_validate_opsec_contracts.py",
 }
 # BC-050 production and test roots. Permitted only while the readiness
 # checklist records an explicit Dad/Blu BC-050 implementation authorization;
 # without that record every guard below behaves exactly as it did pre-BC-050.
-BC050_PRODUCTION_PREFIX = "src/blu_runtime/"
-BC050_TEST_PREFIX = "tests/runtime_phase1/"
-BC050_ROOT_FILES = {"pyproject.toml"}
 
 
 def _load(path: Path) -> Any:
@@ -124,26 +123,49 @@ def _validate_golden(root: Path) -> list[str]:
     return errors
 
 
-def _bc050_authorized(root: Path) -> bool:
-    """Report whether Dad/Blu explicitly authorized BC-050 implementation.
+# BC-050-C2: one complete authorization record, authenticated independently at
+# every enforcement point. Validator ordering is not an authorization mechanism.
+BC050_ASSIGNMENT = "BC-050"
+BC050_AUTHORIZED_BY = "Dad/Blu"
+BC050_PACKET = "docs/domains/runtime/assignments/BC-050/assignment.md"
+BC050_CHECKLIST = Path("readiness/python_phase1_readiness_checklist.json")
+BC050_SLICE = Path("readiness/phase1_executable_slice.json")
+BC050_PRODUCTION_PREFIX = "src/blu_runtime/"
+BC050_TEST_PREFIX = "tests/runtime_phase1/"
+BC050_ROOT_FILES = {"pyproject.toml"}
 
-    This is the single gate that distinguishes authorized Phase-1 code from
-    implementation appearing without authorization. Absent or malformed, every
-    downstream guard keeps its pre-BC-050 behavior.
+
+def _bc050_authorized(root: Path) -> bool:
+    """Authenticate the complete BC-050 implementation authorization record.
+
+    Fail-closed. Any missing, malformed, contradictory, or non-exact value
+    restores this validator's pre-implementation prohibition, independently of
+    what any other validator concludes.
     """
-    checklist = root / READINESS / "python_phase1_readiness_checklist.json"
-    if not checklist.is_file():
-        return False
     try:
-        document = json.loads(checklist.read_text(encoding="utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
+        checklist = json.loads((root / BC050_CHECKLIST).read_text(encoding="utf-8"))
+        executable_slice = json.loads((root / BC050_SLICE).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return False
-    record = document.get("bc050_implementation_authorization")
+    if not isinstance(checklist, dict) or not isinstance(executable_slice, dict):
+        return False
+    record = checklist.get("bc050_implementation_authorization")
+    nested = executable_slice.get("implementation_authorization")
+    if not isinstance(record, dict) or not isinstance(nested, dict):
+        return False
     return (
-        isinstance(record, dict)
-        and record.get("state") == "authorized"
-        and record.get("assignment") == "BC-050"
-        and document.get("implementation_authorized") is True
+        record.get("state") == "authorized"
+        and record.get("assignment") == BC050_ASSIGNMENT
+        and record.get("authorized_by") == BC050_AUTHORIZED_BY
+        and bool(record.get("authorization_date"))
+        and record.get("packet") == BC050_PACKET
+        and nested.get("assignment") == BC050_ASSIGNMENT
+        and nested.get("authorized_by") == BC050_AUTHORIZED_BY
+        and nested.get("authorization_date") == record.get("authorization_date")
+        and nested.get("packet") == BC050_PACKET
+        and checklist.get("implementation_authorized") is True
+        and executable_slice.get("implementation_authorized") is True
+        and checklist.get("automatic_start_prohibited") is True
     )
 
 
@@ -524,9 +546,9 @@ def validate(root: Path) -> list[str]:
             errors.append("authorized implementation does not record the BC-050 scope check")
         if "no_runtime_code_introduced" in checks:
             errors.append("readiness retains the stale pre-implementation runtime-code assertion")
-        record = checklist.get("bc050_implementation_authorization", {})
-        if record.get("authorized_by") != "Dad/Blu" or not record.get("packet"):
-            errors.append("BC-050 authorization record does not bind an authorizing party and packet")
+        # The authorizing party, packet path, and cross-file agreement are
+        # authenticated by _bc050_authorized itself, so reaching this branch
+        # already proves the complete record. No weaker re-check belongs here.
     else:
         if checks.get("no_runtime_code_introduced", {}).get("status") != "pass":
             errors.append("readiness does not assert that no runtime code was introduced")

@@ -1,5 +1,26 @@
 # Runtime Next Steps
 
+## Immediate — Dad/Blu decision on B-02 authority contradictions
+
+BC-050-C2 corrected six of Codex's seven blockers. B-02 is escalated as two
+authority contradictions recorded in `assignments/BC-050/validation.md`:
+
+- **C2-AC-01** Verb Lock and "structural scan is not reading".
+- **C2-AC-02** Execution Law residue, the Compliance Gate checks, the
+  Completion Proof enumeration, and the Truth Discipline placeholder rule.
+
+Both stem from excluding `00_Instructions.md` from the model-facing envelope
+while those rules live nowhere else. Three options are recorded for each;
+whichever is chosen should cover both. Until one is chosen, BC-050 cannot claim
+full One-Blu parity for Python Phase 1.
+
+After that decision, Codex re-reviews BC-050 and should rerun all seven
+original reproductions.
+
+Also open: two LM Studio field-name assumptions from B-04/B-07 need live-smoke
+confirmation, and B-05 now strips punctuation from ordinary replies, which may
+warrant a follow-on print-safe canonicalization decision.
+
 ## Immediate — independent Codex review of BC-050
 
 BC-050-C1 resolved contradiction C-1. All four suites and every applicable

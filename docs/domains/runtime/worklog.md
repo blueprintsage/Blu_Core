@@ -1,5 +1,32 @@
 # Runtime Worklog
 
+## BC-050-C2 — Independent Review Blocker Correction
+
+Codex returned BC-050 for correction at `33be23a` with blockers B-01 to B-07.
+Six are corrected on `bc-050-c2-review-blockers`; B-02 is escalated.
+
+B-01 replaced three divergent authorization predicates with one byte-identical
+fail-closed predicate. Codex demonstrated eight mutations that some validators
+accepted; the matrix now runs 22 mutations against each validator independently
+with zero acceptances. B-03 requires positive chat-compatibility evidence.
+B-04 establishes terminal completion before any candidate text is read. B-05
+publishes the canonical candidate on CLEAR. B-06 removed the in-band `/exit`
+and `/quit` bypass so slash commands run the full turn. B-07 removed the
+synthesized completion-evidence fallback in both the provider and the
+orchestrator.
+
+B-02 could not be closed. Exact search confirms Verb Lock's verbs appear zero
+times in Persona and Operations Law, and several Execution Law, Compliance
+Gate, and Completion Proof rules have no exact destination either. Two
+authority contradictions, C2-AC-01 and C2-AC-02, are returned to Dad/Blu with
+the smallest decision each requires. No golden canon was modified and no third
+behavioral prompt was invented.
+
+Suites: runtime 154, security 50, readiness 35, continuity 58, all OK. Envelope
+digest and architecture unchanged. OPSEC oracle byte-identical; differential
+re-run clean over 60,000 additional cases. The known BC-020 fixed-base
+host-adapter finding is preserved unchanged.
+
 ## BC-050-C1 — Authorized-Implementation Validator Alignment
 
 Bounded correction from `708101d7f6dfc7748bb69d71f56e4da1044a2699` on branch

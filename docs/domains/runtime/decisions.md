@@ -1,5 +1,27 @@
 # Runtime Decisions
 
+## BC-050-C2 — authorization is authenticated, never inherited
+
+Three validators previously accepted different subsets of the BC-050
+authorization record, so a malformed record could relax one guard while another
+still rejected it. Validator ordering is not an authorization mechanism.
+
+The decision is that every enforcement point authenticates the same complete
+record itself, using a byte-identical fail-closed predicate. It binds state,
+assignment, authorizer, date, canonical packet path, both authorization flags,
+the nested slice record, cross-file agreement, and `automatic_start_prohibited`.
+Any deviation restores that validator's pre-implementation prohibition
+independently.
+
+## BC-050-C2 — completion and compatibility require positive evidence
+
+Absence of a known-bad signal is not evidence of good. Chat compatibility now
+requires an observed compatible type rather than the mere absence of an
+incompatible one, and a completion requires an observed terminal state plus a
+provider-assigned identifier rather than the absence of an error. Where evidence
+is missing the runtime fails closed, and no evidence reference is ever
+synthesized from the request.
+
 ## BC-050-C1 — one authorization gate, three enforcement points
 
 Pre-implementation law forbidding any runtime tree was encoded independently in

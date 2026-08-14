@@ -12,7 +12,7 @@ architecture without making her less Blu.
     capsules loaded as Markdown sources.
 - The complete golden CTS source set is preserved byte-for-byte under
   `kernel/golden/v0.22.0/`.
-- No Python Blu runtime exists in this bootstrap release.
+- A Phase 1 Python Blu runtime now exists for boot and ordinary conversation through the LM Studio model boundary; later runtime phases remain unimplemented.
 - `Blu_KB_Preview` is the current continuity/reference repository.
 - `agent-kit` supplies the repository coordination scaffold.
 - Alice supplies a profile-controller reference, not an identity merge target.

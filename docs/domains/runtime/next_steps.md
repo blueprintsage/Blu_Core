@@ -257,3 +257,17 @@ Do not begin Chat live probing, continuity-provider implementation, Python
 runtime implementation, or a successor control plane; restore historical
 capabilities; or reopen the 28 current-source gaps without an approved packet
 and named base.
+
+## After BC-050-C4
+
+- Codex independently reviews `bc-050-c4-lmstudio-provider-contract` and the
+  repeated live LM Studio smoke.
+- Open a separate bounded assignment for the completion/inference boundary. It
+  has live evidence to work from: the native chat response carries no `status`
+  and no top-level `id`, its `model_instance_id` (`granite-4.0-h-micro:2`) is
+  not the inventory's loaded-instance id (`granite-4.0-h-micro`), and an HTTP
+  error carrying a structured provider error body is currently classified
+  `PROVIDER_ENDPOINT_UNAVAILABLE` rather than `PROVIDER_ERROR_REPORTED`.
+- Decide the operator-facing consequence of envelope size: the frozen 36,887-byte
+  envelope is roughly 8,021 prompt tokens, so any `requested_tokens` below that
+  plus input and output headroom cannot run a turn.

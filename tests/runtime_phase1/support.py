@@ -102,12 +102,17 @@ def model_inventory(
     model_type: str = "llm",
     instances: int = 1,
 ) -> dict[str, Any]:
-    record: dict[str, Any] = {"id": model_key, "type": model_type, "loaded_instances": []}
+    """A native LM Studio v1 inventory in the live record shape.
+
+    Record identity is `key`; loaded-instance identity is `id`; observed
+    capacity is `loaded_instances[].config.context_length` (BC-050-C4).
+    """
+    record: dict[str, Any] = {"key": model_key, "type": model_type, "loaded_instances": []}
     if loaded:
         for index in range(instances):
-            instance: dict[str, Any] = {"instance_id": f"{model_key}:{index}"}
+            instance: dict[str, Any] = {"id": f"{model_key}:{index}", "config": {}}
             if context_length is not None:
-                instance["context_length"] = context_length
+                instance["config"]["context_length"] = context_length
             record["loaded_instances"].append(instance)
     return {"data": [record]}
 

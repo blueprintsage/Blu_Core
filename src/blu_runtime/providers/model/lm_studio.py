@@ -48,6 +48,23 @@ CHAT_PATH = "/api/v1/chat"
 
 CHAT_COMPATIBLE_TYPES = frozenset({"llm", "vlm"})
 
+#: Native v1 model-record identity (BC-050-C4). The live `/api/v1/models`
+#: document identifies each model record with `key`; `id` appears only on the
+#: loaded instance. Matching is exact against this one field: display names,
+#: publishers, filenames, and substrings are not identity.
+MODEL_RECORD_KEY_FIELD = "key"
+
+#: Loaded-instance identity, in precedence order.
+INSTANCE_ID_FIELDS = ("instance_id", "id")
+
+#: Observed loaded-instance capacity (BC-050-C4). The live document reports the
+#: capacity the instance was actually loaded with at
+#: `loaded_instances[].config.context_length`. The record-level
+#: `max_context_length` is maximum model capability, not loaded configuration,
+#: and is deliberately never read as capacity evidence.
+INSTANCE_CONFIG_FIELD = "config"
+INSTANCE_CONTEXT_FIELD = "context_length"
+
 #: Output item kinds this Phase-1 profile can normalize.
 MESSAGE_KIND = "message"
 REASONING_KIND = "reasoning"
@@ -134,11 +151,14 @@ class LMStudioProvider(ModelExecutionProvider):
         if records is None:
             return unusable(PROVIDER_RESPONSE_MALFORMED)
 
-        matched = [record for record in records if record.get("id") == configured_model_key]
+        matched = [
+            record for record in records if self._record_key(record) == configured_model_key
+        ]
         if not matched:
             return unusable(PROVIDER_MODEL_ABSENT)
 
         record = matched[0]
+        observed_model_key = self._record_key(record)
         # B-03: positive compatibility evidence is required. Absent, null, or
         # malformed type evidence is not "probably compatible" -- compatibility
         # is never inferred from the configured name, the filename, successful
@@ -154,21 +174,23 @@ class LMStudioProvider(ModelExecutionProvider):
         instance = instances[0]
         if not isinstance(instance, dict):
             return unusable(PROVIDER_RESPONSE_MALFORMED)
-        instance_id = instance.get("instance_id") or instance.get("id")
-        if not isinstance(instance_id, str) or not instance_id:
+        instance_id = self._instance_id(instance)
+        if instance_id is None:
             return unusable(PROVIDER_RESPONSE_MALFORMED)
 
-        context_length = instance.get("context_length", record.get("loaded_context_length"))
-        if not isinstance(context_length, int) or isinstance(context_length, bool) or context_length <= 0:
+        # Capacity is whatever the instance was actually loaded with. A missing,
+        # malformed, or non-positive value is unknown capacity, never a default.
+        context_length = self._instance_context_length(instance)
+        if context_length is None:
             return unusable(
                 PROVIDER_CONTEXT_UNKNOWN,
-                observed_model_key=configured_model_key,
+                observed_model_key=observed_model_key,
                 model_instance_id=instance_id,
             )
         if context_length < required_context:
             return unusable(
                 PROVIDER_CONTEXT_INSUFFICIENT,
-                observed_model_key=configured_model_key,
+                observed_model_key=observed_model_key,
                 model_instance_id=instance_id,
                 observed_context_length=context_length,
             )
@@ -182,13 +204,40 @@ class LMStudioProvider(ModelExecutionProvider):
             provider_id=self.provider_id,
             endpoint_state="reachable",
             configured_model_key=configured_model_key,
-            observed_model_key=record.get("id"),
+            observed_model_key=observed_model_key,
             model_instance_id=instance_id,
             observed_context_length=context_length,
             usable=True,
             safe_error_code=None,
             limitations=tuple(limitations),
         )
+
+    @staticmethod
+    def _record_key(record: dict[str, Any]) -> str | None:
+        """Return the record's provider identity, or None when it asserts none."""
+        key = record.get(MODEL_RECORD_KEY_FIELD)
+        if isinstance(key, str) and key:
+            return key
+        return None
+
+    @staticmethod
+    def _instance_id(instance: dict[str, Any]) -> str | None:
+        for field in INSTANCE_ID_FIELDS:
+            value = instance.get(field)
+            if isinstance(value, str) and value:
+                return value
+        return None
+
+    @staticmethod
+    def _instance_context_length(instance: dict[str, Any]) -> int | None:
+        """Return observed loaded capacity, or None when it is not evidenced."""
+        config = instance.get(INSTANCE_CONFIG_FIELD)
+        if not isinstance(config, dict):
+            return None
+        value = config.get(INSTANCE_CONTEXT_FIELD)
+        if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+            return None
+        return value
 
     @staticmethod
     def _model_records(document: Any) -> list[dict[str, Any]] | None:

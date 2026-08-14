@@ -227,9 +227,9 @@ class ChatCompatibilityEvidenceTests(unittest.TestCase):
 
     def _record(self, **overrides) -> dict:
         record = {
-            "id": MODEL,
+            "key": MODEL,
             "type": "llm",
-            "loaded_instances": [{"instance_id": INSTANCE, "context_length": 8192}],
+            "loaded_instances": [{"instance_id": INSTANCE, "config": {"context_length": 8192}}],
         }
         record.update(overrides)
         return record
@@ -356,3 +356,163 @@ class TerminalCompletionEvidenceTests(unittest.TestCase):
         self.assertIn("resp-42", result.completion_evidence_ref)
         self.assertIn(INSTANCE, result.completion_evidence_ref)
         self.assertNotIn(execution_request().request_id, result.completion_evidence_ref)
+
+
+LIVE_MODEL = "granite-4.0-h-micro"
+LIVE_CONTEXT = 1048576
+
+#: Distinguishes "field absent" from "field present but null" in the matrices.
+_ABSENT = object()
+
+
+def live_record(**overrides) -> dict:
+    """The observed 2026-08-14 LM Studio `/api/v1/models` record shape.
+
+    Reduced to the fields this boundary reads plus enough surrounding fields to
+    keep the shape recognizable. Identity is `key`; the loaded instance carries
+    `id` and `config.context_length`; `max_context_length` is model capability.
+    """
+    record = {
+        "type": "llm",
+        "publisher": "lmstudio-community",
+        "key": LIVE_MODEL,
+        "display_name": "Granite 4.0 H Micro",
+        "loaded_instances": [{"id": LIVE_MODEL, "config": {"context_length": LIVE_CONTEXT}}],
+        "max_context_length": LIVE_CONTEXT,
+        "format": "gguf",
+    }
+    record.update(overrides)
+    return record
+
+
+class LiveProviderContractTests(unittest.TestCase):
+    """BC-050-C4: the real LM Studio native v1 model-record contract.
+
+    The C3 boundary matched the record field `id` and read capacity from
+    `loaded_instances[].context_length`. The live provider supplies neither,
+    so a loaded, reachable model was reported `PROVIDER_MODEL_ABSENT`.
+    """
+
+    def _observe(self, document, configured: str = LIVE_MODEL, required: int = 4096):
+        return provider(RecordingTransport(inventory=document)).observe(configured, required)
+
+    def _observe_record(self, record: dict, **kwargs):
+        return self._observe({"models": [record]}, **kwargs)
+
+    # -- model discovery ---------------------------------------------------
+
+    def test_live_record_is_recognized(self) -> None:
+        observation = self._observe_record(live_record())
+        self.assertTrue(observation.usable)
+        self.assertIsNone(observation.safe_error_code)
+        self.assertEqual(observation.observed_model_key, LIVE_MODEL)
+        self.assertEqual(observation.model_instance_id, LIVE_MODEL)
+        self.assertEqual(observation.observed_context_length, LIVE_CONTEXT)
+
+    def test_live_multi_model_inventory_selects_the_configured_record(self) -> None:
+        """Unloaded neighbours in the live inventory must not confuse identity."""
+        document = {
+            "models": [
+                {
+                    "type": "llm",
+                    "key": "qwen3-coder-next-ream-awq",
+                    "display_name": "Qwen3 Coder Next Ream Awq 4bit",
+                    "loaded_instances": [],
+                    "max_context_length": 262144,
+                },
+                live_record(),
+            ]
+        }
+        observation = self._observe(document)
+        self.assertTrue(observation.usable)
+        self.assertEqual(observation.observed_model_key, LIVE_MODEL)
+
+    def test_display_name_is_not_identity(self) -> None:
+        observation = self._observe_record(live_record(), configured="Granite 4.0 H Micro")
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_record_id_is_not_identity(self) -> None:
+        """`id` on a model record is not the native v1 model key."""
+        record = live_record(id=LIVE_MODEL)
+        del record["key"]
+        observation = self._observe_record(record)
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_conflicting_record_id_cannot_claim_the_configured_key(self) -> None:
+        observation = self._observe_record(live_record(key="some-other-model", id=LIVE_MODEL))
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_malformed_record_key_is_absent(self) -> None:
+        for value in (None, "", 7, True, ["granite-4.0-h-micro"], {"key": LIVE_MODEL}):
+            with self.subTest(value=value):
+                observation = self._observe_record(live_record(key=value))
+                self.assertFalse(observation.usable)
+                self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_live_record_without_loaded_instances_is_not_loaded(self) -> None:
+        observation = self._observe_record(live_record(loaded_instances=[]))
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_NOT_LOADED)
+
+    def test_live_instance_without_identity_is_malformed(self) -> None:
+        observation = self._observe_record(
+            live_record(loaded_instances=[{"config": {"context_length": LIVE_CONTEXT}}])
+        )
+        self.assertEqual(observation.safe_error_code, PROVIDER_RESPONSE_MALFORMED)
+
+    # -- observed context evidence -----------------------------------------
+
+    def test_live_loaded_instance_capacity_satisfies_the_request(self) -> None:
+        observation = self._observe_record(live_record(), required=4096)
+        self.assertTrue(observation.usable)
+        self.assertEqual(observation.observed_context_length, LIVE_CONTEXT)
+
+    def _instance(self, config) -> dict:
+        instance: dict = {"id": LIVE_MODEL}
+        if config is not _ABSENT:
+            instance["config"] = config
+        return live_record(loaded_instances=[instance])
+
+    def test_missing_or_malformed_context_evidence_is_unknown(self) -> None:
+        cases = {
+            "missing config": self._instance(_ABSENT),
+            "null config": self._instance(None),
+            "config not a mapping": self._instance("1048576"),
+            "missing context_length": self._instance({"flash_attention": True}),
+            "null context_length": self._instance({"context_length": None}),
+            "string context_length": self._instance({"context_length": "1048576"}),
+            "float context_length": self._instance({"context_length": 4096.0}),
+            "boolean context_length": self._instance({"context_length": True}),
+            "zero context_length": self._instance({"context_length": 0}),
+            "negative context_length": self._instance({"context_length": -1}),
+        }
+        for label, record in cases.items():
+            with self.subTest(case=label):
+                observation = self._observe_record(record)
+                self.assertFalse(observation.usable)
+                self.assertEqual(observation.safe_error_code, PROVIDER_CONTEXT_UNKNOWN)
+                self.assertEqual(observation.model_instance_id, LIVE_MODEL)
+                self.assertIsNone(observation.observed_context_length)
+
+    def test_observed_capacity_below_request_is_insufficient(self) -> None:
+        record = self._instance({"context_length": 2048})
+        observation = self._observe_record(record, required=4096)
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_CONTEXT_INSUFFICIENT)
+        self.assertEqual(observation.observed_context_length, 2048)
+
+    def test_model_capability_is_not_loaded_instance_capacity(self) -> None:
+        """`max_context_length` describes the model, not the loaded instance."""
+        record = self._instance(_ABSENT)
+        record["max_context_length"] = LIVE_CONTEXT
+        record["loaded_context_length"] = LIVE_CONTEXT
+        observation = self._observe_record(record, required=4096)
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_CONTEXT_UNKNOWN)
+        self.assertIsNone(observation.observed_context_length)
+
+    def test_incompatible_live_type_still_rejects(self) -> None:
+        observation = self._observe_record(live_record(type="embeddings"))
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_INCOMPATIBLE)

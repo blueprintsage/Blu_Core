@@ -418,8 +418,9 @@ without provider invocation, asserted by test.
 
 ## Live LM Studio smoke test
 
-`not_performed`. No live environment was supplied. No live evidence is
-fabricated or implied.
+`not_performed` through BC-050-C3. No live environment was supplied and no live
+evidence was fabricated or implied. **Performed under BC-050-C4** — see
+"BC-050-C4 correction pass" below for the observed results.
 
 ## BC-050-C1 correction pass
 
@@ -818,3 +819,141 @@ or duplicate paths. Golden verified with
 - N-03 continuity defensive invariant remains carried to the
   continuity-provider phase.
 - BC-020 fixed-base host-adapter guard remains open and unrelated.
+
+
+## BC-050-C4 correction pass
+
+Bounded LM Studio provider-contract correction driven by the first real live
+smoke. Correction base `be19ea16b61088e78850d15662943357fb3ee9b0`, branch
+`bc-050-c4-lmstudio-provider-contract`. One production file changed:
+`src/blu_runtime/providers/model/lm_studio.py`. No architecture, canon,
+envelope, security, host-adapter, or continuity surface was touched.
+
+### The two defects, as the live provider proved them
+
+LM Studio was reachable and the configured model was loaded, yet boot failed
+`UNAVAILABLE PROVIDER_MODEL_ABSENT`. The C3 boundary read two fields the native
+v1 document does not supply.
+
+| Defect | C3 read | Live `/api/v1/models` supplies |
+| --- | --- | --- |
+| D-1 model identity | `record["id"]` | `record["key"]` |
+| D-2 observed capacity | `instance["context_length"]`, falling back to `record["loaded_context_length"]` | `instance["config"]["context_length"]` |
+
+D-2 was latent behind D-1: correcting identity alone would have produced
+`PROVIDER_CONTEXT_UNKNOWN` on the next boot.
+
+### What changed
+
+- Model-record identity is exactly `key`, matched exactly. `display_name`,
+  `publisher`, `format`, and substrings are not identity, and a record-level
+  `id` can no longer claim a configured key. Matching was not loosened; it was
+  moved to the field the provider actually publishes.
+- Observed capacity is read only from `loaded_instances[].config.context_length`
+  — the capacity the instance was actually loaded with. The record-level
+  `max_context_length` describes model capability, not loaded configuration,
+  and is never read as capacity evidence. The former
+  `record["loaded_context_length"]` fallback was removed rather than kept
+  alongside: it was an unobserved spelling, and inferring capacity from a
+  model-level field would report capability as though it were configuration.
+- Loaded-instance identity is unchanged (`instance_id`, then `id`); the live
+  document supplies `id`, which the existing precedence already accepted.
+- `observed_model_key` is now the identity read from the record instead of an
+  echo of the configured key, so the observation reports what was seen.
+
+Fail-closed behavior is unchanged. Absent, null, non-`dict`, non-integer,
+boolean, float, zero, and negative capacity all yield `PROVIDER_CONTEXT_UNKNOWN`;
+capacity below the requested window still yields
+`PROVIDER_CONTEXT_INSUFFICIENT` with the observed value recorded. No capacity
+value is synthesized, defaulted, or inferred.
+
+### Regression coverage
+
+`LiveProviderContractTests` in `tests/runtime_phase1/test_lm_studio_provider.py`
+reproduces the observed live record shape (13 tests): recognition of the live
+record, selection among a multi-model inventory containing unloaded neighbours,
+`display_name` rejected as identity, record `id` rejected as identity,
+a conflicting `id` unable to claim the configured key, six malformed `key`
+forms, not-loaded and identity-less instances, the ten-case malformed-capacity
+matrix, capacity below request, model capability rejected as loaded-instance
+capacity, and incompatible `type` on an otherwise live record.
+
+`tests/runtime_phase1/support.py::model_inventory` now emits the live record
+shape (`key`, `loaded_instances[].id`, `config.context_length`), so the
+end-to-end suite exercises the real contract rather than the shape that
+encoded the defect.
+
+### Live LM Studio smoke — performed 2026-08-14
+
+Environment: Windows 10 Pro, Python 3.12, LM Studio at `http://127.0.0.1:1234`,
+model key `granite-4.0-h-micro` ("Granite 4.0 H Micro"), GGUF, Q4_K_M, loaded
+instance context `1048576`.
+
+The protected policy used for the smoke was the repository's **synthetic** test
+fixture (`synthetic test policy != production protected policy`); the
+production protected policy was not available in this environment. It gates
+OPSEC evaluation only and is not part of the model-execution boundary under
+test.
+
+| Stage | Result |
+| --- | --- |
+| Boot before C4 | `UNAVAILABLE PROVIDER_MODEL_ABSENT` (operator's reproduction) |
+| Boot after C4 | **OK** — `observed_model_key=granite-4.0-h-micro`, `model_instance_id=granite-4.0-h-micro`, observed context `1048576` |
+| Turn, `requested_tokens: 4096` | `UNAVAILABLE PROVIDER_ENDPOINT_UNAVAILABLE` |
+| Turn, `requested_tokens: 16384` | `INVALID PROVIDER_COMPLETION_UNVERIFIED`, `model_invoked: true`, no public output |
+
+The provider boundary this assignment corrects is passed live. The two turn
+failures are the next surface and were deliberately **not** corrected in C4.
+
+### Next-surface evidence captured, not corrected
+
+1. **The Phase-1 envelope does not fit a 4096-token window.** A direct probe
+   with the real 36,887-byte envelope returned HTTP 500 wrapping the engine's
+   `exceed_context_size_error`: `request (8021 tokens) exceeds the available
+   context size (4096 tokens)`. The envelope alone is ~8,021 prompt tokens, so
+   `requested_tokens: 4096` cannot carry it. This is a configuration
+   observation about the smoke config, not a defect in the corrected boundary.
+2. **HTTP error responses are classified as endpoint-unavailable.** LM Studio
+   returned a structured provider error body with an HTTP error status;
+   `urllib.error.HTTPError` is a `URLError` subclass, so `infer` reports
+   `PROVIDER_ENDPOINT_UNAVAILABLE`. The endpoint was reachable and did report an
+   error, which `PROVIDER_ERROR_REPORTED` already describes. Recorded for a
+   separate bounded correction.
+3. **The live chat response carries no `status` and no top-level `id`.** The
+   observed 200 response body was `{model_instance_id, output[], stats{}}`. The
+   B-04 terminal-state assumption and the B-07 completion-evidence identifier
+   assumption are therefore both unconfirmed by this provider; both failed
+   closed exactly as designed (`PROVIDER_COMPLETION_UNVERIFIED`, no public
+   output, no fabricated evidence).
+4. **Chat and inventory report different instance identities.** The chat
+   response asserted `model_instance_id: "granite-4.0-h-micro:2"` while
+   `/api/v1/models` reported the loaded instance as `granite-4.0-h-micro`. Had
+   the completion check passed, `PROVIDER_IDENTITY_MISMATCH` would have
+   followed. This needs its own live-evidenced correction.
+
+### Suites and validators after C4
+
+| Suite | Result |
+| --- | --- |
+| Runtime Phase 1 | **175 OK** (was 162; +13 live-contract tests) |
+| Security | **50 OK** |
+| Readiness | **53 OK** |
+| Continuity | **58 OK** |
+
+Eight validators pass; `validate_host_adapter_contracts.py` still reports the
+known BC-020 fixed-base finding, unchanged and unsuppressed.
+
+Envelope `36887` bytes, digest
+`103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142`, final byte
+`0x5D`. Architecture 7 / 8 / 9. Golden CTS unmodified. `SecurityDecision`
+vocabulary, protected ingress/egress semantics, completion-evidence fail-closed
+handling, authorization-date enforcement, and `/exit` / `/quit` ordinary-ingress
+behavior are all unchanged. `00_Instructions.md` parity was not reopened.
+
+Two working-tree artifacts of the live smoke sit outside the commit and make
+`validate_python_readiness.py` and `validate_continuity_contracts.py` report
+errors while they are present: the untracked operator config `smoke.runtime.json`
+(absent from `MANIFEST.sha256`) and the gitignored `src/blu_runtime.egg-info/`
+build directory left by a local editable install. Neither is repository content
+and neither is caused by C4; both validators pass on a clean checkout of the C4
+commit.

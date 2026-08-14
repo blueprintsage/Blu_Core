@@ -1,5 +1,33 @@
 # Runtime Worklog
 
+## BC-050-C4 — Live LM Studio Provider-Contract Correction
+
+The first real live LM Studio smoke failed at boot with
+`UNAVAILABLE PROVIDER_MODEL_ABSENT` while the endpoint was reachable and
+`granite-4.0-h-micro` was loaded. Two adapter field assumptions were wrong:
+native v1 identifies a model record with `key`, not `id`, and reports the
+loaded instance's capacity at `loaded_instances[].config.context_length`, not
+`loaded_instances[].context_length`. The second defect was latent behind the
+first.
+
+`src/blu_runtime/providers/model/lm_studio.py` is the only production file
+changed. Identity matching stays exact — display names and a record-level `id`
+cannot claim a configured key — and the record-level `max_context_length` is
+treated as model capability, never as loaded-instance capacity. Every
+fail-closed capacity path is preserved and 13 live-shape regression tests were
+added.
+
+Live smoke after the fix: boot passes the provider boundary with observed
+context `1048576`. The turn then fails further down and was deliberately not
+corrected here — the frozen envelope is ~8,021 prompt tokens against the smoke
+config's 4,096-token request, and the live chat response carries no `status`,
+no top-level `id`, and an instance identity (`granite-4.0-h-micro:2`) that
+differs from the inventory's. Those are recorded for a separate assignment.
+
+Suites: runtime 175, security 50, readiness 53, continuity 58. Envelope 36887
+bytes and digest `103e0e2d` unchanged, architecture 7/8/9, golden CTS
+unmodified, known BC-020 fixed-base finding preserved.
+
 ## BC-050-C3 — Final Independent Re-Review Micro-Correction
 
 Codex's second review (`157441d`) closed B-02 through B-05 and left three narrow

@@ -1,6 +1,6 @@
 # BC-050 — Handoff Record
 
-status: active_correction
+status: ready_for_independent_Codex_re_review
 owner: Claude
 reviewer: Codex
 project_lead: Blu
@@ -241,7 +241,7 @@ Do not merge. BC-050 is not self-closed.
 
 ## BC-050-C2 — Independent Review Blocker Correction
 
-status: six of seven blockers corrected; B-02 escalated
+status: all seven blockers addressed (B-02 resolved by BC-050-C2A)
 
 Correction base `33be23a4c43a160e41e2aeca78962d1cbd3c4a47` (Codex review),
 branch `bc-050-c2-review-blockers`. Codex's disposition on
@@ -253,21 +253,23 @@ B-07. The implementation was preserved, not rewritten.
 | Blocker | Result |
 | --- | --- |
 | B-01 authorization authentication | corrected; 22 mutations x 3 validators, 0 acceptances |
-| B-02 One-Blu parity at rule granularity | analysis redone; **two authority contradictions escalated** |
+| B-02 One-Blu parity at rule granularity | **resolved_by_Dad_Blu_C2A_source_classification** |
 | B-03 positive chat compatibility | corrected |
 | B-04 complete provider completion evidence | corrected |
 | B-05 canonical CLEAR output | corrected |
 | B-06 in-band `/exit` and `/quit` bypass | corrected |
 | B-07 synthesized completion evidence | corrected |
 
-### B-02 is not closed
+### B-02 is closed by BC-050-C2A
 
 The rule-granular mapping in `validation.md` replaces the section-level table.
 Codex was right: the previous table claimed equivalence that the sources do not
 establish. Exact search confirms `extract`, `compare`, `summarize`, and `audit`
 appear zero times in `01_Persona.md` and `02_Operations_Law.md`.
 
-Two authority contradictions remain and are returned to Dad/Blu:
+Two authority contradictions were escalated and Dad/Blu resolved both in
+BC-050-C2A by correcting the underlying source classification rather than by
+accepting a false equivalence:
 
 - **C2-AC-01** — Verb Lock (eight rules) plus "Structural scan is not reading"
   have no exact destination. Not in Persona or Operations Law, not
@@ -281,13 +283,13 @@ Both share one cause: BC-050 §3.1 excluded `00_Instructions.md` from the
 model-facing envelope on the premise that its applicable behavior lives
 elsewhere. For most rules it does; for these it does not.
 
-Each contradiction records the smallest Dad/Blu decision required. I did not
-choose among them, did not modify golden canon, did not inject
-`00_Instructions.md` into the envelope, and did not invent a third behavioral
-prompt.
+Dad/Blu chose source reclassification: `00_Instructions.md` remains immutable
+deployment provenance and is not a successor invariant parity source. No third
+prompt, no generated projection, no semantic judge, and no Verb Lock subsystem
+were created. See the BC-050-C2A section in `validation.md`.
 
-Per the BC-050-C2 packet, C2 is therefore **not** presented as if all seven
-blockers were fixed.
+**C2-AC-01: resolved. C2-AC-02: resolved.** All seven Codex blockers are now
+addressed.
 
 ### Production runtime files changed
 
@@ -347,10 +349,10 @@ suppressed, not repaired, not folded into C2.
 
 ### Ready for independent Codex re-review?
 
-**Partially.** B-01 and B-03 through B-07 are ready for re-review. B-02 cannot
-be closed by Claude and needs a Dad/Blu authority decision first. Codex should
-rerun all seven original reproductions; six should now fail to reproduce, and
-B-02's should still reproduce by design until the authority question is
-answered.
+**Yes**, after BC-050-C2A. B-01 and B-03 through B-07 were corrected in C2;
+B-02 is resolved by the C2A authority decision. Codex should rerun all seven
+original reproductions: six should fail to reproduce against corrected code, and
+B-02 should be assessed against the amended parity premise rather than the
+withdrawn rule-destination requirement.
 
 Not merged. BC-050 not self-closed. Codex remains the independent reviewer.

@@ -4,27 +4,14 @@
   "canon_id": "one_blu_canon",
   "current_runtime_authority": "kernel/golden/v0.22.0",
   "successor_rule": "Preserve behavior and law; reconsider the component graph.",
-  "deployment_rule": "ChatGPT Custom GPT and Python Blu are projections of one canon, never independent behavioral products.",
+  "deployment_rule": "ChatGPT Custom GPT and Python Blu are projections of one canon, never independent behavioral products. Host instruction surfaces are deployment-local mechanics; their presence or absence does not determine One-Blu parity.",
   "mappings": [
-    {
-      "mapping_id": "CANON-001",
-      "subject": "host_and_deployment_instructions",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/00_Instructions.md"],
-      "source_role": "deployment_instruction",
-      "current_cts_authority_relationship": "authoritative_current_ChatGPT_bootstrap",
-      "successor_behavioral_relationship": "host bootstrap is separated from invariant behavior; it cannot define a new Persona or law",
-      "chatgpt_projection": "exact current instruction until an approved generated projection supersedes it",
-      "python_projection": "host-neutral canon loader and terminal binding generated from source-role mappings; GPT-only mechanics omitted",
-      "exact_identity_required": false,
-      "transformation_allowed": true,
-      "allowed_transformation_type": "host_binding_projection",
-      "validation_method": "source-role allowlist, canonical digest receipt, and semantic review",
-      "prohibited_divergence": ["identity redefinition", "behavioral-law redefinition", "source-precedence change"]
-    },
     {
       "mapping_id": "CANON-002",
       "subject": "Persona_identity_relational_posture_tone_floor",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/01_Persona.md"],
+      "canonical_source_artifact": [
+        "kernel/golden/v0.22.0/01_Persona.md"
+      ],
       "source_role": "kernel_runtime_capsule_model_facing_authority",
       "current_cts_authority_relationship": "authoritative_current_behavior",
       "successor_behavioral_relationship": "authoritative model-facing identity and presence; not routing or capability truth",
@@ -34,12 +21,18 @@
       "transformation_allowed": false,
       "allowed_transformation_type": "none",
       "validation_method": "SHA-256 equality with golden source and projection digest",
-      "prohibited_divergence": ["Python-only Persona", "ChatGPT-only Persona", "host-specific identity overlay"]
+      "prohibited_divergence": [
+        "Python-only Persona",
+        "ChatGPT-only Persona",
+        "host-specific identity overlay"
+      ]
     },
     {
       "mapping_id": "CANON-003",
       "subject": "Operations_Law_behavioral_truth_and_antidrift",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/02_Operations_Law.md"],
+      "canonical_source_artifact": [
+        "kernel/golden/v0.22.0/02_Operations_Law.md"
+      ],
       "source_role": "kernel_runtime_capsule_model_facing_law",
       "current_cts_authority_relationship": "authoritative_current_behavior",
       "successor_behavioral_relationship": "law remains model-facing; only independently provable receipt, packet, scope, and evidence invariants are mechanical",
@@ -49,12 +42,19 @@
       "transformation_allowed": false,
       "allowed_transformation_type": "none",
       "validation_method": "SHA-256 equality plus invariant-to-source traceability review",
-      "prohibited_divergence": ["host-specific truth standard", "receipt inflation", "semantic law rewritten as code authority"]
+      "prohibited_divergence": [
+        "host-specific truth standard",
+        "receipt inflation",
+        "semantic law rewritten as code authority"
+      ]
     },
     {
       "mapping_id": "CANON-004",
       "subject": "teaching_behavior",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/01_Persona.md", "contracts/successor/behavior_placement.json"],
+      "canonical_source_artifact": [
+        "kernel/golden/v0.22.0/01_Persona.md",
+        "contracts/successor/behavior_placement.json"
+      ],
       "source_role": "model_facing_behavior_with_successor_placement",
       "current_cts_authority_relationship": "current Persona remains authoritative",
       "successor_behavioral_relationship": "pedagogical judgment remains model-facing; no School Engine",
@@ -64,12 +64,20 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "mechanical_reference_projection_without_rewording",
       "validation_method": "source digest plus cross-deployment scenario review",
-      "prohibited_divergence": ["host-specific pedagogy canon", "School Engine restoration"]
+      "prohibited_divergence": [
+        "host-specific pedagogy canon",
+        "School Engine restoration"
+      ]
     },
     {
       "mapping_id": "CANON-005",
       "subject": "current_control_and_command_workflow_semantics",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/03_Exec.md", "kernel/golden/v0.22.0/04_Exec_Library.md", "kernel/golden/v0.22.0/05_Commands.md", "kernel/golden/v0.22.0/06_Programs.md"],
+      "canonical_source_artifact": [
+        "kernel/golden/v0.22.0/03_Exec.md",
+        "kernel/golden/v0.22.0/04_Exec_Library.md",
+        "kernel/golden/v0.22.0/05_Commands.md",
+        "kernel/golden/v0.22.0/06_Programs.md"
+      ],
       "source_role": "current_runtime_only_with_selective_behavioral_migration",
       "current_cts_authority_relationship": "authoritative_current_CTS_runtime",
       "successor_behavioral_relationship": "not automatically future canon; only behaviors explicitly placed by successor contracts survive",
@@ -79,14 +87,24 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "approved_behavioral_extraction_with_traceability",
       "validation_method": "implementation-gap matrix, behavior placement, route catalog, and semantic review",
-      "prohibited_divergence": ["mega-Exec restoration", "Exec Library restoration", "silent command catalog port", "projecting successor decisions backward into CTS"]
+      "prohibited_divergence": [
+        "mega-Exec restoration",
+        "Exec Library restoration",
+        "silent command catalog port",
+        "projecting successor decisions backward into CTS"
+      ]
     },
     {
       "mapping_id": "CANON-006",
       "subject": "security_semantics",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/00_Instructions.md", "kernel/golden/v0.22.0/03_Exec.md", "docs/architecture/successor_boundaries.md", "contracts/successor/unresolved_register.json"],
+      "canonical_source_artifact": [
+        "contracts/security/opsec/minimum_contract.json",
+        "kernel/golden/v0.22.0/03_Exec.md",
+        "docs/architecture/successor_boundaries.md",
+        "contracts/successor/unresolved_register.json"
+      ],
       "source_role": "current_behavior_plus_approved_successor_boundary_with_protected_policy_gap",
-      "current_cts_authority_relationship": "current OPSEC behavior preserved without retroactive lane repair",
+      "current_cts_authority_relationship": "current OPSEC behavior preserved without retroactive lane repair; the ChatGPT instruction surface is deployment provenance, not the successor security authority",
       "successor_behavioral_relationship": "pre-ingress restraint before ordinary routing; missing protected policy fails closed",
       "chatgpt_projection": "current model-executed security instructions subject to honest host limits",
       "python_projection": "deterministic restraint only after separately authorized minimum policy; protected routes unavailable before then",
@@ -94,12 +112,22 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "protected_policy_binding_without_publication",
       "validation_method": "security-authorized review plus fail-closed route tests",
-      "prohibited_divergence": ["invented matcher", "invented redaction values", "permissive fallback", "model inference of missing policy"]
+      "prohibited_divergence": [
+        "invented matcher",
+        "invented redaction values",
+        "permissive fallback",
+        "model inference of missing policy",
+        "treating 00_Instructions.md as the successor security authority"
+      ]
     },
     {
       "mapping_id": "CANON-007",
       "subject": "authorization_semantics",
-      "canonical_source_artifact": ["docs/architecture/successor_boundaries.md", "contracts/successor/packet_registry.json", "adapters/common/authorization_transport_contract.json"],
+      "canonical_source_artifact": [
+        "docs/architecture/successor_boundaries.md",
+        "contracts/successor/packet_registry.json",
+        "adapters/common/authorization_transport_contract.json"
+      ],
       "source_role": "approved_successor_contract",
       "current_cts_authority_relationship": "does not rewrite undefined current Auth internals",
       "successor_behavioral_relationship": "action/resource/evidence scoped; protected evidence policy remains unavailable",
@@ -109,12 +137,21 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "typed_binding_only",
       "validation_method": "packet/interface invariants and evidence matrix",
-      "prohibited_divergence": ["conversation identity as authentication", "host sign-in as Blu authorization", "unbounded attempts"]
+      "prohibited_divergence": [
+        "conversation identity as authentication",
+        "host sign-in as Blu authorization",
+        "unbounded attempts"
+      ]
     },
     {
       "mapping_id": "CANON-008",
       "subject": "continuity_semantics",
-      "canonical_source_artifact": ["continuity/README.md", "continuity/lifecycle.json", "continuity/security_evidence.json", "continuity/schemas"],
+      "canonical_source_artifact": [
+        "continuity/README.md",
+        "continuity/lifecycle.json",
+        "continuity/security_evidence.json",
+        "continuity/schemas"
+      ],
       "source_role": "approved_successor_continuity_contract",
       "current_cts_authority_relationship": "does not claim current durable implementation",
       "successor_behavioral_relationship": "host_session differs from durable_external; provider receipt required",
@@ -124,12 +161,21 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "provider_binding_beneath_generic_interface",
       "validation_method": "Draft 2020-12 instance validation and provider receipts",
-      "prohibited_divergence": ["prompt history as durable continuity", "LM Studio as continuity", "Local Mirror coupling to model provider"]
+      "prohibited_divergence": [
+        "prompt history as durable continuity",
+        "LM Studio as continuity",
+        "Local Mirror coupling to model provider"
+      ]
     },
     {
       "mapping_id": "CANON-009",
       "subject": "model_execution_guidance",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/01_Persona.md", "kernel/golden/v0.22.0/02_Operations_Law.md", "contracts/successor/behavior_placement.json", "readiness/model_execution_provider_contract.json"],
+      "canonical_source_artifact": [
+        "kernel/golden/v0.22.0/01_Persona.md",
+        "kernel/golden/v0.22.0/02_Operations_Law.md",
+        "contracts/successor/behavior_placement.json",
+        "readiness/model_execution_provider_contract.json"
+      ],
       "source_role": "canonical_model_facing_source_plus_provider_neutral_boundary",
       "current_cts_authority_relationship": "preserves Persona and Operations behavior",
       "successor_behavioral_relationship": "model can change only behind provider boundary",
@@ -139,12 +185,20 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "mechanically_generated_prompt_envelope",
       "validation_method": "source digest receipt plus scenario parity review",
-      "prohibited_divergence": ["model family becomes identity", "provider-specific Persona", "provider capability self-certification"]
+      "prohibited_divergence": [
+        "model family becomes identity",
+        "provider-specific Persona",
+        "provider capability self-certification"
+      ]
     },
     {
       "mapping_id": "CANON-010",
       "subject": "validation_and_egress_principles",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/02_Operations_Law.md", "contracts/successor/component_registry.json", "contracts/successor/error_model.json"],
+      "canonical_source_artifact": [
+        "kernel/golden/v0.22.0/02_Operations_Law.md",
+        "contracts/successor/component_registry.json",
+        "contracts/successor/error_model.json"
+      ],
       "source_role": "law_plus_approved_deterministic_boundary",
       "current_cts_authority_relationship": "preserves current truth and terminal discipline",
       "successor_behavioral_relationship": "one independent validator authorizes one terminal result",
@@ -154,12 +208,21 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "provable_invariant_implementation",
       "validation_method": "terminal scenario fixtures and receipt checks",
-      "prohibited_divergence": ["model self-certifies completion", "partial stream as terminal result", "host-specific truth vocabulary"]
+      "prohibited_divergence": [
+        "model self-certifies completion",
+        "partial stream as terminal result",
+        "host-specific truth vocabulary"
+      ]
     },
     {
       "mapping_id": "CANON-011",
       "subject": "source_and_receipt_truth",
-      "canonical_source_artifact": ["kernel/golden/v0.22.0/02_Operations_Law.md", "contracts/successor/traceability.json", "adapters/common/receipt_contract.json", "continuity/schemas/continuity_receipt.schema.json"],
+      "canonical_source_artifact": [
+        "kernel/golden/v0.22.0/02_Operations_Law.md",
+        "contracts/successor/traceability.json",
+        "adapters/common/receipt_contract.json",
+        "continuity/schemas/continuity_receipt.schema.json"
+      ],
       "source_role": "canonical_law_plus_typed_evidence_contracts",
       "current_cts_authority_relationship": "preserves current honesty discipline",
       "successor_behavioral_relationship": "positive support and provider receipts required where claimed",
@@ -169,12 +232,20 @@
       "transformation_allowed": true,
       "allowed_transformation_type": "typed_receipt_binding",
       "validation_method": "schema instance tests and evidence-reference closure",
-      "prohibited_divergence": ["request equals completion", "configuration equals capability", "model statement equals receipt"]
+      "prohibited_divergence": [
+        "request equals completion",
+        "configuration equals capability",
+        "model statement equals receipt"
+      ]
     },
     {
       "mapping_id": "CANON-012",
       "subject": "source_authority",
-      "canonical_source_artifact": ["AGENTS.md", "docs/sources/authority_map.md", "config/source_authority.json"],
+      "canonical_source_artifact": [
+        "AGENTS.md",
+        "docs/sources/authority_map.md",
+        "config/source_authority.json"
+      ],
       "source_role": "repository_governance_and_source_precedence",
       "current_cts_authority_relationship": "preserves current source order",
       "successor_behavioral_relationship": "no deployment or provider may create a higher behavioral authority",
@@ -184,9 +255,31 @@
       "transformation_allowed": false,
       "allowed_transformation_type": "none",
       "validation_method": "path, digest, and role validation plus repository review",
-      "prohibited_divergence": ["host-specific authority order", "generated projection as independent canon", "retired source promotion"]
+      "prohibited_divergence": [
+        "host-specific authority order",
+        "generated projection as independent canon",
+        "retired source promotion"
+      ]
     }
   ],
+  "legacy_deployment_artifacts": [
+    {
+      "artifact_id": "DEPLOY-PROV-001",
+      "source": "kernel/golden/v0.22.0/00_Instructions.md",
+      "historical_cts_role": "chatgpt_deployment_instruction",
+      "immutable_golden": true,
+      "successor_invariant": false,
+      "python_projection": "none",
+      "chatgpt_projection": "deployment-local host mechanics only",
+      "cross_deployment_parity_required": false,
+      "automatic_behavior_migration": false,
+      "rationale": "This surface stabilized a hosted model that was not running Blu's deterministic architecture: bootstrap, runtime binding, loop, repository location, anti-drift, and execution guidance. Instruction text was used to attempt persistence; that persistence cannot be assumed. Appearing here is not evidence that a behavior is invariant Blu canon.",
+      "promotion_rule": "A behavior found here becomes successor law only by explicit Dad/Blu promotion into Persona, Operations Law, or an approved deterministic successor contract, with tests. No automatic resurrection.",
+      "authority_decision": "BC-050-C2A, 2026-08-13, Dad/Blu",
+      "prior_mapping_id": "CANON-001"
+    }
+  ],
+  "legacy_deployment_artifact_rule": "Entries here are historical deployment provenance. They are never a canonical mapping, never a Python model-facing source, and never a cross-deployment parity dimension.",
   "drift_detection": {
     "deterministic": [
       "required source path exists",

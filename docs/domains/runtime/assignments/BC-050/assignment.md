@@ -575,3 +575,76 @@ independent Codex review.
 
 Do not merge. Do not self-close BC-050. Dad and Blu retain integration
 authority.
+
+---
+
+# Amendment — BC-050-C2A, 2026-08-13 (Dad/Blu)
+
+## Instruction-Layer Classification Cleanup / B-02 Resolution
+
+This dated amendment supersedes only the `00_Instructions.md` parity
+requirement. The original packet text above is preserved unedited as history.
+
+### Authority decision
+
+`kernel/golden/v0.22.0/00_Instructions.md` remains immutable historical and
+current CTS deployment provenance. It is **not** a successor invariant
+behavioral-canon source, not a required Python model-facing source, not a
+cross-deployment parity source, and not a source whose individual rules must be
+reproduced, mapped, or projected by Python Blu.
+
+That surface primarily stabilized a hosted model that was not running Blu's
+deterministic architecture — bootstrap, runtime binding, loop discipline,
+repository location, anti-drift, and execution guidance. Instruction text was
+used to attempt persistence inside the hosted model, and that persistence cannot
+be assumed. The successor therefore does not treat inclusion in a host
+instruction surface as proof that a behavior is invariant Blu canon.
+
+### Superseded requirements
+
+- §3.1, the sentence requiring every Phase-1-applicable `00_Instructions.md`
+  behavior to be accounted for.
+- §17.2, the mandatory `00_Instructions.md` parity mapping.
+- The validation-record requirement to carry that parity table as a gate.
+- Completion criterion 32, requiring that table to exist and be reviewable.
+- Any equivalent B-02 rule-destination requirement introduced during BC-050-C2.
+
+### Not superseded
+
+The frozen model-facing envelope is unchanged: Persona then Operations Law,
+36887 bytes, digest
+`103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142`, final byte
+`0x5D`. No `00_Instructions.md` text may be copied, excerpted, summarized,
+paraphrased, mechanically projected, or appended to the runtime binding. No
+envelope re-freeze is authorized.
+
+B-01 and B-03 through B-07 are unchanged and remain in force.
+
+### Restated completion question
+
+The B-02 question is now:
+
+> Does Python Blu preserve the actual successor One-Blu invariant from its
+> approved canonical owners and deterministic contracts?
+
+It is no longer "where did every rule from `00_Instructions.md` go?"
+
+The successor One-Blu invariant remains identity, Persona, relational posture,
+tone floor, Operations Law, teaching behavior, truthfulness, security and
+privacy semantics, refusal and boundary posture, continuity truth discipline,
+validation truth, receipt discipline, source authority, and explicitly approved
+successor architectural invariants.
+
+### Future promotion rule
+
+Nothing useful is deleted from history. A behavior found in
+`00_Instructions.md` — Verb Lock, a specific anti-drift micro-rule, anything
+else — may be promoted in a future assignment. Promotion requires an explicit
+behavior statement, the proper owner, justification that it belongs to Blu
+rather than to one deployment, implementation or model-facing placement, tests,
+and Dad/Blu approval. No instruction-file archaeology silently becomes canon.
+
+### Live Custom GPT
+
+This amendment does not modify the live Custom GPT. Reducing or removing its
+persistent instruction surface is a separate deployment task.

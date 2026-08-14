@@ -1,5 +1,25 @@
 # Runtime Decisions
 
+## BC-050-C2A — a host instruction surface is not canon
+
+Presence in `00_Instructions.md` is not evidence that a behavior is invariant
+Blu canon. That surface existed to make a hosted model approximate an
+architecture it was not running, and instruction text cannot be assumed to have
+made those behaviors persistent.
+
+Successor behavior survives because its proper owner says it survives: Persona,
+Operations Law, or an approved deterministic successor contract. Host
+instruction surfaces are deployment-local mechanics, and their presence or
+absence does not determine One-Blu parity.
+
+Nothing useful is discarded. A behavior found only in the instruction surface may
+be promoted later by explicit Dad/Blu action into its proper owner, with tests.
+There is no automatic resurrection and no instruction-file archaeology becoming
+canon by default.
+
+The old deployment authority remains historical truth; only the successor
+invariant authority changes, and only prospectively.
+
 ## BC-050-C2 — authorization is authenticated, never inherited
 
 Three validators previously accepted different subsets of the BC-050

@@ -1,5 +1,28 @@
 # Runtime Next Steps
 
+## Immediate — independent Codex re-review of BC-050
+
+B-02 is resolved by the BC-050-C2A source-classification decision, and B-01 plus
+B-03 through B-07 were corrected in BC-050-C2. All applicable validators pass
+except the known BC-020 fixed-base host-adapter condition.
+
+Codex should rerun all seven original reproductions and assess B-02 against the
+amended premise rather than the withdrawn rule-destination requirement.
+
+Still open and unchanged by C2A:
+
+- editable-install verification (`pip install -e .`) blocked by a missing local
+  build backend; external `PYTHONPATH=src` fallback in use;
+- live LM Studio smoke test `not_performed`, including confirmation of the two
+  B-04/B-07 field-name assumptions;
+- the B-05 consequence that canonical public output strips punctuation, which may
+  warrant a follow-on print-safe canonicalization decision;
+- N-03 continuity defensive invariant, carried to the continuity-provider phase;
+- the BC-020 fixed-base host-adapter guard.
+
+Deliberately deferred: reducing or removing the live Custom GPT instruction
+surface is a separate deployment task and was not performed.
+
 ## Immediate — Dad/Blu decision on B-02 authority contradictions
 
 BC-050-C2 corrected six of Codex's seven blockers. B-02 is escalated as two

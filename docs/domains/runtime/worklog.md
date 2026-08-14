@@ -1,5 +1,32 @@
 # Runtime Worklog
 
+## BC-050-C2A — Instruction-Layer Classification Cleanup
+
+Dad/Blu resolved B-02 by correcting a source-classification premise rather than
+by accepting a false equivalence. `00_Instructions.md` remains immutable
+historical CTS deployment provenance but is no longer successor invariant canon,
+no longer a required Python model-facing source, and no longer a
+cross-deployment parity source.
+
+The reasoning is that the instruction surface primarily stabilized a hosted
+model that was not running Blu's deterministic architecture. Instruction text was
+used to attempt persistence inside that model, and persistence cannot be assumed
+from instruction text alone. Appearing in that surface is therefore not evidence
+that a behavior is invariant Blu canon.
+
+CANON-001 moved out of the invariant mappings into
+`legacy_deployment_artifacts`; CANON-006 no longer cites the instruction surface
+as a security authority; the ChatGPT deployment projection no longer requires
+"deployment instruction plus six golden capsules"; and the parity matrix gained
+an explicit non-parity rule for deployment-local mechanics while keeping all
+eleven real parity dimensions.
+
+C2-AC-01 and C2-AC-02 are resolved. No third prompt, no generated projection, no
+semantic judge, no Verb Lock subsystem, no golden change, no envelope change, and
+no `src/blu_runtime/**` change. Seventeen negative tests prevent the
+classification from being reverted. Suites: runtime 154, security 50, readiness
+53, continuity 58.
+
 ## BC-050-C2 — Independent Review Blocker Correction
 
 Codex returned BC-050 for correction at `33be23a` with blockers B-01 to B-07.

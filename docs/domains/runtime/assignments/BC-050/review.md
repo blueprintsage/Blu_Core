@@ -834,3 +834,141 @@ introduced.
 ## Final disposition
 
 `approve-with-notes`
+
+---
+
+# BC-050-C5A Final Independent Codex Review
+
+status: complete
+reviewer: Codex
+review_target: `ed76f311976fba62e26356af6c4e145aa8ee2d6e`
+correction_base: `374cc29da43d104f7ed6e9628e3fd8ebe9c4ff25`
+implementation_branch: `bc-050-c5a-completion-failclosed`
+review_branch: `bc-050-c5a-final-independent-review`
+review_date: 2026-08-14
+disposition: return-for-correction
+
+## Executive result
+
+Disposition: `return-for-correction`.
+
+C5A closes both defects named by Blu's bounded C5 review. `model_instance_id`
+is mandatory and cannot fall back to `model`; every asserted completion-ID
+field is validated before deterministic selection. The real synchronous
+native-v1 success shape remains valid, keeps a null completion reference with
+`synchronous_provider_response` proof, and sends `store: false`.
+
+One independently reproduced blocker remains on the assignment's required
+malformed-response surface: an asserted malformed `stats` value is ignored.
+The provider boundary returns PASS, and the end-to-end runtime emits public
+output and a success receipt. This directly violates the assignment's explicit
+requirement that malformed stats fail closed.
+
+The review was performed from the independent Codex branch above, created
+directly from the exact implementation target. No review artifact was committed
+to Claude's implementation branch.
+
+## Blocking findings
+
+### C5A-B01 - malformed asserted stats produce public success
+
+- **Affected path:** `src/blu_runtime/providers/model/lm_studio.py`,
+  `LMStudioProvider.normalize_response`, immediately before output parsing.
+- **Contradictory test:**
+  `tests/runtime_phase1/test_lm_studio_provider.py::LiveStatelessCompletionTests::test_statistics_are_never_promoted_into_completion_proof`
+  explicitly expects malformed stats to PASS.
+- **Violated contract:** the C5A final-review packet's "Malformed Native-v1
+  Response Regression Surface" includes malformed stats and requires every
+  malformed case to fail closed without exception. BC-050 sections 9 and 13
+  likewise require untrusted malformed provider responses to terminate without
+  candidate output.
+- **Reproducible mutations:** otherwise-valid native-v1 responses with `stats`
+  equal to `None`, `[]`, `"bad"`, `{"input_tokens": "many"}`, or
+  `{"total_output_tokens": -1}`.
+- **Observed normalization result:** every mutation returned `PASS`, usable
+  candidate text, a null completion reference, and
+  `synchronous_provider_response` proof.
+- **Observed end-to-end result:**
+  `{"stats": {"input_tokens": "many", "total_output_tokens": -1}}`
+  returned `PASS`, public output `Hello`, and one success receipt.
+- **Expected result:** deterministic non-PASS failure, no candidate or public
+  output, no success receipt, no coercion, and no exception.
+
+This is a concrete fail-closed regression on an expressly required mutation,
+not a speculative provider or architecture concern.
+
+## C5A target disposition
+
+### Mandatory model instance identity - resolved
+
+Fresh probes covered missing, null, integer, float, boolean, list, dictionary,
+empty, and whitespace-only `model_instance_id`. Every case returned
+`INVALID / PROVIDER_RESPONSE_MALFORMED` with no candidate, reference, or proof.
+A valid `model` field with no `model_instance_id` also failed closed. No value
+was coerced, inferred, synthesized, or trimmed into accepted evidence.
+
+### Mixed completion-ID validation - resolved
+
+All five required mixed mutations returned
+`INVALID / PROVIDER_COMPLETION_EVIDENCE_MISSING`, with no candidate, completion
+reference, or proof. End-to-end, the representative `{"id": "good",
+"response_id": 7}` case produced no public output and zero receipts.
+
+No completion-ID fields remained valid with a null reference and synchronous
+proof. Exactly one valid nonblank string remained valid. Multiple valid strings
+remained valid and selected deterministically in declared order: `id`, then
+`response_id`, then `completion_id`.
+
+### Native-v1 success contract - preserved
+
+The exact required success shape with `model_instance_id`, one message output,
+and valid token stats returned PASS with assistant content `Hello.`, no
+provider completion reference, and `synchronous_provider_response` proof. It
+did not produce `PROVIDER_COMPLETION_UNVERIFIED` or
+`PROVIDER_COMPLETION_EVIDENCE_MISSING`. The outbound payload retained
+`store: false` and `stream: false` and contained only the six evidenced native
+fields.
+
+## Foundational regression evidence
+
+| Check | Result |
+| --- | --- |
+| Runtime Phase 1 suite | 207 tests, OK |
+| Security suite | 50 tests, OK |
+| Readiness suite | 53 tests, OK |
+| Continuity suite | 58 tests, OK |
+| Frozen envelope | 36,887 bytes; pinned SHA-256; final byte `0x5D` |
+| Architecture | 7 components / 8 packets / 9 interfaces |
+| Golden CTS | all seven Markdown files and CTS ZIP OK; C5-to-C5A diff empty |
+| Authorization date | exact `2026-08-12` in both records |
+| Target diff check | clean |
+
+The runtime/security regressions retain ordinary unsupported `/exit` and
+`/quit` ingress, provider invocation count `0` for protected ingress,
+protected egress never CLEAR, OPSEC differential equivalence, and the
+`00_Instructions.md` successor-canon exclusion. No architecture component,
+provider-side continuity, fabricated completion ID, content hash, UUID proof,
+or `model_instance_id` relabeling was introduced.
+
+Eight repository validators passed against an isolated exact-target snapshot.
+The host-adapter validator reproduced only the known BC-020 fixed-base finding
+on `contracts/successor/unresolved_register.json`; C5A did not change that path.
+Direct readiness/continuity validation in the shared working directory also
+reported only pre-existing local smoke/install artifacts, so those artifacts
+were excluded from target evidence rather than moved or modified.
+
+`live_lm_studio_smoke: not_performed`. The implementation handoff records an
+earlier live PASS, but this independent review does not relabel fixture or prior
+author evidence as a live Codex observation.
+
+## Required follow-up
+
+Return C5A to the implementation owner for the smallest bounded correction that
+validates asserted native-v1 stats and pins malformed values to fail-closed
+end-to-end behavior. Re-review the exact correction target. Do not redesign
+BC-050 or reopen the already-resolved identity, completion-ID, architecture,
+canon, continuity, or provider decisions.
+
+## Final disposition
+
+`return-for-correction`

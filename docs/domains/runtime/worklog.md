@@ -1,5 +1,65 @@
 # Runtime Worklog
 
+## BC-050-C5 — LM Studio Native-v1 Completion Proof Correction
+
+C4 got Blu to the terminal loop; the first live turn then failed with
+`PROVIDER_COMPLETION_UNVERIFIED` after the model had already answered. The real
+native-v1 stateless response carries `model_instance_id`, typed `output`, and
+`stats` — no terminal `status`, no per-completion identifier, and an instance
+ordinal (`granite-4.0-h-micro:3`) the inventory does not report. The C3
+boundary required all three, so all three were corrected in one pass rather
+than exposing the same rejection one step later.
+
+Completion is now established from the response the provider actually returns:
+valid structure, consistent instance identity, supported typed output, usable
+assistant content, and no provider or transport failure. A terminal state is
+honoured when present and not required when absent.
+
+Absence of a provider completion id is stated rather than papered over.
+`TurnReceipt.provider_completion_evidence_ref` is nullable and a new
+`provider_completion_proof` names what the receipt rests on —
+`provider_assigned_completion_id` or `synchronous_provider_response`. Nothing
+is fabricated: no uuid, no hash, no coercion, no request-id fallback, no
+`model_instance_id` relabelling, and `store` stays `false`. B-07 is intact
+where evidence is asserted, and a result claiming no proof still cannot become
+a successful turn.
+
+Live smoke, full ordinary turn: `Hey, Blu.` -> `Greetings! How can I assist you
+today?`, receipt with instance `granite-4.0-h-micro:2`, null provider
+reference, and `synchronous_provider_response` proof.
+
+Suites: runtime 190, security 50, readiness 53, continuity 58. Envelope 36887
+bytes and digest `103e0e2d` unchanged, architecture 7/8/9, golden CTS
+unmodified, known BC-020 fixed-base finding preserved.
+
+## BC-050-C4 — Live LM Studio Provider-Contract Correction
+
+The first real live LM Studio smoke failed at boot with
+`UNAVAILABLE PROVIDER_MODEL_ABSENT` while the endpoint was reachable and
+`granite-4.0-h-micro` was loaded. Two adapter field assumptions were wrong:
+native v1 identifies a model record with `key`, not `id`, and reports the
+loaded instance's capacity at `loaded_instances[].config.context_length`, not
+`loaded_instances[].context_length`. The second defect was latent behind the
+first.
+
+`src/blu_runtime/providers/model/lm_studio.py` is the only production file
+changed. Identity matching stays exact — display names and a record-level `id`
+cannot claim a configured key — and the record-level `max_context_length` is
+treated as model capability, never as loaded-instance capacity. Every
+fail-closed capacity path is preserved and 13 live-shape regression tests were
+added.
+
+Live smoke after the fix: boot passes the provider boundary with observed
+context `1048576`. The turn then fails further down and was deliberately not
+corrected here — the frozen envelope is ~8,021 prompt tokens against the smoke
+config's 4,096-token request, and the live chat response carries no `status`,
+no top-level `id`, and an instance identity (`granite-4.0-h-micro:2`) that
+differs from the inventory's. Those are recorded for a separate assignment.
+
+Suites: runtime 175, security 50, readiness 53, continuity 58. Envelope 36887
+bytes and digest `103e0e2d` unchanged, architecture 7/8/9, golden CTS
+unmodified, known BC-020 fixed-base finding preserved.
+
 ## BC-050-C3 — Final Independent Re-Review Micro-Correction
 
 Codex's second review (`157441d`) closed B-02 through B-05 and left three narrow

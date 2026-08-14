@@ -11,6 +11,8 @@ import urllib.error
 from tests.runtime_phase1.support import RecordingTransport, chat_response, model_inventory
 
 from blu_runtime.contracts.models import (
+    COMPLETION_PROOF_PROVIDER_ID,
+    COMPLETION_PROOF_SYNCHRONOUS_RESPONSE,
     INVALID,
     PASS,
     PROVIDER_CONTEXT_INSUFFICIENT,
@@ -227,9 +229,9 @@ class ChatCompatibilityEvidenceTests(unittest.TestCase):
 
     def _record(self, **overrides) -> dict:
         record = {
-            "id": MODEL,
+            "key": MODEL,
             "type": "llm",
-            "loaded_instances": [{"instance_id": INSTANCE, "context_length": 8192}],
+            "loaded_instances": [{"instance_id": INSTANCE, "config": {"context_length": 8192}}],
         }
         record.update(overrides)
         return record
@@ -280,10 +282,18 @@ class TerminalCompletionEvidenceTests(unittest.TestCase):
         return provider(RecordingTransport()).normalize_response(execution_request(), document)
 
     def test_ordinary_completion_is_accepted(self) -> None:
+        """The live stateless shape: no status, no id, still a completion."""
         result = self._normalize(chat_response(INSTANCE, "Fine."))
         self.assertEqual(result.status, PASS)
         self.assertEqual(result.candidate_text, "Fine.")
-        self.assertTrue(result.completion_evidence_ref)
+        self.assertIsNone(result.completion_evidence_ref)
+        self.assertEqual(result.completion_proof, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE)
+
+    def test_provider_assigned_identifier_is_still_referenced(self) -> None:
+        result = self._normalize(chat_response(INSTANCE, "Fine.", evidence_id="resp-1"))
+        self.assertEqual(result.status, PASS)
+        self.assertIn("resp-1", result.completion_evidence_ref)
+        self.assertEqual(result.completion_proof, COMPLETION_PROOF_PROVIDER_ID)
 
     def test_conflicting_provider_identity_rejects(self) -> None:
         for field in ("provider_id", "provider"):
@@ -326,11 +336,16 @@ class TerminalCompletionEvidenceTests(unittest.TestCase):
                 self.assertEqual(result.status, UNAVAILABLE)
                 self.assertIsNone(result.candidate_text)
 
-    def test_missing_terminal_completion_evidence_rejects(self) -> None:
+    def test_absent_terminal_status_is_accepted(self) -> None:
+        """C5: native v1 defines no terminal state field, so absence is normal.
+
+        This inverts the pre-C5 expectation. The rule it replaces rejected
+        every real LM Studio completion.
+        """
         result = self._normalize(chat_response(INSTANCE, "Text.", status=None))
-        self.assertEqual(result.status, INVALID)
-        self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_UNVERIFIED)
-        self.assertIsNone(result.candidate_text)
+        self.assertEqual(result.status, PASS)
+        self.assertEqual(result.candidate_text, "Text.")
+        self.assertNotIn("status", chat_response(INSTANCE, "Text.", status=None))
 
     def test_malformed_terminal_state_rejects(self) -> None:
         for value in (7, ["completed"], {"state": "completed"}, True):
@@ -339,11 +354,12 @@ class TerminalCompletionEvidenceTests(unittest.TestCase):
                 self.assertEqual(result.status, INVALID)
                 self.assertIsNone(result.candidate_text)
 
-    def test_missing_completion_evidence_rejects(self) -> None:
+    def test_absent_completion_identifier_is_represented_not_rejected(self) -> None:
+        """C5: `store: false` assigns no id, and absence is stated as absence."""
         result = self._normalize(chat_response(INSTANCE, "Text.", evidence_id=None))
-        self.assertEqual(result.status, INVALID)
-        self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_EVIDENCE_MISSING)
-        self.assertIsNone(result.candidate_text)
+        self.assertEqual(result.status, PASS)
+        self.assertIsNone(result.completion_evidence_ref)
+        self.assertEqual(result.completion_proof, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE)
 
     def test_blank_completion_evidence_rejects(self) -> None:
         for value in ("", "   "):
@@ -356,3 +372,374 @@ class TerminalCompletionEvidenceTests(unittest.TestCase):
         self.assertIn("resp-42", result.completion_evidence_ref)
         self.assertIn(INSTANCE, result.completion_evidence_ref)
         self.assertNotIn(execution_request().request_id, result.completion_evidence_ref)
+
+
+LIVE_MODEL = "granite-4.0-h-micro"
+LIVE_CONTEXT = 1048576
+
+#: Distinguishes "field absent" from "field present but null" in the matrices.
+_ABSENT = object()
+
+
+def live_record(**overrides) -> dict:
+    """The observed 2026-08-14 LM Studio `/api/v1/models` record shape.
+
+    Reduced to the fields this boundary reads plus enough surrounding fields to
+    keep the shape recognizable. Identity is `key`; the loaded instance carries
+    `id` and `config.context_length`; `max_context_length` is model capability.
+    """
+    record = {
+        "type": "llm",
+        "publisher": "lmstudio-community",
+        "key": LIVE_MODEL,
+        "display_name": "Granite 4.0 H Micro",
+        "loaded_instances": [{"id": LIVE_MODEL, "config": {"context_length": LIVE_CONTEXT}}],
+        "max_context_length": LIVE_CONTEXT,
+        "format": "gguf",
+    }
+    record.update(overrides)
+    return record
+
+
+class LiveProviderContractTests(unittest.TestCase):
+    """BC-050-C4: the real LM Studio native v1 model-record contract.
+
+    The C3 boundary matched the record field `id` and read capacity from
+    `loaded_instances[].context_length`. The live provider supplies neither,
+    so a loaded, reachable model was reported `PROVIDER_MODEL_ABSENT`.
+    """
+
+    def _observe(self, document, configured: str = LIVE_MODEL, required: int = 4096):
+        return provider(RecordingTransport(inventory=document)).observe(configured, required)
+
+    def _observe_record(self, record: dict, **kwargs):
+        return self._observe({"models": [record]}, **kwargs)
+
+    # -- model discovery ---------------------------------------------------
+
+    def test_live_record_is_recognized(self) -> None:
+        observation = self._observe_record(live_record())
+        self.assertTrue(observation.usable)
+        self.assertIsNone(observation.safe_error_code)
+        self.assertEqual(observation.observed_model_key, LIVE_MODEL)
+        self.assertEqual(observation.model_instance_id, LIVE_MODEL)
+        self.assertEqual(observation.observed_context_length, LIVE_CONTEXT)
+
+    def test_live_multi_model_inventory_selects_the_configured_record(self) -> None:
+        """Unloaded neighbours in the live inventory must not confuse identity."""
+        document = {
+            "models": [
+                {
+                    "type": "llm",
+                    "key": "qwen3-coder-next-ream-awq",
+                    "display_name": "Qwen3 Coder Next Ream Awq 4bit",
+                    "loaded_instances": [],
+                    "max_context_length": 262144,
+                },
+                live_record(),
+            ]
+        }
+        observation = self._observe(document)
+        self.assertTrue(observation.usable)
+        self.assertEqual(observation.observed_model_key, LIVE_MODEL)
+
+    def test_display_name_is_not_identity(self) -> None:
+        observation = self._observe_record(live_record(), configured="Granite 4.0 H Micro")
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_record_id_is_not_identity(self) -> None:
+        """`id` on a model record is not the native v1 model key."""
+        record = live_record(id=LIVE_MODEL)
+        del record["key"]
+        observation = self._observe_record(record)
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_conflicting_record_id_cannot_claim_the_configured_key(self) -> None:
+        observation = self._observe_record(live_record(key="some-other-model", id=LIVE_MODEL))
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_malformed_record_key_is_absent(self) -> None:
+        for value in (None, "", 7, True, ["granite-4.0-h-micro"], {"key": LIVE_MODEL}):
+            with self.subTest(value=value):
+                observation = self._observe_record(live_record(key=value))
+                self.assertFalse(observation.usable)
+                self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_ABSENT)
+
+    def test_live_record_without_loaded_instances_is_not_loaded(self) -> None:
+        observation = self._observe_record(live_record(loaded_instances=[]))
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_NOT_LOADED)
+
+    def test_live_instance_without_identity_is_malformed(self) -> None:
+        observation = self._observe_record(
+            live_record(loaded_instances=[{"config": {"context_length": LIVE_CONTEXT}}])
+        )
+        self.assertEqual(observation.safe_error_code, PROVIDER_RESPONSE_MALFORMED)
+
+    # -- observed context evidence -----------------------------------------
+
+    def test_live_loaded_instance_capacity_satisfies_the_request(self) -> None:
+        observation = self._observe_record(live_record(), required=4096)
+        self.assertTrue(observation.usable)
+        self.assertEqual(observation.observed_context_length, LIVE_CONTEXT)
+
+    def _instance(self, config) -> dict:
+        instance: dict = {"id": LIVE_MODEL}
+        if config is not _ABSENT:
+            instance["config"] = config
+        return live_record(loaded_instances=[instance])
+
+    def test_missing_or_malformed_context_evidence_is_unknown(self) -> None:
+        cases = {
+            "missing config": self._instance(_ABSENT),
+            "null config": self._instance(None),
+            "config not a mapping": self._instance("1048576"),
+            "missing context_length": self._instance({"flash_attention": True}),
+            "null context_length": self._instance({"context_length": None}),
+            "string context_length": self._instance({"context_length": "1048576"}),
+            "float context_length": self._instance({"context_length": 4096.0}),
+            "boolean context_length": self._instance({"context_length": True}),
+            "zero context_length": self._instance({"context_length": 0}),
+            "negative context_length": self._instance({"context_length": -1}),
+        }
+        for label, record in cases.items():
+            with self.subTest(case=label):
+                observation = self._observe_record(record)
+                self.assertFalse(observation.usable)
+                self.assertEqual(observation.safe_error_code, PROVIDER_CONTEXT_UNKNOWN)
+                self.assertEqual(observation.model_instance_id, LIVE_MODEL)
+                self.assertIsNone(observation.observed_context_length)
+
+    def test_observed_capacity_below_request_is_insufficient(self) -> None:
+        record = self._instance({"context_length": 2048})
+        observation = self._observe_record(record, required=4096)
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_CONTEXT_INSUFFICIENT)
+        self.assertEqual(observation.observed_context_length, 2048)
+
+    def test_model_capability_is_not_loaded_instance_capacity(self) -> None:
+        """`max_context_length` describes the model, not the loaded instance."""
+        record = self._instance(_ABSENT)
+        record["max_context_length"] = LIVE_CONTEXT
+        record["loaded_context_length"] = LIVE_CONTEXT
+        observation = self._observe_record(record, required=4096)
+        self.assertFalse(observation.usable)
+        self.assertEqual(observation.safe_error_code, PROVIDER_CONTEXT_UNKNOWN)
+        self.assertIsNone(observation.observed_context_length)
+
+    def test_incompatible_live_type_still_rejects(self) -> None:
+        observation = self._observe_record(live_record(type="embeddings"))
+        self.assertEqual(observation.safe_error_code, PROVIDER_MODEL_INCOMPATIBLE)
+
+
+LIVE_INSTANCE = f"{LIVE_MODEL}:3"
+
+
+def live_chat_response(**overrides) -> dict:
+    """The observed 2026-08-14 LM Studio `/api/v1/chat` success body.
+
+    Stateless native v1: `model_instance_id`, typed `output`, and `stats`. No
+    `status`, no `response_id`, no `completion_id`, no per-completion `id`.
+    """
+    document = {
+        "model_instance_id": LIVE_INSTANCE,
+        "output": [
+            {
+                "type": "message",
+                "content": (
+                    "Hey there! How can I assist you with the API smoke test? "
+                    "Let me know if you have any specific questions or requirements."
+                ),
+            }
+        ],
+        "stats": {
+            "input_tokens": 30,
+            "total_output_tokens": 27,
+            "reasoning_output_tokens": 0,
+            "tokens_per_second": 172.48979435383404,
+            "time_to_first_token_seconds": 0.24348,
+        },
+    }
+    document.update(overrides)
+    return document
+
+
+def live_request(instance_id: str = LIVE_MODEL) -> ModelExecutionRequest:
+    return ModelExecutionRequest(
+        request_id="live-req-1",
+        model_instance_id=instance_id,
+        canon_projection_digest="0" * 64,
+        turn_request_ref="turn-request:live-req-1",
+        control_decision_ref="control-decision:live-req-1",
+        system_prompt="ENVELOPE",
+        user_input="Hey, Blu.",
+        context_budget=16384,
+    )
+
+
+class LiveStatelessCompletionTests(unittest.TestCase):
+    """BC-050-C5: the real native-v1 stateless completion contract.
+
+    The C3/C4 boundary required a terminal `status` and a provider-assigned
+    completion id. LM Studio native v1 with `stream: false` and `store: false`
+    supplies neither, so real completions were rejected as
+    `PROVIDER_COMPLETION_UNVERIFIED`.
+    """
+
+    def _normalize(self, document, request: ModelExecutionRequest | None = None):
+        return provider(RecordingTransport()).normalize_response(
+            request or live_request(), document
+        )
+
+    # -- the live success ---------------------------------------------------
+
+    def test_live_stateless_response_is_a_completion(self) -> None:
+        result = self._normalize(live_chat_response())
+        self.assertEqual(result.status, PASS)
+        self.assertIn("Hey there!", result.candidate_text)
+        self.assertNotEqual(result.safe_error_code, PROVIDER_COMPLETION_UNVERIFIED)
+        self.assertNotEqual(result.safe_error_code, PROVIDER_COMPLETION_EVIDENCE_MISSING)
+        self.assertIsNone(result.safe_error_code)
+        self.assertEqual(result.model_instance_id, LIVE_INSTANCE)
+
+    def test_absent_terminal_status_does_not_block_completion(self) -> None:
+        self.assertNotIn("status", live_chat_response())
+        self.assertEqual(self._normalize(live_chat_response()).status, PASS)
+
+    def test_absent_provider_identifier_is_stated_not_invented(self) -> None:
+        document = live_chat_response()
+        for field in ("id", "response_id", "completion_id"):
+            self.assertNotIn(field, document)
+        result = self._normalize(document)
+        self.assertIsNone(result.completion_evidence_ref)
+        self.assertEqual(result.completion_proof, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE)
+
+    def test_nothing_in_the_response_is_recycled_as_a_completion_id(self) -> None:
+        """No id is manufactured from the instance, the request, or the stats."""
+        request = live_request()
+        result = self._normalize(live_chat_response(), request)
+        self.assertIsNone(result.completion_evidence_ref)
+        for forbidden in (LIVE_INSTANCE, LIVE_MODEL, request.request_id, "172.4", "30"):
+            self.assertNotIn(forbidden, result.completion_proof)
+
+    def test_statistics_are_never_promoted_into_completion_proof(self) -> None:
+        for stats in ({"input_tokens": "many"}, None, [], "ok", {}, {"total_output_tokens": -1}):
+            with self.subTest(stats=stats):
+                result = self._normalize(live_chat_response(stats=stats))
+                self.assertEqual(result.status, PASS)
+                self.assertEqual(result.completion_proof, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE)
+                self.assertIsNone(result.completion_evidence_ref)
+
+    def test_an_asserted_terminal_state_still_binds(self) -> None:
+        """Optional does not mean ignored."""
+        for state, expected in (("processing", INVALID), ("failed", UNAVAILABLE)):
+            with self.subTest(state=state):
+                result = self._normalize(live_chat_response(status=state))
+                self.assertEqual(result.status, expected)
+                self.assertIsNone(result.candidate_text)
+
+    # -- instance identity --------------------------------------------------
+
+    def test_per_load_instance_ordinal_is_accepted(self) -> None:
+        """`/api/v1/models` says `granite-4.0-h-micro`; chat answers `:3`."""
+        result = self._normalize(live_chat_response(), live_request(LIVE_MODEL))
+        self.assertEqual(result.status, PASS)
+        self.assertEqual(result.model_instance_id, LIVE_INSTANCE)
+
+    def test_exact_instance_identity_is_accepted(self) -> None:
+        result = self._normalize(
+            live_chat_response(model_instance_id=LIVE_MODEL), live_request(LIVE_MODEL)
+        )
+        self.assertEqual(result.status, PASS)
+
+    def test_a_different_model_is_still_an_identity_mismatch(self) -> None:
+        cases = (
+            "some-other-model",
+            "some-other-model:3",
+            "granite-4.0-h-micro-instruct:3",
+            "granite-4.0-h:3",
+            f"{LIVE_MODEL}:",
+            f"prefix-{LIVE_MODEL}:3",
+        )
+        for identity in cases:
+            with self.subTest(identity=identity):
+                result = self._normalize(
+                    live_chat_response(model_instance_id=identity), live_request(LIVE_MODEL)
+                )
+                self.assertEqual(result.status, INVALID)
+                self.assertEqual(result.safe_error_code, PROVIDER_IDENTITY_MISMATCH)
+                self.assertIsNone(result.candidate_text)
+
+    # -- fail-closed on malformed stateless bodies --------------------------
+
+    def test_malformed_live_shaped_responses_fail_closed(self) -> None:
+        cases = {
+            "none": None,
+            "list body": [live_chat_response()],
+            "string body": "completed",
+            "integer body": 7,
+            "empty object": {},
+            "missing model_instance_id": {"output": live_chat_response()["output"]},
+            "blank model_instance_id": live_chat_response(model_instance_id=""),
+            "whitespace model_instance_id": live_chat_response(model_instance_id="   "),
+            "null model_instance_id": live_chat_response(model_instance_id=None),
+            "non-string model_instance_id": live_chat_response(model_instance_id=7),
+            "missing output": {"model_instance_id": LIVE_INSTANCE, "stats": {}},
+            "null output": live_chat_response(output=None),
+            "object output": live_chat_response(output={}),
+            "empty output": live_chat_response(output=[]),
+            "non-dict output item": live_chat_response(output=["message"]),
+            "untyped output item": live_chat_response(output=[{"content": "Hi."}]),
+            "message without content": live_chat_response(output=[{"type": "message"}]),
+            "null content": live_chat_response(output=[{"type": "message", "content": None}]),
+            "numeric content": live_chat_response(output=[{"type": "message", "content": 7}]),
+            "blank content": live_chat_response(output=[{"type": "message", "content": ""}]),
+            "whitespace content": live_chat_response(
+                output=[{"type": "message", "content": "   \n\t"}]
+            ),
+            "unsupported kinds only": live_chat_response(
+                output=[{"type": "audio", "content": "..."}]
+            ),
+            "reasoning only": live_chat_response(
+                output=[{"type": "reasoning", "content": "thinking"}]
+            ),
+            "malformed part list": live_chat_response(
+                output=[{"type": "message", "content": [{"type": "text"}]}]
+            ),
+        }
+        for label, document in cases.items():
+            with self.subTest(case=label):
+                result = self._normalize(document)
+                self.assertNotEqual(result.status, PASS)
+                self.assertIsNone(result.candidate_text)
+                self.assertIsNone(result.completion_proof)
+                self.assertIsNone(result.completion_evidence_ref)
+                self.assertTrue(result.safe_error_code)
+
+    def test_asserted_but_unusable_identifier_still_fails_closed(self) -> None:
+        """B-07 is unchanged: malformed evidence is not honest absence."""
+        for value in ("", "   ", 7, True, None, ["resp-1"], {"id": "resp-1"}):
+            with self.subTest(value=value):
+                result = self._normalize(live_chat_response(id=value))
+                self.assertEqual(result.status, INVALID)
+                self.assertEqual(result.safe_error_code, PROVIDER_COMPLETION_EVIDENCE_MISSING)
+                self.assertIsNone(result.candidate_text)
+                self.assertIsNone(result.completion_proof)
+
+    def test_a_provider_assigned_identifier_is_used_when_present(self) -> None:
+        for field in ("id", "response_id", "completion_id"):
+            with self.subTest(field=field):
+                result = self._normalize(live_chat_response(**{field: "resp-500"}))
+                self.assertEqual(result.status, PASS)
+                self.assertEqual(result.completion_proof, COMPLETION_PROOF_PROVIDER_ID)
+                self.assertIn("resp-500", result.completion_evidence_ref)
+                self.assertIn(LIVE_INSTANCE, result.completion_evidence_ref)
+                self.assertNotIn("live-req-1", result.completion_evidence_ref)
+
+    def test_error_body_still_rejects_before_any_text(self) -> None:
+        result = self._normalize(live_chat_response(error={"message": "engine failed"}))
+        self.assertEqual(result.status, UNAVAILABLE)
+        self.assertEqual(result.safe_error_code, PROVIDER_ERROR_REPORTED)
+        self.assertIsNone(result.candidate_text)

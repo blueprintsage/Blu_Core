@@ -66,6 +66,17 @@ PROVIDER_COMPLETION_UNVERIFIED = "PROVIDER_COMPLETION_UNVERIFIED"
 PROVIDER_ERROR_REPORTED = "PROVIDER_ERROR_REPORTED"
 PROVIDER_COMPLETION_EVIDENCE_MISSING = "PROVIDER_COMPLETION_EVIDENCE_MISSING"
 
+# BC-050-C5: what a completion proof actually rests on. A provider profile
+# either assigns a per-completion identifier or it does not; both are truthful,
+# and the difference must be stated rather than papered over. Nothing here
+# licenses inventing an identifier: `SYNCHRONOUS_RESPONSE` asserts that the
+# provider returned a complete synchronous response and assigned no id, which
+# is exactly what LM Studio native REST v1 does with `store: false`.
+COMPLETION_PROOF_PROVIDER_ID = "provider_assigned_completion_id"
+COMPLETION_PROOF_SYNCHRONOUS_RESPONSE = "synchronous_provider_response"
+
+COMPLETION_PROOFS = (COMPLETION_PROOF_PROVIDER_ID, COMPLETION_PROOF_SYNCHRONOUS_RESPONSE)
+
 ROUTE_UNSUPPORTED = "ROUTE_UNSUPPORTED"
 SECURITY_DECISION_NOT_EXECUTABLE = "SECURITY_DECISION_NOT_EXECUTABLE"
 
@@ -177,7 +188,13 @@ class NormalizedModelResult:
     candidate_text: str | None
     output_kinds: tuple[str, ...]
     safe_error_code: str | None = None
+    #: Provider-assigned completion identifier, or None when the provider
+    #: profile assigns none. None is never a placeholder for a value that was
+    #: expected and lost -- `completion_proof` says which case this is.
     completion_evidence_ref: str | None = None
+    #: One of COMPLETION_PROOFS on success. None means the boundary claimed no
+    #: completion proof at all, which cannot become a successful turn.
+    completion_proof: str | None = None
 
 
 @dataclass(frozen=True)
@@ -227,9 +244,15 @@ class TurnReceipt:
     control_decision_ref: str
     validation_result_ref: str
     terminal_packet_ref: str
-    provider_completion_evidence_ref: str
+    #: The provider's own completion identifier, or None when the provider
+    #: assigned none. A receipt states what the provider supplied; it never
+    #: fills this in from a request id, a hash, or the model instance id.
+    provider_completion_evidence_ref: str | None
+    #: Which member of COMPLETION_PROOFS this receipt rests on, so a null
+    #: reference reads as "the provider assigns none" rather than "unknown".
+    provider_completion_proof: str
 
-    def as_dict(self) -> dict[str, str]:
+    def as_dict(self) -> dict[str, str | None]:
         return {
             "request_id": self.request_id,
             "provider_id": self.provider_id,
@@ -240,4 +263,5 @@ class TurnReceipt:
             "validation_result_ref": self.validation_result_ref,
             "terminal_packet_ref": self.terminal_packet_ref,
             "provider_completion_evidence_ref": self.provider_completion_evidence_ref,
+            "provider_completion_proof": self.provider_completion_proof,
         }

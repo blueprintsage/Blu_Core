@@ -31,7 +31,15 @@ from tests.runtime_phase1.support import (
 from blu_runtime import __main__ as runtime_main
 from blu_runtime.adapters.host.terminal import TerminalHostAdapter
 from blu_runtime.canon import loader
-from blu_runtime.contracts.models import BLOCK, INVALID, PASS, UNAVAILABLE, RawHostEvent
+from blu_runtime.contracts.models import (
+    BLOCK,
+    COMPLETION_PROOF_PROVIDER_ID,
+    COMPLETION_PROOF_SYNCHRONOUS_RESPONSE,
+    INVALID,
+    PASS,
+    UNAVAILABLE,
+    RawHostEvent,
+)
 from blu_runtime.providers.model.base import ModelExecutionBoundary
 from blu_runtime.providers.model.lm_studio import LMStudioProvider
 
@@ -111,9 +119,16 @@ class SuccessfulOrdinaryTurnTests(RuntimeHarness):
             "control_decision_ref",
             "validation_result_ref",
             "terminal_packet_ref",
-            "provider_completion_evidence_ref",
+            "provider_completion_proof",
         ):
             self.assertTrue(receipt[field], f"receipt field not bound: {field}")
+        # C5: the provider reference is present as a field and truthfully null
+        # under the stateless native-v1 profile, which the proof names.
+        self.assertIn("provider_completion_evidence_ref", receipt)
+        self.assertIsNone(receipt["provider_completion_evidence_ref"])
+        self.assertEqual(
+            receipt["provider_completion_proof"], COMPLETION_PROOF_SYNCHRONOUS_RESPONSE
+        )
         self.assertEqual(receipt["model_instance_id"], INSTANCE)
         self.assertEqual(receipt["canon_projection_digest"], runtime.projection.digest)
 
@@ -383,14 +398,19 @@ class SlashCommandIngressTests(RuntimeHarness):
 
 
 class CompletionEvidenceTests(RuntimeHarness):
-    """B-07: no success without observed provider completion evidence."""
+    """B-07 as corrected by C5: evidence is observed, absence is stated."""
 
-    def test_missing_completion_evidence_yields_no_success(self) -> None:
+    def test_absent_provider_identifier_still_completes_the_turn(self) -> None:
+        """The live profile assigns no id; that is not a failed completion."""
         runtime = self.boot(chat=chat_response(INSTANCE, "Hello.", evidence_id=None))
         packet = runtime_main.run_turn(runtime, "hello")
-        self.assertNotEqual(packet.status, PASS)
-        self.assertIsNone(packet.public_output)
-        self.assertEqual(runtime.receipts, [])
+        self.assertEqual(packet.status, PASS)
+        self.assertEqual(len(runtime.receipts), 1)
+        receipt = runtime.receipts[0].as_dict()
+        self.assertIsNone(receipt["provider_completion_evidence_ref"])
+        self.assertEqual(
+            receipt["provider_completion_proof"], COMPLETION_PROOF_SYNCHRONOUS_RESPONSE
+        )
 
     def test_boundary_level_result_without_evidence_is_not_success(self) -> None:
         """An otherwise-PASS normalized result with no evidence must not pass."""
@@ -426,11 +446,47 @@ class CompletionEvidenceTests(RuntimeHarness):
         self.assertIsNone(packet.public_output)
         self.assertEqual(runtime.receipts, [])
 
-    def test_no_evidence_identifier_is_synthesized_from_the_request(self) -> None:
+    def test_live_shaped_stateless_turn_reaches_a_public_reply(self) -> None:
+        """C5 end to end: no status, no id, a per-load instance ordinal.
+
+        This is the exact combination the live provider returns and the exact
+        combination that produced `PROVIDER_COMPLETION_UNVERIFIED` before C5.
+        """
+        responding = f"{INSTANCE}:7"
+        document = chat_response(responding, "Hey there.", status=None, evidence_id=None)
+        self.assertNotIn("status", document)
+        self.assertNotIn("id", document)
+
+        runtime = self.boot(chat=document)
+        packet = runtime_main.run_turn(runtime, "Hey, Blu.", request_id="req-live")
+        self.assertEqual(packet.status, PASS)
+        self.assertEqual(packet.public_output, "Hey there")
+        self.assertTrue(packet.model_invoked)
+        self.assertFalse(packet.tool_executed)
+
+        receipt = runtime.receipts[0].as_dict()
+        self.assertEqual(receipt["model_instance_id"], responding)
+        self.assertIsNone(receipt["provider_completion_evidence_ref"])
+        self.assertEqual(
+            receipt["provider_completion_proof"], COMPLETION_PROOF_SYNCHRONOUS_RESPONSE
+        )
+
+    def test_no_evidence_identifier_is_synthesized_when_the_provider_assigns_none(self) -> None:
+        """A completion without a provider id must not acquire one anywhere."""
         runtime = self.boot(chat=chat_response(INSTANCE, "Hello.", evidence_id=None))
-        packet = runtime_main.run_turn(runtime, "hello", request_id="req-xyz")
-        self.assertEqual(runtime.receipts, [])
-        self.assertIsNone(packet.public_output)
+        runtime_main.run_turn(runtime, "hello", request_id="req-xyz")
+        receipt = runtime.receipts[0].as_dict()
+        self.assertIsNone(receipt["provider_completion_evidence_ref"])
+        for field, value in receipt.items():
+            if field in ("provider_completion_evidence_ref", "provider_completion_proof"):
+                continue
+            self.assertNotIn(
+                "completion", str(value), f"{field} carries an invented completion reference"
+            )
+        # The request id correlates Blu's own records and is never promoted
+        # into provider-assigned evidence.
+        self.assertNotIn("req-xyz", str(receipt["provider_completion_evidence_ref"]))
+        self.assertNotIn("req-xyz", receipt["provider_completion_proof"])
 
     def test_successful_receipt_carries_observed_provider_evidence(self) -> None:
         runtime = self.boot(chat=chat_response(INSTANCE, "Hello.", evidence_id="resp-77"))
@@ -524,6 +580,7 @@ class MalformedCompletionEvidenceTests(RuntimeHarness):
                     output_kinds=("message",),
                     safe_error_code=None,
                     completion_evidence_ref=evidence,
+                    completion_proof=COMPLETION_PROOF_PROVIDER_ID,
                 )
 
         return ModelExecutionBoundary(_Provider())

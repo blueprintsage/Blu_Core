@@ -418,8 +418,9 @@ without provider invocation, asserted by test.
 
 ## Live LM Studio smoke test
 
-`not_performed`. No live environment was supplied. No live evidence is
-fabricated or implied.
+`not_performed` through BC-050-C3. No live environment was supplied and no live
+evidence was fabricated or implied. **Performed under BC-050-C4** — see
+"BC-050-C4 correction pass" below for the observed results.
 
 ## BC-050-C1 correction pass
 
@@ -818,3 +819,376 @@ or duplicate paths. Golden verified with
 - N-03 continuity defensive invariant remains carried to the
   continuity-provider phase.
 - BC-020 fixed-base host-adapter guard remains open and unrelated.
+
+
+## BC-050-C4 correction pass
+
+Bounded LM Studio provider-contract correction driven by the first real live
+smoke. Correction base `be19ea16b61088e78850d15662943357fb3ee9b0`, branch
+`bc-050-c4-lmstudio-provider-contract`. One production file changed:
+`src/blu_runtime/providers/model/lm_studio.py`. No architecture, canon,
+envelope, security, host-adapter, or continuity surface was touched.
+
+### The two defects, as the live provider proved them
+
+LM Studio was reachable and the configured model was loaded, yet boot failed
+`UNAVAILABLE PROVIDER_MODEL_ABSENT`. The C3 boundary read two fields the native
+v1 document does not supply.
+
+| Defect | C3 read | Live `/api/v1/models` supplies |
+| --- | --- | --- |
+| D-1 model identity | `record["id"]` | `record["key"]` |
+| D-2 observed capacity | `instance["context_length"]`, falling back to `record["loaded_context_length"]` | `instance["config"]["context_length"]` |
+
+D-2 was latent behind D-1: correcting identity alone would have produced
+`PROVIDER_CONTEXT_UNKNOWN` on the next boot.
+
+### What changed
+
+- Model-record identity is exactly `key`, matched exactly. `display_name`,
+  `publisher`, `format`, and substrings are not identity, and a record-level
+  `id` can no longer claim a configured key. Matching was not loosened; it was
+  moved to the field the provider actually publishes.
+- Observed capacity is read only from `loaded_instances[].config.context_length`
+  — the capacity the instance was actually loaded with. The record-level
+  `max_context_length` describes model capability, not loaded configuration,
+  and is never read as capacity evidence. The former
+  `record["loaded_context_length"]` fallback was removed rather than kept
+  alongside: it was an unobserved spelling, and inferring capacity from a
+  model-level field would report capability as though it were configuration.
+- Loaded-instance identity is unchanged (`instance_id`, then `id`); the live
+  document supplies `id`, which the existing precedence already accepted.
+- `observed_model_key` is now the identity read from the record instead of an
+  echo of the configured key, so the observation reports what was seen.
+
+Fail-closed behavior is unchanged. Absent, null, non-`dict`, non-integer,
+boolean, float, zero, and negative capacity all yield `PROVIDER_CONTEXT_UNKNOWN`;
+capacity below the requested window still yields
+`PROVIDER_CONTEXT_INSUFFICIENT` with the observed value recorded. No capacity
+value is synthesized, defaulted, or inferred.
+
+### Regression coverage
+
+`LiveProviderContractTests` in `tests/runtime_phase1/test_lm_studio_provider.py`
+reproduces the observed live record shape (13 tests): recognition of the live
+record, selection among a multi-model inventory containing unloaded neighbours,
+`display_name` rejected as identity, record `id` rejected as identity,
+a conflicting `id` unable to claim the configured key, six malformed `key`
+forms, not-loaded and identity-less instances, the ten-case malformed-capacity
+matrix, capacity below request, model capability rejected as loaded-instance
+capacity, and incompatible `type` on an otherwise live record.
+
+`tests/runtime_phase1/support.py::model_inventory` now emits the live record
+shape (`key`, `loaded_instances[].id`, `config.context_length`), so the
+end-to-end suite exercises the real contract rather than the shape that
+encoded the defect.
+
+### Live LM Studio smoke — performed 2026-08-14
+
+Environment: Windows 10 Pro, Python 3.12, LM Studio at `http://127.0.0.1:1234`,
+model key `granite-4.0-h-micro` ("Granite 4.0 H Micro"), GGUF, Q4_K_M, loaded
+instance context `1048576`.
+
+The protected policy used for the smoke was the repository's **synthetic** test
+fixture (`synthetic test policy != production protected policy`); the
+production protected policy was not available in this environment. It gates
+OPSEC evaluation only and is not part of the model-execution boundary under
+test.
+
+| Stage | Result |
+| --- | --- |
+| Boot before C4 | `UNAVAILABLE PROVIDER_MODEL_ABSENT` (operator's reproduction) |
+| Boot after C4 | **OK** — `observed_model_key=granite-4.0-h-micro`, `model_instance_id=granite-4.0-h-micro`, observed context `1048576` |
+| Turn, `requested_tokens: 4096` | `UNAVAILABLE PROVIDER_ENDPOINT_UNAVAILABLE` |
+| Turn, `requested_tokens: 16384` | `INVALID PROVIDER_COMPLETION_UNVERIFIED`, `model_invoked: true`, no public output |
+
+The provider boundary this assignment corrects is passed live. The two turn
+failures are the next surface and were deliberately **not** corrected in C4.
+
+### Next-surface evidence captured, not corrected
+
+1. **The Phase-1 envelope does not fit a 4096-token window.** A direct probe
+   with the real 36,887-byte envelope returned HTTP 500 wrapping the engine's
+   `exceed_context_size_error`: `request (8021 tokens) exceeds the available
+   context size (4096 tokens)`. The envelope alone is ~8,021 prompt tokens, so
+   `requested_tokens: 4096` cannot carry it. This is a configuration
+   observation about the smoke config, not a defect in the corrected boundary.
+2. **HTTP error responses are classified as endpoint-unavailable.** LM Studio
+   returned a structured provider error body with an HTTP error status;
+   `urllib.error.HTTPError` is a `URLError` subclass, so `infer` reports
+   `PROVIDER_ENDPOINT_UNAVAILABLE`. The endpoint was reachable and did report an
+   error, which `PROVIDER_ERROR_REPORTED` already describes. Recorded for a
+   separate bounded correction.
+3. **The live chat response carries no `status` and no top-level `id`.** The
+   observed 200 response body was `{model_instance_id, output[], stats{}}`. The
+   B-04 terminal-state assumption and the B-07 completion-evidence identifier
+   assumption are therefore both unconfirmed by this provider; both failed
+   closed exactly as designed (`PROVIDER_COMPLETION_UNVERIFIED`, no public
+   output, no fabricated evidence).
+4. **Chat and inventory report different instance identities.** The chat
+   response asserted `model_instance_id: "granite-4.0-h-micro:2"` while
+   `/api/v1/models` reported the loaded instance as `granite-4.0-h-micro`. Had
+   the completion check passed, `PROVIDER_IDENTITY_MISMATCH` would have
+   followed. This needs its own live-evidenced correction.
+
+### Suites and validators after C4
+
+| Suite | Result |
+| --- | --- |
+| Runtime Phase 1 | **175 OK** (was 162; +13 live-contract tests) |
+| Security | **50 OK** |
+| Readiness | **53 OK** |
+| Continuity | **58 OK** |
+
+Eight validators pass; `validate_host_adapter_contracts.py` still reports the
+known BC-020 fixed-base finding, unchanged and unsuppressed.
+
+Envelope `36887` bytes, digest
+`103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142`, final byte
+`0x5D`. Architecture 7 / 8 / 9. Golden CTS unmodified. `SecurityDecision`
+vocabulary, protected ingress/egress semantics, completion-evidence fail-closed
+handling, authorization-date enforcement, and `/exit` / `/quit` ordinary-ingress
+behavior are all unchanged. `00_Instructions.md` parity was not reopened.
+
+Two working-tree artifacts of the live smoke sit outside the commit and make
+`validate_python_readiness.py` and `validate_continuity_contracts.py` report
+errors while they are present: the untracked operator config `smoke.runtime.json`
+(absent from `MANIFEST.sha256`) and the gitignored `src/blu_runtime.egg-info/`
+build directory left by a local editable install. Neither is repository content
+and neither is caused by C4 — every reported error names one of those two
+artifacts and none names a repository file. Verified by moving both aside and
+re-running: **both validators pass**, after which both artifacts were restored.
+`smoke.runtime.json` was deliberately not committed and not added to the
+manifest; it is the operator's local file, and a manifest entry for it would go
+stale on any checkout that lacks it.
+
+A `git worktree` checkout is not a usable verification vehicle here: this
+Windows clone converts line endings on checkout, so a fresh worktree fails the
+golden checksum and several digest-sensitive validators for reasons unrelated to
+any commit. Golden verification was therefore run in the working clone, where it
+reports zero non-`OK` lines.
+
+## BC-050-C5 correction pass
+
+Bounded completion-proof correction for the LM Studio native REST v1 stateless
+profile, driven by the live turn that C4 unblocked. Correction base
+`ac784f0cb136593b73f65a128eee658918dbb023`, branch
+`bc-050-c5-lmstudio-completion-proof`.
+
+### The defect the live provider proved
+
+After C4, boot succeeded and the model was invoked, but every real completion
+was rejected as `INVALID` with `PROVIDER_COMPLETION_UNVERIFIED` and
+`model_invoked=True`.
+
+The live native-v1 success body is:
+
+```json
+{
+  "model_instance_id": "granite-4.0-h-micro:3",
+  "output": [{"type": "message", "content": "Hey there! ..."}],
+  "stats": {"input_tokens": 30, "total_output_tokens": 27}
+}
+```
+
+Three assumptions in the C3 boundary do not hold against it:
+
+| # | C3 required | Live native v1 with `stream: false`, `store: false` |
+| --- | --- | --- |
+| 1 | a terminal `status` string | no `status` field at all |
+| 2 | a provider-assigned completion id (`id` / `response_id` / `completion_id`) | none — nothing is stored, so nothing is identified |
+| 3 | `model_instance_id` equal to the requested instance | answers with a per-load ordinal: `granite-4.0-h-micro:3` where `/api/v1/models` reported `granite-4.0-h-micro` |
+
+Defect 3 sat behind defects 1 and 2. Removing only the `status` check would
+have moved the same rejection one step later, which the assignment explicitly
+forbids, so all three were corrected together.
+
+### How native-v1 synchronous completion is now verified
+
+`normalize_response` establishes completion before reading any candidate text,
+in this order:
+
+1. body is an object;
+2. no unresolved `error` (timeout-classified errors still map to
+   `PROVIDER_TIMEOUT`, others to `PROVIDER_ERROR_REPORTED`);
+3. `status` **if present** must be a string and must be terminal —
+   non-terminal, error, timeout, and non-string states all still reject. Its
+   absence is normal for this profile and is no longer a rejection;
+4. `model_instance_id` (or `model`) is a non-blank string naming the instance
+   Blu selected;
+5. asserted provider/request identities, when present, must agree;
+6. completion evidence resolves to one of the two proofs below;
+7. `output` is a non-empty list of typed items, tool-call candidates are
+   refused without execution, reasoning never becomes public text, and the
+   assembled message text is non-blank.
+
+`stats` is read nowhere. It cannot become proof of anything.
+
+### Instance identity
+
+`_instance_identity_agrees` accepts the requested identity exactly, or the
+requested identity followed by `:` and a non-empty per-load ordinal. The model
+portion must still match exactly, so `some-other-model:3`,
+`granite-4.0-h-micro-instruct:3`, `granite-4.0-h:3`, `granite-4.0-h-micro:`,
+and `prefix-granite-4.0-h-micro:3` all remain `PROVIDER_IDENTITY_MISMATCH`.
+
+This suffix rule is inferred from three live observations (`:2` twice, `:3`
+once) against an inventory that reported the instance unsuffixed. The published
+LM Studio evidence (LM-EVID-002, LM-EVID-004) records that loaded instances
+carry an identity but does not pin this format. Recorded as a live-evidenced
+inference, not a documented provider guarantee.
+
+### How an absent provider completion id is represented
+
+New vocabulary in `contracts/models.py`:
+
+```text
+COMPLETION_PROOF_PROVIDER_ID           = "provider_assigned_completion_id"
+COMPLETION_PROOF_SYNCHRONOUS_RESPONSE  = "synchronous_provider_response"
+```
+
+- `NormalizedModelResult.completion_proof: str | None` — which proof the
+  boundary established. `None` means it claimed none.
+- `TurnReceipt.provider_completion_evidence_ref: str | None` — was `str`. It is
+  now nullable so a receipt can say "the provider assigned none" instead of
+  being forced to hold something.
+- `TurnReceipt.provider_completion_proof: str` — names which proof the receipt
+  rests on, so a null reference reads as a provider fact rather than as missing
+  data. `as_dict()` returns both keys and is typed `dict[str, str | None]`.
+- `readiness/phase1_executable_slice.json` adds `provider_completion_proof` to
+  `success_receipt_requires` plus a `provider_completion_proof_semantics`
+  statement of what each proof asserts.
+
+`run_turn` no longer tests the reference alone. `_completion_proof_holds`
+requires the proof and the evidence to agree:
+
+| Claimed proof | Required evidence |
+| --- | --- |
+| `provider_assigned_completion_id` | a non-blank string reference (B-07 unchanged) |
+| `synchronous_provider_response` | the reference is exactly `None` |
+| anything else, including none | fails closed |
+
+A provider that returns a successful-looking result while claiming no proof is
+still not a completed turn — the original B-07 defence is intact and still
+covered by `test_boundary_level_result_without_evidence_is_not_success`.
+
+### Proof that no completion id is fabricated
+
+- The only value ever placed in `completion_evidence_ref` is
+  `f"{provider_id}:{instance_id}:{value}"` where `value` came from the provider
+  document. No other assignment to that field exists in the file.
+- When the provider asserts no identifier field, the boundary returns `None`
+  and the receipt stores `None`. There is no uuid, hash, `str()` coercion,
+  request-id fallback, or `model_instance_id` relabelling anywhere on that
+  path.
+- `store` remains `False` in the request payload; it was not flipped to obtain
+  an id. The payload field set is unchanged and still asserted by
+  `test_request_profile_uses_only_evidenced_native_fields`.
+- Tests pin it: `test_nothing_in_the_response_is_recycled_as_a_completion_id`
+  checks the proof carries no instance id, model key, request id, or statistic;
+  `test_no_evidence_identifier_is_synthesized_when_the_provider_assigns_none`
+  scans every other receipt field for an invented completion reference.
+- Absence is not confused with malformation:
+  `test_asserted_but_unusable_identifier_still_fails_closed` keeps `""`,
+  `"   "`, `7`, `True`, `None`, `["resp-1"]`, and `{"id": "resp-1"}` rejecting
+  with `PROVIDER_COMPLETION_EVIDENCE_MISSING`.
+
+### Fail-closed coverage
+
+`test_malformed_live_shaped_responses_fail_closed` runs 24 malformed bodies
+against the live shape — `None`, list, string, and integer bodies; empty
+object; missing, blank, whitespace, null, and non-string `model_instance_id`;
+missing, null, object, and empty `output`; non-dict and untyped output items;
+message without content; null, numeric, blank, and whitespace content;
+unsupported-kinds-only; reasoning-only; malformed content part lists. Every
+case yields a non-`PASS` status, no candidate text, no proof, no reference, a
+safe error code, and no exception.
+
+### Tests changed rather than added
+
+Seven assertions encoded the pre-C5 rule that the authority decision overturns.
+They were re-aimed at the corrected contract, not deleted:
+
+| Test | Was | Now |
+| --- | --- | --- |
+| `test_ordinary_completion_is_accepted` | required a reference | live stateless shape passes with a null reference and a named proof |
+| `test_missing_terminal_completion_evidence_rejects` | absent `status` rejected | renamed `test_absent_terminal_status_is_accepted` |
+| `test_missing_completion_evidence_rejects` | absent id rejected | renamed `test_absent_completion_identifier_is_represented_not_rejected` |
+| `test_receipt_is_evidence_bound` | every receipt field truthy | the proof must be bound; the reference is asserted present-and-null |
+| `test_missing_completion_evidence_yields_no_success` | absence failed the turn | renamed `test_absent_provider_identifier_still_completes_the_turn` |
+| `test_no_evidence_identifier_is_synthesized_from_the_request` | asserted no receipt | asserts a receipt with no invented reference anywhere |
+| `test_valid_evidence_still_succeeds` | evidence without a proof | the synthetic provider now declares `provider_assigned_completion_id` |
+
+`chat_response` in `support.py` now defaults to the live stateless shape (no
+`status`, no `id`, with `stats`), so the end-to-end suite exercises the real
+contract; tests that need either field pass it explicitly.
+
+### Live LM Studio smoke — performed 2026-08-14, full turn PASS
+
+Same environment as C4 (LM Studio at `127.0.0.1:1234`, `granite-4.0-h-micro`,
+loaded context `1048576`, repository synthetic protected-policy fixture,
+`requested_tokens: 16384`).
+
+```text
+BOOT: OK   model_instance_id: granite-4.0-h-micro   context_budget: 16384
+TURN:  status: PASS   safe_error_code: None   model_invoked: True   tool_executed: False
+       public_output: Greetings! How can I assist you today?
+RECEIPT:
+  provider_id                       : lm_studio_native_rest_v1
+  model_instance_id                 : granite-4.0-h-micro:2
+  canon_projection_digest           : 103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142
+  provider_completion_evidence_ref  : None
+  provider_completion_proof         : synchronous_provider_response
+```
+
+The full ordinary-turn path — ingress, control, envelope, live inference,
+normalization, egress, terminal packet, receipt — completes against the real
+provider. The receipt records the observed instance ordinal, states its proof,
+and claims no provider identifier.
+
+The one deviation from the operator's `smoke.runtime.json` is
+`requested_tokens`: 4096 cannot carry the ~8,021-token frozen envelope (C4
+finding 1), so 16384 was used. That remains a configuration decision for the
+operator; no code compensates for it.
+
+### Suites and validators after C5
+
+| Suite | Result |
+| --- | --- |
+| Runtime Phase 1 | **190 OK** (was 175) |
+| Security | **50 OK** |
+| Readiness | **53 OK** |
+| Continuity | **58 OK** |
+
+Eight validators pass; `validate_host_adapter_contracts.py` still reports the
+known BC-020 fixed-base finding. The readiness and continuity validators report
+only the two untracked local smoke artifacts described under C4
+(`smoke.runtime.json`, `src/blu_runtime.egg-info/`); with both moved aside they
+pass, and both were restored.
+
+Envelope `36887` bytes, digest
+`103e0e2dd94183c914dc8c46e3ac376af516382548e17af40c14c27d3319f142`, final byte
+`0x5D`. Architecture 7 / 8 / 9. Golden CTS zero non-`OK` lines. `store: false`,
+stateless provider behavior, no durable continuity, `SecurityDecision`
+vocabulary, protected ingress/egress semantics, authorization-date enforcement,
+`/exit` and `/quit` ordinary-ingress behavior, and the `00_Instructions.md`
+exclusion are all unchanged.
+
+### Remaining risks
+
+- The instance-ordinal rule is inferred from live observation, not from
+  published LM Studio documentation. If LM Studio ever answers with an
+  unrelated instance identity format, turns fail closed with
+  `PROVIDER_IDENTITY_MISMATCH` rather than accepting the wrong model.
+- `PROVIDER_ERROR_REPORTED` is still not used for HTTP-level provider errors
+  (C4 finding 2): an error body returned with an HTTP error status is reported
+  as `PROVIDER_ENDPOINT_UNAVAILABLE`. Unchanged in C5; it is a classification
+  defect, not a truth defect, and belongs to its own bounded correction.
+- The terminal-state vocabulary (`TERMINAL_COMPLETION_STATES` and friends)
+  remains an assumption for providers that do assert a state. Native v1 never
+  exercises it, so it stays unconfirmed by live evidence.
+- Only one provider profile exists, so `synchronous_provider_response` is
+  correct for it by construction. A future provider that does assign ids must
+  declare `provider_assigned_completion_id`; nothing in the runtime prevents a
+  future adapter from declaring the weaker proof incorrectly, so adapter
+  review remains the control there.

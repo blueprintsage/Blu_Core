@@ -721,6 +721,116 @@ SkillForge, or Custom GPT changes. Dad/Blu retains final integration authority.
 
 ---
 
+# BC-050 Final Authority Reconciliation and Freeze Review
+
+status: accepted_and_frozen
+reviewer: Codex
+authority: Dad/Blu
+review_target: `ed76f311976fba62e26356af6c4e145aa8ee2d6e`
+superseded_review_record: `31476a1309589a989d709e45cb8c0fbdce2f7e6a`
+review_date: 2026-08-14
+disposition: approve-with-notes
+
+## Executive result
+
+Disposition: `approve-with-notes`.
+
+Dad/Blu superseded the sole blocking requirement in the immediately preceding
+review. For LM Studio native REST v1 synchronous stateless inference, `stats`
+is non-authoritative telemetry and is not used as completion proof, identity,
+authorization, authentication, security, routing, model-output, continuity, or
+other evidence. Missing or malformed telemetry does not invalidate an otherwise
+structurally valid completion when no authoritative claim depends on it.
+
+That clarification corrects the review requirement; it is not a runtime-code
+waiver. The reviewed C5A implementation already treats `stats` as irrelevant to
+proof. No production correction is authorized or required for that behavior.
+
+No other blocker remains in the C5A review record, and this reconciliation
+identified no new independently reproducible blocker. BC-050 is accepted and
+frozen as the completed Phase-1 experimental/local runtime slice.
+
+## Blocking findings
+
+None.
+
+### C5A-B01 — superseded as a blocker
+
+The prior reproduction remains historically accurate: malformed `stats` was
+ignored and the otherwise valid response completed. Dad/Blu authority now
+establishes that this is the required evidentiary treatment because `stats` is
+irrelevant telemetry. Promoting that malformed telemetry into authoritative
+failure evidence would exceed its role.
+
+Retained nonblocking note: if a future contract makes a public, routing,
+security, authorization, identity, completion-proof, or continuity claim depend
+on a telemetry field, that new use must define and validate the field under its
+own separately authorized contract. BC-050 makes no such claim.
+
+## C5A actual correction targets
+
+### Mandatory native-v1 model instance identity — independently closed
+
+The C5A review at `31476a1309589a989d709e45cb8c0fbdce2f7e6a`
+independently reproduced that missing, blank, whitespace-only, and malformed
+`model_instance_id` values fail closed and that `model` cannot rescue an absent
+instance identity. No coercion, inference, or synthesis was accepted. That
+finding remains authoritative.
+
+### All asserted completion IDs — independently closed
+
+The same review independently reproduced that every asserted `id`,
+`response_id`, and `completion_id` must be a valid nonblank string before
+deterministic selection. A valid field cannot hide a malformed asserted
+sibling. The valid no-ID native-v1 path remains a null reference with
+`synchronous_provider_response` proof; it fabricates nothing, never relabels
+`model_instance_id`, and preserves `store:false`.
+
+## Live LM Studio evidence
+
+Dad/Blu supplied the completed real local-path observation:
+
+```text
+you> Hey, Blu.
+blu> Hello! How can I assist you today?
+```
+
+`live_lm_studio_smoke: PASS`
+
+The accepted evidence covers terminal ingress, Pre-ingress Security Restraint,
+`ordinary_conversation`, Turn Controller, Model Execution Boundary, LM Studio,
+Granite, normalized provider result, Validation and Egress, and terminal reply.
+It is not fixture evidence. Codex did not rerun or fabricate this live
+observation during the documentation reconciliation.
+
+## Freeze and deployment disposition
+
+- BC-050 final status: `accepted and frozen`.
+- No Python Phase 2 or further parity campaign is authorized.
+- No CLI expansion, additional continuity, Auth, tools/MCP, artifacts, or
+  primary-Python deployment work is authorized.
+- ChatGPT Custom GPT is Blu's mandatory primary, family-facing deployment and
+  the next active product workstream.
+- Python/LM Studio is a secondary local capability and portability deployment.
+- One Blu remains authoritative: shared kernel, canon, behavior, and law where
+  applicable; deployment mechanics remain wrapper-specific. This does not
+  require two feature-complete runtimes.
+
+## Scope and change review
+
+This reconciliation changes documentation and review/status records only. No
+production runtime code, golden CTS source, Persona, Operations Law,
+`00_Instructions.md`, 7/8/9 architecture, OPSEC implementation,
+authorization-date behavior, completion-evidence semantics, model envelope,
+Custom GPT implementation, ComfyUI work, or future Python phase was changed or
+started.
+
+## Final disposition
+
+`approve-with-notes`
+
+---
+
 # Final Independent Re-Review After BC-050-C3
 
 status: complete
@@ -972,3 +1082,27 @@ canon, continuity, or provider decisions.
 ## Final disposition
 
 `return-for-correction`
+
+---
+
+# Controlling Final BC-050 Disposition
+
+status: accepted_and_frozen
+authority: Dad/Blu
+reviewer: Codex
+review_date: 2026-08-14
+disposition: approve-with-notes
+
+This is the controlling final disposition. It incorporates the detailed
+authority reconciliation above and supersedes the immediately preceding C5A
+`return-for-correction` disposition and required follow-up. Malformed
+non-authoritative `stats` telemetry is not a blocker and no runtime correction
+is authorized for it. C5A's mandatory `model_instance_id` and
+all-asserted-completion-ID targets remain independently closed.
+
+`live_lm_studio_smoke: PASS`
+
+BC-050 is accepted and frozen. ChatGPT Custom GPT is the mandatory primary
+deployment and next active workstream; Python/LM Studio is secondary local
+capability and portability. No further Python phase or parity work is
+authorized.

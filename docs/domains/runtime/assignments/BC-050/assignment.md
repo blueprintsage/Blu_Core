@@ -1,12 +1,12 @@
 # BC-050 — Python Runtime Phase 1 — Boot + Ordinary Turn + LM Studio Model Boundary
 
-status: active
+status: accepted_and_frozen
 owner: Claude
 reviewer: Codex
 project_lead: Blu
 project_owner: Dad
 domain: runtime
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-14
 
 ## Packet provenance
 
@@ -648,3 +648,93 @@ and Dad/Blu approval. No instruction-file archaeology silently becomes canon.
 
 This amendment does not modify the live Custom GPT. Reducing or removing its
 persistent instruction surface is a separate deployment task.
+
+---
+
+# Amendment — Final Authority Reconciliation and Freeze, 2026-08-14 (Dad/Blu)
+
+This amendment supersedes only the final Codex review requirement recorded at
+`31476a1309589a989d709e45cb8c0fbdce2f7e6a` that malformed LM Studio native-v1
+`stats` telemetry must make an otherwise valid synchronous stateless completion
+fail closed. It authorizes documentation and review reconciliation only. It
+does not waive a runtime requirement, authorize a runtime-code correction, or
+reopen any previously closed behavior or architecture decision.
+
+## LM Studio `stats` authority
+
+For LM Studio native REST v1 synchronous stateless inference, `stats` is
+non-authoritative telemetry. It is not completion proof, provider or completion
+identity, authorization or authentication evidence, security evidence, routing
+evidence, model-output evidence, or continuity evidence. Missing or malformed
+`stats` therefore does not invalidate an otherwise structurally valid
+synchronous completion when no security, authorization, completion-proof,
+routing, or public factual claim depends on those values.
+
+Blu must not promote malformed telemetry into authoritative evidence and need
+not reject a valid model response solely because irrelevant telemetry is
+malformed. The prior Codex blocker is superseded by Dad/Blu authority and may be
+retained only as a nonblocking note.
+
+## C5A findings preserved
+
+The two actual C5A correction targets remain authoritative and independently
+closed at implementation target
+`ed76f311976fba62e26356af6c4e145aa8ee2d6e`:
+
+1. Native-v1 `model_instance_id` is mandatory and never falls back to `model`.
+   Missing, blank, malformed, coerced, inferred, or synthesized instance
+   identity remains invalid.
+2. Every asserted provider completion-ID field — `id`, `response_id`, and
+   `completion_id` — is validated before selection. One valid identifier cannot
+   conceal a malformed asserted sibling. When none is asserted, no completion
+   identifier is fabricated, `model_instance_id` is not relabelled,
+   `synchronous_provider_response` remains the valid stateless proof, and
+   `store:false` remains intact.
+
+## Accepted live evidence
+
+Dad/Blu supplied the real local-path observation:
+
+```text
+you> Hey, Blu.
+blu> Hello! How can I assist you today?
+```
+
+This establishes the ordinary Phase-1 path from terminal ingress through the
+security restraint, ordinary-conversation control, model boundary, LM Studio
+and Granite, normalized provider result, validation and egress, and terminal
+reply.
+
+`live_lm_studio_smoke: PASS`
+
+This is accepted live evidence, not fixture evidence and not a claim that Codex
+personally reran the provider during the documentation reconciliation.
+
+## Final disposition and freeze
+
+With the sole remaining blocker superseded and no new independently
+reproducible blocker identified, the final disposition is
+`approve-with-notes`. BC-050 is `accepted and frozen` as the completed Phase-1
+experimental/local runtime slice.
+
+No additional Python runtime phase or parity campaign is authorized. This
+expressly excludes Python Phase 2, CLI expansion, additional continuity, Auth,
+tools or MCP, artifacts, and any attempt to make Python the primary Blu
+deployment. Future local work requires separate explicit authorization tied to
+a concrete capability need.
+
+## Deployment priority and One-Blu rule
+
+ChatGPT Custom GPT is Blu's mandatory primary, family-facing deployment and the
+next active product workstream. Near-term work prioritizes making that
+deployment correct and useful for the family.
+
+Python/LM Studio is a secondary local capability and portability path. It must
+not replace or delay the Custom GPT. Separately authorized future local work may
+support capabilities unavailable or unsuitable in the hosted environment, such
+as local creative tooling, but this amendment starts none of that work.
+
+There is one Blu: preserve the behavior and law; reconsider the component
+graph. The Blu kernel and canon remain shared authority where applicable;
+deployment mechanics belong in deployment-specific wrappers. One-Blu does not
+require two feature-complete runtime implementations.

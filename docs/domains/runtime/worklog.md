@@ -1,5 +1,42 @@
 # Runtime Worklog
 
+## 2026-08-14 — BC-050 final authority reconciliation and freeze
+
+Codex reconciled final review record
+`31476a1309589a989d709e45cb8c0fbdce2f7e6a` under Dad/Blu's clarified
+authority. The malformed-`stats` finding is no longer blocking because LM
+Studio native-v1 synchronous stateless `stats` is non-authoritative telemetry
+and no BC-050 authoritative claim depends on it. The historical reproduction is
+retained as a note; no production runtime change was authorized or made.
+
+C5A target `ed76f311976fba62e26356af6c4e145aa8ee2d6e` remains independently
+closed on its two real fail-closed targets: mandatory native-v1
+`model_instance_id` with no `model` fallback, and validation of every asserted
+completion-ID field before selection. The valid no-ID synchronous response
+still fabricates nothing and retains `store:false`.
+
+Dad/Blu's real local ordinary-turn evidence is recorded as
+`live_lm_studio_smoke: PASS`. Final disposition is `approve-with-notes` and
+BC-050 is accepted and frozen as the completed Phase-1 experimental/local
+slice.
+
+The assignment record, final review, handoff, validation, global assignment
+index, runtime decision/failure/next-step continuity, and documentation index
+were reconciled. ChatGPT Custom GPT is recorded as Blu's mandatory primary,
+family-facing deployment and next active workstream. Python/LM Studio is
+secondary local capability and portability only. No Python Phase 2, further
+parity, runtime expansion, continuity, Auth, tools/MCP, artifacts, Custom GPT
+implementation, or ComfyUI work was started.
+
+Validation: `git diff --check` passed; exact committed golden blobs matched all
+eight `SHA256SUMS` entries; readiness and continuity manifest checks returned
+zero errors over 312 staged entries; and all nine repository validators passed
+against a raw staged-blob snapshot. The direct Windows checkout and the first
+`git archive` snapshot materialized CRLF golden Markdown and reproduced the
+known checksum limitation, so neither was misreported as a golden defect and no
+golden file was normalized. Runtime suites were not rerun because no runtime,
+test, contract, or readiness behavior changed.
+
 ## BC-050-C5A — Completion Evidence Fail-Closed Micro-Correction
 
 Blu's bounded C5 review found two malformed-response holes. `model_instance_id`

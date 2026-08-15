@@ -1301,3 +1301,99 @@ report only the two untracked local smoke artifacts recorded under C4.
   real id, that response now fails closed rather than being read past. That is
   the intended direction under this assignment, and it would surface as a
   live-smoke observation rather than as silent acceptance.
+
+## Final authority reconciliation validation — 2026-08-14
+
+### Identity and scope
+
+- Reconciliation base and prior Codex review record:
+  `31476a1309589a989d709e45cb8c0fbdce2f7e6a`.
+- Reviewed C5A implementation target:
+  `ed76f311976fba62e26356af6c4e145aa8ee2d6e`.
+- Branch: `bc-050-final-authority-reconciliation`.
+- `git merge-base --is-ancestor 31476a1309589a989d709e45cb8c0fbdce2f7e6a HEAD`:
+  exit `0`; pre-commit HEAD equals the exact review record.
+- Changed-path inspection against `src`, `kernel/golden`, successor/security
+  contracts, tools, tests, readiness, and `pyproject.toml`: no paths.
+- Production runtime code changed: no.
+
+### Documentation checks
+
+```text
+git diff --check
+```
+
+Result: exit `0`, no output.
+
+`MANIFEST.sha256` was regenerated from the complete staged tracked-file set
+using the validators' canonical Git-index byte rule. It remains self-excluding
+with 312 entries.
+
+### Golden integrity and Windows checkout limitation
+
+The direct `sha256sum -c SHA256SUMS` command was unavailable on the PowerShell
+PATH. Calling Git's bundled GNU `sha256sum` directly against this worktree then
+failed to open the CRLF-terminated manifest path names. A PowerShell
+working-tree byte check likewise reported the seven Markdown artifacts as
+mismatched because this isolated Windows worktree materialized CRLF; the CTS
+ZIP passed.
+
+No golden file was normalized, edited, staged, or otherwise changed. The exact
+committed Git blobs were then hashed against `SHA256SUMS`; all seven Markdown
+files and the CTS ZIP returned `OK`. `git diff --name-only -- kernel/golden`
+is empty. This is the repository's recorded canonical-LF/Git-blob validation
+path for a CRLF-materialized Windows checkout.
+
+### Validator execution
+
+The validators were first invoked in the shared worktree. Runtime contracts,
+viability audit, historical archive inventory, and OPSEC passed. Five validators
+that read golden working-tree bytes reported the same seven CRLF checksum
+mismatches; the host-adapter validator also retained the known BC-020 fixed-base
+finding on `contracts/successor/unresolved_register.json`. These are checkout
+materialization and pre-existing fixed-base conditions, not reconciliation
+diffs.
+
+The first `git archive` snapshot inherited the same Windows export filtering and
+reproduced the CRLF failures, so it was rejected as a validation substrate. A
+second temporary snapshot was materialized directly from every staged Git blob,
+with no checkout filter and no golden modification. All nine repository
+validators then returned exit `0`:
+
+| Validator | Result |
+| --- | --- |
+| `validate_runtime_contracts.py` | PASS |
+| `validate_viability_audit.py` | PASS |
+| `validate_historical_archive_inventory.py` | PASS |
+| `validate_historical_behavioral_archaeology.py` | PASS |
+| `validate_successor_kernel_spec.py` | PASS |
+| `validate_opsec_contracts.py` | PASS |
+| `validate_python_readiness.py` | PASS |
+| `validate_continuity_contracts.py` | PASS |
+| `validate_host_adapter_contracts.py` | PASS |
+
+The raw snapshot has no `.git` checkout metadata, so its manifest guards do not
+claim index coverage. The readiness and continuity manifest functions were also
+invoked directly in the real staged worktree; both returned `0` errors against
+all 312 canonical staged entries.
+
+### Live LM Studio evidence
+
+Dad/Blu supplied and accepted the real local ordinary-turn observation:
+
+```text
+you> Hey, Blu.
+blu> Hello! How can I assist you today?
+```
+
+`live_lm_studio_smoke: PASS`
+
+Codex did not substitute fixture evidence or claim to rerun the live provider
+during this documentation-only reconciliation.
+
+### Runtime test disposition
+
+No runtime suite was rerun because no production runtime, tests, contracts, or
+readiness behavior changed. The independent C5A review's recorded runtime 207,
+security 50, readiness 53, and continuity 58 results remain historical target
+evidence; this reconciliation does not relabel them as newly executed.

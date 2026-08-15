@@ -1,6 +1,6 @@
 # BC-050 — Handoff Record
 
-status: ready_for_final_independent_Codex_re_review
+status: accepted_and_frozen
 owner: Claude
 reviewer: Codex
 project_lead: Blu
@@ -540,3 +540,42 @@ frozen invariant are unchanged.
 **Yes.** Micro-correction only: two fail-closed defects, seventeen regression
 tests, no change to C5 success semantics. Not merged; BC-050 is not
 self-closed.
+
+## Final authority reconciliation and freeze handoff
+
+Dad/Blu superseded the malformed-`stats` requirement that was the sole blocker
+in Codex review record `31476a1309589a989d709e45cb8c0fbdce2f7e6a`. Native-v1
+`stats` is non-authoritative telemetry and no BC-050 security, authorization,
+identity, completion-proof, routing, public-output, or continuity claim depends
+on it. No production runtime correction was authorized or made.
+
+The C5A implementation target
+`ed76f311976fba62e26356af6c4e145aa8ee2d6e` remains approved on its two actual
+correction targets: mandatory real `model_instance_id` without `model`
+fallback, and validation of every asserted `id`, `response_id`, and
+`completion_id` before selection. The valid no-ID synchronous path remains
+truthful and stateless.
+
+Dad/Blu accepted the real ordinary-turn evidence and directed the record:
+
+`live_lm_studio_smoke: PASS`
+
+Final disposition is `approve-with-notes`; BC-050 is `accepted and frozen`.
+ChatGPT Custom GPT is the mandatory primary, family-facing deployment and the
+next active workstream. Python/LM Studio is secondary local capability and
+portability only. No Python Phase 2, further parity campaign, CLI expansion,
+continuity, Auth, tool/MCP, artifact, Custom GPT implementation, ComfyUI work,
+or primary-Python deployment work began in this reconciliation.
+
+### Reconciliation identity and files
+
+- Base/review record: `31476a1309589a989d709e45cb8c0fbdce2f7e6a`.
+- C5A implementation target: `ed76f311976fba62e26356af6c4e145aa8ee2d6e`.
+- Branch: `bc-050-final-authority-reconciliation`.
+- Commit: the single commit containing this record; its exact SHA cannot be
+  self-recorded and is reported in Codex's post-commit deliverable.
+- Push/merge status: not pushed and not merged by Codex.
+- Files changed: `MANIFEST.sha256`, `docs/dev/docs_index.md`, the four BC-050
+  assignment records, the runtime continuity quartet, and
+  `docs/worklogs/assignments.md`.
+- Production runtime files changed: none.

@@ -1,5 +1,42 @@
 # Runtime Decisions
 
+## 2026-08-14 — BC-050 final authority reconciliation and freeze
+
+Dad/Blu supersedes the Codex review requirement that malformed LM Studio
+native-v1 `stats` telemetry invalidate an otherwise structurally valid
+synchronous stateless completion. `stats` is non-authoritative telemetry and is
+not completion proof, provider or completion identity, authorization,
+authentication, security, routing, model-output, or continuity evidence. Blu
+must neither promote it into authoritative evidence nor fail a valid response
+solely because irrelevant telemetry is malformed. This corrects the review
+requirement; it is not a code waiver.
+
+C5A's actual fail-closed requirements remain closed and authoritative:
+`model_instance_id` is mandatory with no `model` fallback, coercion, inference,
+or synthesis; and every asserted `id`, `response_id`, and `completion_id` is
+validated before selection. A response may assert none of those completion-ID
+fields, in which case no ID is fabricated, instance identity is not relabelled,
+`synchronous_provider_response` remains the proof, and `store:false` remains
+intact.
+
+The accepted real local ordinary-turn evidence is
+`live_lm_studio_smoke: PASS`. Final disposition is `approve-with-notes`, and
+BC-050 is accepted and frozen as the completed Phase-1 experimental/local
+runtime slice.
+
+No Python Phase 2, further parity campaign, CLI expansion, additional
+continuity, Auth, tools/MCP, artifacts, or attempt to make Python the primary
+Blu deployment is authorized. Future local work requires separate explicit
+authority for a concrete capability need.
+
+ChatGPT Custom GPT is Blu's mandatory primary and family-facing deployment and
+has near-term product priority. Python/LM Studio is a secondary local capability
+and portability path. There remains one Blu: shared kernel, canon, behavior,
+and law stay authoritative where applicable, while deployment mechanics belong
+in deployment-specific wrappers. One-Blu does not require two feature-complete
+runtime implementations. The next active project workstream is Custom GPT
+first.
+
 ## BC-050-C2A — a host instruction surface is not canon
 
 Presence in `00_Instructions.md` is not evidence that a behavior is invariant

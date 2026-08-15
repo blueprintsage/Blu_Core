@@ -2,7 +2,7 @@
 
 status: active
 owner: docs/dev
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-14
 
 ## Read first
 
@@ -206,7 +206,41 @@ general Unicode confusable/homoglyph substitution remain excluded, and
 independent correction review is complete at `f0998f78aaada899a16d4413170ef3689f04fe28`
 with `approve-with-notes` and zero blocking findings. BC-041 and BC-041-C1 are
 closed. Technical readiness remains distinct from implementation authorization;
-Python Runtime Phase 1 remains unstarted and unauthorized.
+at BC-041 closure Python Runtime Phase 1 remained unstarted and unauthorized.
+BC-050 later received its own bounded implementation authorization and final
+freeze disposition below.
+
+## Python Runtime Phase 1 — accepted and frozen
+
+```text
+src/blu_runtime/
+tests/runtime_phase1/
+docs/domains/runtime/assignments/BC-050/
+docs/domains/runtime/decisions.md
+docs/domains/runtime/next_steps.md
+```
+
+BC-050 implements and closes the finite experimental/local Phase-1 ordinary
+conversation slice through terminal ingress, deterministic restraints and
+control, the LM Studio native-v1 model boundary, validation/egress, and a
+terminal reply. C5A's two actual fail-closed targets are closed: native-v1
+`model_instance_id` is mandatory with no `model` fallback, and every asserted
+`id`, `response_id`, and `completion_id` is validated before selection. The
+valid stateless no-ID path fabricates no completion identity and keeps
+`store:false`.
+
+Dad/Blu superseded the final Codex review requirement that malformed
+non-authoritative `stats` telemetry invalidate an otherwise valid synchronous
+completion. Final disposition is `approve-with-notes`, accepted live evidence
+is `live_lm_studio_smoke: PASS`, and BC-050 is accepted and frozen.
+
+ChatGPT Custom GPT is Blu's mandatory primary and family-facing deployment and
+the next active workstream. Python/LM Studio is a secondary local capability and
+portability path. No Python Phase 2, further parity campaign, runtime expansion,
+additional continuity, Auth, tools/MCP, artifacts, or primary-Python deployment
+work is authorized. One-Blu preserves shared behavior, law, kernel, and canon
+where applicable without requiring two feature-complete runtime
+implementations.
 
 ## Historical archive source map
 

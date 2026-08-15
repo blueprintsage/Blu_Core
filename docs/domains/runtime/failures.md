@@ -2,7 +2,25 @@
 
 status: active
 owner: docs/domains/runtime
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-14
+
+## 2026-08-14 — Non-authoritative telemetry is not fail-closed evidence
+
+- **Observed:** the final C5A Codex review promoted malformed LM Studio
+  native-v1 `stats` telemetry into a blocking malformed-response requirement,
+  even though BC-050 uses no statistic as completion proof, identity,
+  authorization, authentication, security, routing, model-output, or continuity
+  evidence.
+- **Unsafe shortcut:** applying fail-closed treatment to every malformed
+  untrusted field without first establishing that the field supports an
+  authoritative claim. That lets irrelevant telemetry reject an otherwise
+  valid synchronous completion and silently expands the evidence contract.
+- **Prevention:** classify each provider field by authority and use. Validate
+  fields that support a security, authorization, identity, routing,
+  completion-proof, output, continuity, or public factual claim. Ignore
+  non-authoritative telemetry when no such claim depends on it; do not promote
+  telemetry into evidence merely because the provider asserted it. A future use
+  of telemetry requires its own explicit contract and validation rule.
 
 ## 2026-08-12 - Removed Cf can erase an outer protected-word boundary
 

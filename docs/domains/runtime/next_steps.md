@@ -1,5 +1,34 @@
 # Runtime Next Steps
 
+## Current authority — Custom GPT first; BC-050 frozen
+
+BC-050 is accepted and frozen with final disposition `approve-with-notes`.
+`live_lm_studio_smoke: PASS` is accepted real local-path evidence. The prior
+malformed-`stats` blocker is superseded by Dad/Blu authority because native-v1
+synchronous stateless `stats` is non-authoritative telemetry. C5A's mandatory
+`model_instance_id` and all-asserted-completion-ID validation requirements
+remain closed and in force.
+
+The next active project workstream is ChatGPT Custom GPT first. It is Blu's
+mandatory primary, family-facing deployment and receives near-term product
+priority. This record authorizes no Custom GPT implementation by itself; that
+work requires its own packet and named base.
+
+Python/LM Studio remains a secondary local capability and portability path. No
+Python Phase 2, further parity campaign, CLI expansion, additional continuity,
+Auth, tools/MCP, artifacts, or primary-Python deployment work is currently
+authorized. Potential local capabilities, including creative tooling such as
+ComfyUI, require a separately authorized concrete need.
+
+One Blu remains the centerline: preserve behavior and law; reconsider the
+component graph. Shared kernel/canon stays authoritative where applicable, and
+deployment-specific mechanics stay in their wrappers. This does not require
+two feature-complete runtime implementations.
+
+All earlier BC-050 "Immediate" and "After BC-050" headings below are retained
+as chronology and are superseded as current next steps by this authority
+decision.
+
 ## Immediate — final independent Codex re-review of BC-050
 
 BC-050-C3 corrected the last three blockers from Codex's second review. All
